@@ -1,0 +1,101 @@
+<div class="container" animate.enter="enter-animation">
+    <div class="logo-and-name">
+        <img class="logo-image" src="images/jarofmessages.png" alt="Jar of Messages logo">
+        <h1>Jar of Messages</h1> 
+    </div>
+
+    <form pFocusTrap class="signup-form" (ngSubmit)="onSubmit()">
+        <p-iconfield>
+            <p-inputicon>
+                <i class="pi pi-envelope"> </i>
+            </p-inputicon>
+            <input 
+                pInputText 
+                type="email" 
+                placeholder="Email" 
+                [fluid]="true" 
+                [formField]="signupForm.username" />
+        </p-iconfield>
+
+        <p-iconfield>
+            <p-inputicon>
+                <i class="pi pi-lock"> </i>
+            </p-inputicon>
+            <input 
+                pInputText  
+                [type]="showPassword() ? 'text' : 'password'"
+                placeholder="Password" 
+                [fluid]="true" 
+                [formField]="signupForm.password" />
+
+            <!-- Eye icon toggle -->
+            <i 
+                class="pi eye-icon-toggle" 
+                onkeypress=""
+                [ngClass]="!showPassword() ? 'pi-eye-slash' : 'pi-eye'"
+                (click)="togglePassword()">
+            </i>
+        </p-iconfield>
+
+        <p-iconfield>
+            <p-inputicon>
+                <i class="pi pi-lock"> </i>
+            </p-inputicon>
+            <input 
+                pInputText  
+                [type]="showConfirmPassword() ? 'text' : 'password'"
+                placeholder="Confirm Password" 
+                [fluid]="true" 
+                [formField]="signupForm.confirmPassword" />
+
+            <!-- Eye icon toggle -->
+            <i 
+                class="pi eye-icon-toggle" 
+                onkeypress=""
+                [ngClass]="!showConfirmPassword() ? 'pi-eye-slash' : 'pi-eye'"
+                (click)="toggleConfirmPassword()">
+            </i>
+        </p-iconfield>
+
+        <div>
+            <p-checkbox [formField]="signupForm.isAcceptedTerm" inputId="accept" [binary]="true" />
+            <label for="accept">I agree to the terms and conditions.</label>
+        </div>
+        <p-button 
+            type="submit" 
+            label="Sign up" 
+            [style]="{'width': '100%'}"
+            [severity]="submitButtonSeverity()"
+            [disabled]="signupForm().invalid()"/>
+    </form>
+    
+    <div class="divider-with-text">
+        <p-divider [style]="'max-width: 450px; width: 100%'" />
+    
+        <span style="white-space: nowrap;">Or Sign up with</span>
+    
+        <p-divider [style]="'max-width: 450px; width: 100%'" />
+    </div>
+
+    <div class="signups-option">
+        <p-button icon="pi pi-google" [rounded]="true" [text]="true" [raised]="true" severity="danger" pTooltip="Google Account" tooltipPosition="top" />
+        <p-button icon="pi pi-facebook" [rounded]="true" [text]="true" [raised]="true" severity="info" pTooltip="Facebook Account" tooltipPosition="top" />
+        <p-button icon="pi pi-github" [rounded]="true" [text]="true" [raised]="true" severity="warn" pTooltip="Github Account" tooltipPosition="top" />
+    </div>
+
+    <div class="divider-with-text">
+        <p-divider [style]="'max-width: 450px; width: 100%'" />
+    
+        <span style="white-space: nowrap;">Or</span>
+    
+        <p-divider [style]="'max-width: 450px; width: 100%'" />
+    </div>
+
+    <p-button 
+        onkeypress=""
+        (click)="navigateToVerifyAccountPage()"
+        label="Verify your registered account" 
+        severity="contrast"
+        [style]="{'width': '100%', 'margin-top': '10px'}"
+        [disabled]="signupForm().invalid()"/>
+</div>

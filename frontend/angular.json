@@ -30,8 +30,12 @@
               }
             ],
             "styles": [
-              "src/styles.scss"
+              "src/styles.scss",
+              "src/_animation.scss"
             ],
+            "stylePreprocessorOptions": {
+              "includePaths": ["src"] 
+            },
             "server": "src/main.server.ts",
             "outputMode": "server",
             "security": {

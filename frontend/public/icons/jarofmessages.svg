@@ -1,0 +1,51 @@
+<svg width="300" height="420" viewBox="0 0 300 420" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Glass gradient -->
+    <linearGradient id="glassGradient" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.7"/>
+      <stop offset="50%" stop-color="#ffffff" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.5"/>
+    </linearGradient>
+
+    <!-- Glow -->
+    <radialGradient id="glow" cx="50%" cy="55%" r="45%">
+      <stop offset="0%" stop-color="#fff3c4" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#fff3c4" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Cork lid -->
+  <ellipse cx="150" cy="60" rx="70" ry="18" fill="#c89b6c"/>
+  <rect x="80" y="60" width="140" height="35" rx="12" fill="#c89b6c"/>
+  <ellipse cx="150" cy="95" rx="70" ry="18" fill="#b8895b"/>
+
+  <!-- Jar body -->
+  <path
+    d="
+      M80 95
+      C65 110, 65 130, 65 150
+      L65 330
+      C65 360, 235 360, 235 330
+      L235 150
+      C235 130, 235 110, 220 95
+      Z"
+    fill="url(#glassGradient)"
+    stroke="#ffffff"
+    stroke-opacity="0.6"
+    stroke-width="4"
+  />
+
+  <!-- Inner glow -->
+  <ellipse cx="150" cy="230" rx="85" ry="100" fill="url(#glow)"/>
+
+  <!-- Highlight -->
+  <path
+    d="
+      M95 120
+      C85 170, 85 260, 95 310"
+    stroke="#ffffff"
+    stroke-opacity="0.35"
+    stroke-width="6"
+    fill="none"
+  />
+</svg>

@@ -1,0 +1,67 @@
+<div class="container" animate.enter="enter-animation">
+    <div class="logo-and-name">
+        <img class="logo-image" src="images/jarofmessages.png" alt="Jar of Messages logo">
+        <h1>Jar of Messages</h1> 
+    </div>
+
+    <form pFocusTrap class="login-form" (ngSubmit)="onSubmit()">
+        <p-iconfield>
+            <p-inputicon>
+                <i class="pi pi-envelope"> </i>
+            </p-inputicon>
+            <input 
+                pInputText 
+                type="email" 
+                placeholder="Email" 
+                [fluid]="true" 
+                [formField]="loginForm.username" />
+        </p-iconfield>
+
+        <p-iconfield>
+            <p-inputicon>
+                <i class="pi pi-lock"> </i>
+            </p-inputicon>
+            <input 
+                pInputText  
+                [type]="showPassword() ? 'text' : 'password'"
+                placeholder="Password" 
+                [fluid]="true" 
+                [formField]="loginForm.password" />
+
+            <!-- Eye icon toggle -->
+            <i 
+                class="pi eye-icon-toggle" 
+                onkeypress=""
+                [ngClass]="!showPassword() ? 'pi-eye-slash' : 'pi-eye'"
+                (click)="toggleWithAutoHidePassword()">
+            </i>
+        </p-iconfield>
+
+        <div>
+            <p-checkbox [formField]="loginForm.isAcceptedTerm" inputId="accept" [binary]="true" />
+            <label for="accept">I agree to the terms and conditions.</label>
+        </div>
+        <p-button 
+            type="submit" 
+            label="Sign in" 
+            [style]="{'width': '100%'}"
+            [severity]="submitButtonSeverity()"
+            [disabled]="loginForm().invalid()"/>
+    </form>
+
+    <div class="divider-with-text">
+        <p-divider [style]="'max-width: 450px; width: 100%'" />
+    
+        <span>Or</span>
+    
+        <p-divider [style]="'max-width: 450px; width: 100%'" />
+    </div>
+
+    <p-button 
+        label="Sign up" 
+        [style]="{'width': '100%'}"
+        [severity]="'success'"
+        onkeypress=""
+        (click)="navigateToSignupPage()" />
+     
+</div>
