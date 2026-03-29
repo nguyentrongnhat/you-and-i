@@ -22,8 +22,9 @@ public class JwtServiceImpl implements JwtService {
 
     public String generateAccessToken(UserDetails user) {
         return Jwts.builder()
-                .issuer("you_and_i")
+                .issuer(Constants.SYSTEM_NAME)
                 .subject(user.getUsername())
+                .claim("type", Constants.TOKEN_TYPE_ACCESS_TOKEN)
                 .claim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
                 .issuedAt(new Date())
                 .expiration(Date.from(Instant.now().plusSeconds(Constants.ACCESS_TOKEN_MAX_AGE)))
@@ -33,8 +34,9 @@ public class JwtServiceImpl implements JwtService {
 
     public String generateRefreshToken(UserDetails user) {
         return Jwts.builder()
-                .issuer("you_and_i")
+                .issuer(Constants.SYSTEM_NAME)
                 .subject(user.getUsername())
+                .claim("type", Constants.TOKEN_TYPE_REFRESH_TOKEN)
                 .issuedAt(new Date())
                 .expiration(Date.from(Instant.now().plusSeconds(Constants.REFRESH_TOKEN_MAX_AGE)))
                 .signWith(key, Jwts.SIG.HS256)

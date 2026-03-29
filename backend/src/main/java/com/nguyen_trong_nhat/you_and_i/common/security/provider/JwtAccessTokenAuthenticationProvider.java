@@ -1,6 +1,6 @@
 package com.nguyen_trong_nhat.you_and_i.common.security.provider;
 
-import com.nguyen_trong_nhat.you_and_i.common.security.authentication.JwtAuthenticationToken;
+import com.nguyen_trong_nhat.you_and_i.common.security.authentication.JwtAccessTokenAuthentication;
 import com.nguyen_trong_nhat.you_and_i.common.security.service.impl.JwtServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -16,12 +16,13 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class JwtAuthenticationProvider implements AuthenticationProvider {
+public class JwtAccessTokenAuthenticationProvider implements AuthenticationProvider {
 
     private final JwtServiceImpl jwtService;
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+
         String token = (String) authentication.getCredentials();
 
         if (!jwtService.isTokenValid(token)) {
@@ -36,11 +37,11 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
 
         UserDetails userDetails = new User(username, null, authorities);
 
-        return new JwtAuthenticationToken(userDetails, authorities);
+        return new JwtAccessTokenAuthentication(userDetails, authorities);
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return JwtAuthenticationToken.class.isAssignableFrom(authentication);
+        return JwtAccessTokenAuthentication.class.isAssignableFrom(authentication);
     }
 }

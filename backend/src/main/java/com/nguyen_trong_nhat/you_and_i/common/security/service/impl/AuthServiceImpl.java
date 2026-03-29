@@ -3,8 +3,8 @@ package com.nguyen_trong_nhat.you_and_i.common.security.service.impl;
 import com.nguyen_trong_nhat.you_and_i.common.dto.UsernamePasswordSignupRequest;
 import com.nguyen_trong_nhat.you_and_i.common.exception.BadRequestException;
 import com.nguyen_trong_nhat.you_and_i.common.exception.ErrorConstant;
-import com.nguyen_trong_nhat.you_and_i.common.security.authentication.JwtAuthenticationToken;
 import com.nguyen_trong_nhat.you_and_i.common.dto.LoginResponse;
+import com.nguyen_trong_nhat.you_and_i.common.security.authentication.JwtRefreshTokenAuthentication;
 import com.nguyen_trong_nhat.you_and_i.common.security.service.AuthService;
 import com.nguyen_trong_nhat.you_and_i.features.mail.service.MailService;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
@@ -45,7 +45,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public LoginResponse refreshTokenAuthenticate(String refreshToken) {
-        Authentication authentication = new JwtAuthenticationToken(refreshToken);
+        Authentication authentication = new JwtRefreshTokenAuthentication(refreshToken);
         UserDetails user = this.authenticate(authentication);
         String accessToken = jwtService.generateAccessToken(user);
         String newRefreshToken = jwtService.generateRefreshToken(user);

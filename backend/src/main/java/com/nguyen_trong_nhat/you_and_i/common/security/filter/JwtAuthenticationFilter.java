@@ -1,6 +1,6 @@
 package com.nguyen_trong_nhat.you_and_i.common.security.filter;
 
-import com.nguyen_trong_nhat.you_and_i.common.security.authentication.JwtAuthenticationToken;
+import com.nguyen_trong_nhat.you_and_i.common.security.authentication.JwtAccessTokenAuthentication;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,7 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String header = req.getHeader("Authorization");
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
-            JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(token);
+            JwtAccessTokenAuthentication authenticationToken = new JwtAccessTokenAuthentication(token);
             try {
                 var authResult = authenticationManager.authenticate(authenticationToken);
                 SecurityContextHolder.getContext().setAuthentication(authResult);
