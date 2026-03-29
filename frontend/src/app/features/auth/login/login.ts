@@ -16,10 +16,10 @@ import { PasswordModule } from 'primeng/password';
 import { ROUTE_PATHS } from '../../../core/constants/route-paths';
 import { MESSAGE_TYPE, STORAGE_KEY } from '../../../core/enums';
 import { UsernamePasswordLoginResponse } from '../../../core/interfaces/user.dtos';
-import { AuthService } from '../../../services/auth.service';
 import { PlatformService } from '../../../services/platform.service';
 import { SessionStorageService } from '../../../services/session-storage.service';
 import { ToastService } from '../../../services/toast.service';
+import { AuthService } from '../services/auth.service';
 
 export interface LoginModel {
   username: string,

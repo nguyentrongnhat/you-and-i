@@ -2,10 +2,10 @@ import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, catchError, filter, switchMap, take, throwError } from 'rxjs';
-import { AuthService } from '../../services/auth.service';
 import { PlatformService } from '../../services/platform.service';
 import { API_ENDPOINTS } from '../constants/api-endpoints';
 import { ROUTE_PATHS } from '../constants/route-paths';
+import { AuthService } from '../../features/auth/services/auth.service';
 
 let isRefreshingToken = false;
 const refreshTokenSubject = new BehaviorSubject<string | null>(null);

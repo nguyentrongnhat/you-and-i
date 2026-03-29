@@ -1,8 +1,8 @@
 import { inject, Injectable, signal } from "@angular/core";
-import { UsernamePasswordLoginResponse } from "../core/interfaces/user.dtos";
-import { SignupModel } from "../features/auth/signup/signup";
-import { HttpClientService } from "./http-client.service";
-import { API_ENDPOINTS } from "../core/constants/api-endpoints";
+import { HttpClientService } from "../../../services/http-client.service";
+import { UsernamePasswordLoginResponse } from "../../../core/interfaces/user.dtos";
+import { API_ENDPOINTS } from "../../../core/constants/api-endpoints";
+import { SignupModel } from "../signup/signup";
 
 @Injectable({
     providedIn: 'root'

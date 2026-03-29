@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { form, FormField } from '@angular/forms/signals';
 import { Router } from '@angular/router';
@@ -12,10 +12,11 @@ import { InputIconModule } from 'primeng/inputicon';
 import { InputOtp } from 'primeng/inputotp';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
-import { AuthService } from '../../../services/auth.service';
 import { PlatformService } from '../../../services/platform.service';
 import { SessionStorageService } from '../../../services/session-storage.service';
 import { ToastService } from '../../../services/toast.service';
+import { AuthService } from '../services/auth.service';
+import { VerifyAccountService } from '../services/verify-account.service';
 
 export interface SignupModel {
   username: string,
@@ -55,10 +56,13 @@ export enum PASSWORD_FIELD_TYPE {
   templateUrl: './verify-account.html',
   styleUrl: './verify-account.scss',
 })
-export class VerifyAccount{
+export class VerifyAccount implements OnInit {
+  
   protected platformService = inject(PlatformService);
 
   private readonly authService = inject(AuthService);
+
+  private readonly verifyAccountService = inject(VerifyAccountService);
 
   protected sessionStorageService = inject(SessionStorageService);
 
@@ -75,6 +79,17 @@ export class VerifyAccount{
   );
 
   protected isRequested = signal<boolean>(false);
+
+  ngOnInit(): void {
+    if(this.verifyAccountService.emailToBeVerified) {
+      initialData.username = this.verifyAccountService.emailToBeVerified;
+      this.signupModel.set(initialData);
+    }
+    if(this.verifyAccountService.isVerificationCodeSent) {
+      this.isRequested.set(true);
+      this.verifyAccountService.isVerificationCodeSent = false;
+    }
+  }
 
   protected onSubmit() {
     console.log('submit code')

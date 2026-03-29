@@ -17,10 +17,11 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ROUTE_PATHS } from '../../../core/constants/route-paths';
 import { MESSAGE_TYPE } from '../../../core/enums';
 import { UsernamePasswordLoginResponse } from '../../../core/interfaces/user.dtos';
-import { AuthService } from '../../../services/auth.service';
 import { PlatformService } from '../../../services/platform.service';
 import { SessionStorageService } from '../../../services/session-storage.service';
 import { ToastService } from '../../../services/toast.service';
+import { AuthService } from '../services/auth.service';
+import { VerifyAccountService } from '../services/verify-account.service';
 
 export interface SignupModel {
   username: string,
@@ -73,6 +74,8 @@ export class Signup {
 
   private readonly authService = inject(AuthService);
 
+  private readonly verifyAccountService = inject(VerifyAccountService);
+
   protected sessionStorageService = inject(SessionStorageService);
 
   protected toastService = inject(ToastService);
@@ -106,16 +109,14 @@ export class Signup {
     this.authService.signup(signupData).subscribe({
       next: (res: UsernamePasswordLoginResponse) => {
         console.log('res sign up: ', res)
-        // this.authService.setAccessToken(res.accessToken);
-        // const redirectUrl = this.sessionStorageService.getItem(STORAGE_KEY.REDIRECT_URL);
 
-        // if (redirectUrl) {
-        //   this.sessionStorageService.removeItem(STORAGE_KEY.REDIRECT_URL);
-        //   this.router.navigateByUrl(redirectUrl);
-        // } 
-        // else {
-        //   this.router.navigateByUrl(ROUTE_PATHS.HOME);
-        // }
+        const toastSummary = 'Registration successful!';
+        const toastDetail = 'We\'ve sent a verification code to your email. Please enter the code to confirm your email address.';
+        this.toastService.showToast(MESSAGE_TYPE.SUCCESS, toastSummary, toastDetail);
+
+        this.verifyAccountService.emailToBeVerified = signupData.username;
+        this.verifyAccountService.isVerificationCodeSent = true;
+        this.navigateToVerifyAccountPage();
       },
       error: err => {
         const toastSummary = 'Sign up failed';

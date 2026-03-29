@@ -7,8 +7,14 @@ import { MESSAGE_TYPE } from "../core/enums";
 })
 export class ToastService {
     constructor(protected messageService: MessageService) {}
+    displayTime: number = 7000;
 
     public showToast(messageType: MESSAGE_TYPE, summary: string, detail: string) {
-        this.messageService.add({ severity: messageType, summary, detail });
+        this.messageService.add({ 
+            severity: messageType, 
+            summary, 
+            detail, 
+            life: this.displayTime 
+        });
     }
 }
