@@ -72,9 +72,9 @@ public class AuthServiceImpl implements AuthService {
             throw new BadRequestException(ErrorConstant.USERNAME_ALREADY_REGISTERED);
         }
 
-        MyUserDetail user = userService.createUserWithUsernameAndPassword(signupData.getUsername(), signupData.getPassword());
+        MyUserDetail newUser = userService.createUserWithUsernameAndPassword(signupData.getUsername(), signupData.getPassword());
 
-        MyUserDetail newUser = userRepository.save(user);
+        newUser = userRepository.save(newUser);
 
         UserVerification uv = userService.createUserVerificationCode(newUser);
 
