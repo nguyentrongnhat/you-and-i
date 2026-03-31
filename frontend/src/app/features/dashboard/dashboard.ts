@@ -53,5 +53,17 @@ export class Dashboard{
       }
     })
   }
+
+  startGame() {
+    console.log('start game')
+    this.http.get('http://localhost:8080/api/game/find-number-game').pipe(take(1)).subscribe({
+      next: (res) => {
+        console.log("game info: ", res);
+      },
+      error: (err) => {
+        console.log(err)
+      }
+    })
+  }
   
 }
