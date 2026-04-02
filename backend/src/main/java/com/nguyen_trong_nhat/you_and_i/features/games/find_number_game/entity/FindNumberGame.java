@@ -29,7 +29,7 @@ public class FindNumberGame extends BaseEntity {
 
     private Instant endTime;
 
-    private int timeToFinish;
+    private String timeToFinish;
 
     private int bonusTime;
 }

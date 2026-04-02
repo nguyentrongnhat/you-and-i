@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS find_number_games (
     start_time TIMESTAMP,
     end_time TIMESTAMP,
 
-    time_to_finish INTEGER NOT NULL DEFAULT 0,
+    time_to_finish VARCHAR(10),
     bonus_time INTEGER NOT NULL DEFAULT 0,
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

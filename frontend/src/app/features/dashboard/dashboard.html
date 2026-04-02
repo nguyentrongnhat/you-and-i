@@ -6,4 +6,16 @@
     <p-button onkeydown="" (click)="sendMail()">Test mail</p-button>
     <p-button onkeydown="" (click)="refreshToken()">refresh token</p-button>
     <p-button onkeydown="" (click)="startGame()">start new game</p-button>
+    <p-button onkeydown="" (click)="stopTimer()">Finish game</p-button>
+</div>
+
+<h1 class="display-time">{{ timeToDisplay() }}</h1>
+
+<div class="histories">
+    @for(history of gameHistories(); track history) {
+        <div class="history">
+            <div class="date">Date: {{ history.startTime | date:'dd/MM/yyyy - hh:mm:ss a' }}</div>
+            <div class="score" style="margin-left: 50px;">Time to Finish: {{ convertTimerToTimeDisplay(history.timeToFinish) }}</div>
+        </div>
+    }
 </div>
