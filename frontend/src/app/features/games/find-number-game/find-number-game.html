@@ -1,0 +1,15 @@
+<div class="wrapper">
+
+  <button (click)="shuffle()">Shuffle 😏</button>
+
+  <div 
+    class="grid-container"
+    [style.gridTemplateColumns]="'repeat(' + columns() + ', 1fr)'"
+  >
+    @for(item of numbers(); track item) {
+        <app-number [data]="item"></app-number>
+    }
+    
+  </div>
+
+</div>

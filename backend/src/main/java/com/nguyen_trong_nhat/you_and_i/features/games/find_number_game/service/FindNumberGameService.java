@@ -22,6 +22,7 @@ public class FindNumberGameService {
     private final UserRepository userRepository;
 
     public FindNumberGame createNewGame(String userName, CreateNewFindNumberGameRequest gameInfo) {
+
         Optional<MyUserDetail> playerOpt = userRepository.findByUsername(userName);
 
         if(playerOpt.isEmpty()) throw new BadRequestException("");
@@ -29,11 +30,15 @@ public class FindNumberGameService {
         MyUserDetail player = playerOpt.get();
 
         var gamesAreNotFinish = findNumberGameRepository.findByEndTimeIsNull();
+
         findNumberGameRepository.deleteAll(gamesAreNotFinish);
 
         var newGame = new FindNumberGame();
+
         newGame.setBonusTime(0);
+
         newGame.setStartTime(gameInfo.getStartTime());
+
         newGame.setPlayer(player);
 
         newGame = findNumberGameRepository.save(newGame);
@@ -41,8 +46,11 @@ public class FindNumberGameService {
         return newGame;
     }
 
+
     public FindNumberGame finishGame(String userName, FinishFindNumberGameRequest gameInfo) {
+
         Optional<FindNumberGame> gameOpt = findNumberGameRepository.findById(gameInfo.getGameId());
+
         if(gameOpt.isEmpty()) throw new BadRequestException("");
 
         FindNumberGame game = gameOpt.get();
@@ -52,12 +60,15 @@ public class FindNumberGameService {
         }
 
         game.setTimeToFinish(gameInfo.getTimeToFinish());
+
         game.setEndTime(gameInfo.getEndTime());
 
         return findNumberGameRepository.save(game);
     }
 
+
     public List<FindNumberGameHistoryResponse> getGameHistory(String userName) {
+
         Optional<MyUserDetail> playerOpt = userRepository.findByUsername(userName);
 
         if(playerOpt.isEmpty()) throw new BadRequestException("");

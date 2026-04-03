@@ -52,6 +52,14 @@ export const routes: Routes = [
     }
   },
   {
+    path: ROUTE_PATHS.FIND_NUMBER_GAME,
+    loadComponent: () => import('./features/games/find-number-game/find-number-game').then(c => c.FindNumberGame),
+    data: {
+      animation: 'SignUpPage',
+      layout: LAYOUT.EMPTY_LAYOUT
+    }
+  },
+  {
     path: '**',
     redirectTo: ''
   }
