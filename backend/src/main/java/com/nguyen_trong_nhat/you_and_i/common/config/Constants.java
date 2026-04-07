@@ -6,7 +6,7 @@ public class Constants {
     public static final String TOKEN_TYPE_ACCESS_TOKEN = "access_token";
     public static final String TOKEN_TYPE_REFRESH_TOKEN = "refresh_token";
     public static final Integer REFRESH_TOKEN_MAX_AGE = 3600;
-    public static final Integer ACCESS_TOKEN_MAX_AGE = 20;
+    public static final Integer ACCESS_TOKEN_MAX_AGE = 300;
 
     // Otp Const
     public static final Integer OTP_LENGTH = 6;
