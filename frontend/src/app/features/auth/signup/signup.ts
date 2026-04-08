@@ -98,11 +98,12 @@ export class Signup {
     this.signupForm().invalid() ? 'secondary' : 'success'
   );
 
+
   protected onSubmit() {
     if (this.signupForm().invalid()) return;
-
     this.signup(this.signupModel());
   }
+
 
   private signup(signupData: SignupModel) {
     console.log('sign up username: ', signupData)
@@ -122,14 +123,19 @@ export class Signup {
         const toastSummary = 'Sign up failed';
         const toastDetail = err.error.message;
         console.log('Login error: ', err);
-        this.toastService.showToast(MESSAGE_TYPE.WARN, toastSummary, toastDetail);
+        
+        this.toastService.showToast(
+          MESSAGE_TYPE.WARN, toastSummary, 
+          toastDetail);
       }
     })
   }
 
+
   protected navigateToVerifyAccountPage(): void {
     this.router.navigateByUrl(ROUTE_PATHS.VERIFY_ACCOUNT)
   }
+
 
   private toggleWithAutoHide(toggleStatus: WritableSignal<boolean>, timeoutRef?: ReturnType<typeof setTimeout>) {
     toggleStatus.update(currentStatus => !currentStatus);
@@ -147,11 +153,19 @@ export class Signup {
     }
   }
 
+
   protected togglePassword() {
-    this.toggleWithAutoHide(this.showPassword, this.togglePasswordTimeout);
+    this.toggleWithAutoHide(
+      this.showPassword, 
+      this.togglePasswordTimeout
+    );
   }
 
+
   protected toggleConfirmPassword() {
-    this.toggleWithAutoHide(this.showConfirmPassword, this.toggleConfirmPasswordTimeout);
+    this.toggleWithAutoHide(
+      this.showConfirmPassword, 
+      this.toggleConfirmPasswordTimeout
+    );
   }
 }

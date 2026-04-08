@@ -1,14 +1,14 @@
-<div
+<div class="grid-item">
+  <div
     onkeypress=""
-    (click)="selected(data()?.value)"
-    class ="grid-item"
-    [style.color]="data()?.textColor"
-    [style.transform]="
-        'rotate(' + data()?.rotate + 'deg) ' +
-        'translate(' + data()?.tx + 'px,' + data()?.ty + 'px) ' +
-        'scale(' + data()?.scale + ')'
-    "
->
-    <div class="item" [ngClass]="{'selected': isSelected()}"> {{ data()?.value }}</div>
- 
+    class="item"
+    [ngClass]="{
+      'selected': isSelected(),
+      'indicate': isIndicate()
+    }"
+    (click)="onSelect()"
+    [ngStyle]="getTransform()"
+  >
+    <canvas #numberCanvas></canvas>
+  </div>
 </div>

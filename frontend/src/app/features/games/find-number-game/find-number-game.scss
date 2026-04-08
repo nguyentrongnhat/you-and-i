@@ -1,13 +1,6 @@
-// ========================
-// VARIABLES
-// ========================
-$gap: 6px;
 $transition: 0.35s ease;
 $shadow-main: 0 6px 14px rgba(0, 0, 0, 0.25);
 
-// ========================
-// WRAPPER
-// ========================
 .wrapper {
   padding: 16px;
 
@@ -33,20 +26,18 @@ $shadow-main: 0 6px 14px rgba(0, 0, 0, 0.25);
       transform: scale(0.95);
     }
   }
-}
 
-// ========================
-// GRID CONTAINER
-// ========================
-.grid-container {
-  width: min(95%, 1100px);
-  margin: auto;
-  display: grid;
-  gap: $gap;
+  .grid-container {
+    width: min(95%, 1500px);
+    margin: auto;
+    display: grid;
+    gap: 30px;
 
-  grid-template-columns: repeat(10, 1fr);
+    grid-template-columns: repeat(10, 1fr);
 
-  @media (max-width: 768px) {
-    grid-template-columns: repeat(5, 1fr);
+    @media (max-width: 768px) {
+      grid-template-columns: repeat(5, 1fr);
+      gap: 30px;
+    }
   }
 }

@@ -1,19 +1,13 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Component, computed, HostListener, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
+import { AfterViewInit, Component, computed, HostListener, inject, OnDestroy, OnInit, PLATFORM_ID, signal } from '@angular/core';
 import { Number } from './components/number/number';
 
-type GridItem = {
+export type NumberData = {
   value: number;
   rotate: number;
   tx: number;
   ty: number;
-  scale: number;
-  color: string;
-  textColor: string;
   fontSize: number;
-  zIndex: number;
-  originX: number;
-  originY: number;
 };
 
 @Component({
@@ -22,7 +16,8 @@ type GridItem = {
   templateUrl: './find-number-game.html',
   styleUrl: './find-number-game.scss',
 })
-export class FindNumberGame implements OnInit {
+export class FindNumberGame implements OnInit, OnDestroy, AfterViewInit {
+ 
 
   private readonly platformId = inject(PLATFORM_ID);
 
@@ -30,7 +25,11 @@ export class FindNumberGame implements OnInit {
 
   columns = computed(() => this.screenWidth() < 768 ? 5 : 10);
 
-  numbers = signal<GridItem[]>(this.generateItems());
+  numbers = signal<NumberData[]>(this.generateItems());
+
+  currentNumber = signal<number>(0);
+
+  ready = false;
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
@@ -38,7 +37,21 @@ export class FindNumberGame implements OnInit {
     }
   }
 
-  // ✅ resize an toàn
+  ngAfterViewInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      this.screenWidth.set(window.innerWidth);
+
+      setTimeout(() => {
+        this.ready = true;
+      });
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.currentNumber.set(0);
+  }
+
+
   @HostListener('window:resize')
   onResize() {
     if (isPlatformBrowser(this.platformId)) {
@@ -46,7 +59,8 @@ export class FindNumberGame implements OnInit {
     }
   }
 
-  generateItems(): GridItem[] {
+
+  private generateItems(): NumberData[] {
     const arr = Array.from({ length: 100 }, (_, i) => i + 1);
 
     for (let i = arr.length - 1; i > 0; i--) {
@@ -55,32 +69,36 @@ export class FindNumberGame implements OnInit {
     }
 
     return arr.map(num => {
-      const hue = this.random(0, 360);
-      const lightness = this.random(40, 70);
-
-      const bgColor = `hsl(${hue}, 80%, ${lightness}%)`;
-
       return {
         value: num,
-        rotate: this.random(-120, 120),
-        tx: this.random(-20, 20),
-        ty: this.random(-50, 20),
-        scale: this.random(0.8, 1.5),
-        color: bgColor,
-        textColor: '#000',
-        fontSize: this.random(12, 22),
-        zIndex: Math.floor(this.random(1, 50)),
-        originX: this.random(0, 100),
-        originY: this.random(0, 100),
+        rotate: this.random(-180, 170),
+        tx: this.random(0, 100),
+        ty: this.random(0, 100),
+        fontSize: this.random(13, 20)
       };
     });
   }
 
-  random(min: number, max: number) {
+
+  private random(min: number, max: number) {
     return Math.random() * (max - min) + min;
   }
 
-  shuffle() {
+
+  protected shuffle() {
     this.numbers.set(this.generateItems());
+  }
+
+
+  public selectNumber() {
+    if(this.currentNumber() < 99) {
+      this.currentNumber.update((number) => number + 1);
+      console.log('selected: ', this.currentNumber())
+      //this.shuffle();
+    }
+
+    else {
+      console.log('Finish game')
+    }
   }
 }

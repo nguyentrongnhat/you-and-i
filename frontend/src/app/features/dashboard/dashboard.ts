@@ -5,6 +5,7 @@ import { take } from 'rxjs';
 import { UsernamePasswordLoginResponse } from '../../core/interfaces/user.dtos';
 import { AuthService } from '../auth/services/auth.service';
 import { DatePipe } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -13,17 +14,19 @@ import { DatePipe } from '@angular/common';
   styleUrl: './dashboard.scss',
 })
 export class Dashboard{
-  private readonly http = inject(HttpClient);
+
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly httpClient = inject(HttpClient)
+
   public title = signal<string>('')
   public callGetTextNum = 0;
 
-  private readonly authService = inject(AuthService);
 
   isStarted = signal<boolean>(false);
   timer: number = 0;
   timeToDisplay = signal<string>('00 : 00 : 00')
   timeInterval!: ReturnType<typeof setInterval>;
-  httpClient = inject(HttpClient)
   currentGameId: number = 0;
   gameHistories = signal<any[]>([]);
 
@@ -33,7 +36,7 @@ export class Dashboard{
   }
 
   getText() {
-    this.http.get('http://localhost:8080', { responseType: 'text' }).pipe(take(1)).subscribe({
+    this.httpClient.get('http://localhost:8080', { responseType: 'text' }).pipe(take(1)).subscribe({
       next: res => {
         this.callGetTextNum++;
         this.title.set(res + ' : ' + this.callGetTextNum)
@@ -58,7 +61,7 @@ export class Dashboard{
 
   sendMail() {
     console.log('send mail')
-    this.http.get('http://localhost:8080/mail/test').pipe(take(1)).subscribe({
+    this.httpClient.get('http://localhost:8080/mail/test').pipe(take(1)).subscribe({
       next: (res) => {
         console.log('OK');
       },
@@ -70,20 +73,21 @@ export class Dashboard{
 
   startGame() {
     console.log('start game')
-    this.http.post('http://localhost:8080/api/game/find-number-game', {startTime: new Date()}).pipe(take(1)).subscribe({
-      next: (res: any) => {
-        console.log("game info: ", res);
-        this.currentGameId = res.gameId
-        this.isStarted.set(true);
-        this.timeInterval = setInterval(() => {
-          this.timer ++;
-          this.timeToDisplay.set(this.convertTimerToTimeDisplay(this.timer));
-        }, 1000)
-      },
-      error: (err) => {
-        console.log(err)
-      }
-    })
+    this.router.navigateByUrl('game/find-number-game')
+    // this.httpClient.post('http://localhost:8080/api/game/find-number-game', {startTime: new Date()}).pipe(take(1)).subscribe({
+    //   next: (res: any) => {
+    //     console.log("game info: ", res);
+    //     this.currentGameId = res.gameId
+    //     this.isStarted.set(true);
+    //     this.timeInterval = setInterval(() => {
+    //       this.timer ++;
+    //       this.timeToDisplay.set(this.convertTimerToTimeDisplay(this.timer));
+    //     }, 1000)
+    //   },
+    //   error: (err) => {
+    //     console.log(err)
+    //   }
+    // })
   }
 
   startTimer(): void {
