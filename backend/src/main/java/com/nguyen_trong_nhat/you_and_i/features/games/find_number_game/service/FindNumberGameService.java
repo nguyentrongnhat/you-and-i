@@ -77,8 +77,13 @@ public class FindNumberGameService {
 
         List<FindNumberGame> gameFinished = findNumberGameRepository.findByPlayerAndEndTimeIsNotNull(player);
 
-        return gameFinished.stream().map(game -> {
-            return new FindNumberGameHistoryResponse(game.getStartTime(), game.getEndTime(), game.getTimeToFinish(), game.getBonusTime());
-        }).toList();
+        return gameFinished.stream().map(game ->
+            new FindNumberGameHistoryResponse(
+                    game.getStartTime(),
+                    game.getEndTime(),
+                    game.getTimeToFinish(),
+                    game.getBonusTime()
+            )
+        ).toList();
     }
 }

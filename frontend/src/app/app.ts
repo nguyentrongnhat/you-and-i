@@ -23,18 +23,24 @@ import { Toast } from 'primeng/toast';
   styleUrl: './app.scss'
 })
 export class App implements OnInit {
+  
   protected LAYOUT = LAYOUT;
+
   protected activeLayout = signal<string>('');
+
   public destroyRef = inject(DestroyRef);
+
 
   constructor(
     public router: Router,
     public activatedRoute: ActivatedRoute,
   ) {}
 
+
   ngOnInit(): void {
     this.getRouteData();
   }
+
 
   private getRouteData() {
     this.router.events
@@ -45,6 +51,7 @@ export class App implements OnInit {
       this.getLayoutConfigData(this.activatedRoute);
     })
   }
+
 
   // Recursive method to get the deepest child route data
   private getLayoutConfigData(route: ActivatedRoute): void {

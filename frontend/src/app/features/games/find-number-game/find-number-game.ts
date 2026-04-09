@@ -18,7 +18,6 @@ export type NumberData = {
 })
 export class FindNumberGame implements OnInit, OnDestroy, AfterViewInit {
  
-
   private readonly platformId = inject(PLATFORM_ID);
 
   screenWidth = signal(0);
@@ -31,11 +30,19 @@ export class FindNumberGame implements OnInit, OnDestroy, AfterViewInit {
 
   ready = false;
 
+  @HostListener('window:resize')
+  onResize() {
+    if (isPlatformBrowser(this.platformId)) {
+      this.screenWidth.set(window.innerWidth);
+    }
+  }
+
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
       this.screenWidth.set(window.innerWidth);
     }
   }
+
 
   ngAfterViewInit(): void {
     if (isPlatformBrowser(this.platformId)) {
@@ -47,16 +54,9 @@ export class FindNumberGame implements OnInit, OnDestroy, AfterViewInit {
     }
   }
 
+
   ngOnDestroy(): void {
     this.currentNumber.set(0);
-  }
-
-
-  @HostListener('window:resize')
-  onResize() {
-    if (isPlatformBrowser(this.platformId)) {
-      this.screenWidth.set(window.innerWidth);
-    }
   }
 
 

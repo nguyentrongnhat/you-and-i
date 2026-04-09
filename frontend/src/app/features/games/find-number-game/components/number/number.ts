@@ -1,5 +1,6 @@
-import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, Component, effect, ElementRef, inject, input, output, PLATFORM_ID, signal, ViewChild } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AfterViewInit, ChangeDetectionStrategy, Component, effect, ElementRef, inject, input, output, signal, ViewChild } from '@angular/core';
+import { PlatformService } from '../../../../../services/platform.service';
 import { NumberData } from '../../find-number-game';
 
 @Component({
@@ -25,22 +26,23 @@ export class Number implements AfterViewInit {
 
   protected isSelected = signal<boolean>(false);
 
-  private readonly platformId = inject(PLATFORM_ID);
+  private readonly platformService = inject(PlatformService);
 
   constructor() {
-      if (isPlatformBrowser(this.platformId)) {
-        effect(() => {
-          this.drawNumber(this.data() as NumberData);
-          const currentNumber = this.currentNumber();
-          this.updateForSelectedNumber(currentNumber);
-          this.upDateIndicate(currentNumber);
-        });
+    effect(() => {
+      const numberData = this.data() as NumberData;
+      if (this.platformService.isBrowser()) {
+        this.drawNumber(numberData);
+        const currentNumber = this.currentNumber();
+        this.updateForSelectedNumber(currentNumber);
+        this.upDateIndicate(currentNumber);
       }
+    });
   }
 
 
   ngAfterViewInit(): void {
-    if (isPlatformBrowser(this.platformId)) {
+    if (this.platformService.isBrowser()) {
       this.drawNumber(this.data() as NumberData);
     }
   }
