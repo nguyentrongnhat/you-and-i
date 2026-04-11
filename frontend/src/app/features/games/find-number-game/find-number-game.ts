@@ -1,6 +1,11 @@
-import { isPlatformBrowser } from '@angular/common';
-import { AfterViewInit, Component, computed, HostListener, inject, OnDestroy, OnInit, PLATFORM_ID, signal } from '@angular/core';
-import { Number } from './components/number/number';
+import { Component, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
+import { DialogModule } from 'primeng/dialog';
+import { take } from 'rxjs';
+import { HttpClientService } from '../../../services/http-client.service';
+import { GameHistories } from './components/game-histories/game-histories';
+import { GameTable } from './components/game-table/game-table';
 
 export type NumberData = {
   value: number;
@@ -10,95 +15,137 @@ export type NumberData = {
   fontSize: number;
 };
 
+export enum FIND_NUMBER_GAME_STATUSES {
+  NONE = 'none',
+  STARTED = 'started',
+  FINISHED = 'finished',
+  PAUSED = 'paused'
+}
+
 @Component({
   selector: 'app-find-number-game',
-  imports: [Number],
+  imports: [GameTable, ButtonModule, DialogModule, GameHistories],
   templateUrl: './find-number-game.html',
   styleUrl: './find-number-game.scss',
 })
-export class FindNumberGame implements OnInit, OnDestroy, AfterViewInit {
- 
-  private readonly platformId = inject(PLATFORM_ID);
+export class FindNumberGame {
+  FIND_NUMBER_GAME_STATUSES = FIND_NUMBER_GAME_STATUSES;
 
-  screenWidth = signal(0);
+  gameCurrentStatus = signal<FIND_NUMBER_GAME_STATUSES>(FIND_NUMBER_GAME_STATUSES.NONE);
 
-  columns = computed(() => this.screenWidth() < 768 ? 5 : 10);
+  gameFinished = signal<boolean>(false);
 
-  numbers = signal<NumberData[]>(this.generateItems());
+  visible = signal<boolean>(false);
 
-  currentNumber = signal<number>(0);
+  private readonly httpClient = inject(HttpClientService);
 
-  ready = false;
+  private readonly router = inject(Router);
 
-  @HostListener('window:resize')
-  onResize() {
-    if (isPlatformBrowser(this.platformId)) {
-      this.screenWidth.set(window.innerWidth);
+  protected isStarted = signal<boolean>(false);
+
+	protected timer: number = 0;
+
+	protected timeToDisplay = signal<string>('00 : 00 : 00')
+
+	protected timeInterval!: ReturnType<typeof setInterval>;
+
+	protected currentGameId: number = 0;
+
+	protected gameHistories = signal<any[]>([]);
+
+  showGameHistoriesDialog() {
+    this.visible.set(true);
+  }
+
+  startGame() {
+    console.log('start game')
+
+    this.httpClient.post('/game/find-number-game', {startTime: new Date()}).pipe(take(1)).subscribe({
+      next: (res: any) => {
+        console.log("game info: ", res);
+        this.currentGameId = res.gameId
+        this.isStarted.set(true);
+        this.timeInterval = setInterval(() => {
+          this.timer ++;
+          this.gameCurrentStatus.set(FIND_NUMBER_GAME_STATUSES.STARTED);
+          this.timeToDisplay.set(this.convertTimerToTimeDisplay(this.timer));
+        }, 1000)
+      },
+      error: (err) => {
+        console.log(err)
+      }
+    })
+  }
+
+
+  startTimer(): void {
+    this.callAPIstartGame().subscribe({
+      next: (res: any) => {
+        console.log(res)
+        this.currentGameId = res.data.gameId
+        this.isStarted.set(true);
+        this.timeInterval = setInterval(() => {
+          this.timer ++;
+          this.timeToDisplay.set(this.convertTimerToTimeDisplay(this.timer));
+        }, 1000)
+      }
+    })
+  }
+
+
+  stopTimer(): void {
+    this.callAPIFinishGame().subscribe({
+      next: (res: any) => {
+        console.log('finish game: ', res)
+        clearInterval(this.timeInterval);
+        this.isStarted.set(false);
+        this.timer = 0;
+
+        this.getHistories()
+      }
+    })
+  }
+
+
+  getHistories() {
+    this.callAPILoadGameHistory().subscribe({
+      next: (res: any) => {
+        console.log('game history: ', res)
+        this.gameHistories.set(res)
+        console.log('game history: ', this.gameHistories())
+      }
+    })
+  }
+
+
+  convertTimerToTimeDisplay(seconds: number) {
+    const hh = Math.floor(seconds / 3600)
+    const mm = Math.floor((seconds % 3600) / 60)
+    const ss = Math.floor(((seconds % 3600) % 60) % 60)
+    return `${hh > 9 ? hh : 0 + hh.toString()} : ${mm > 9 ? mm : 0 + mm.toString()} : ${ss > 9 ? ss : 0 + ss.toString()}`
+  }
+
+
+  callAPIstartGame() {
+    const startGameInfo = {
+      userId: 1,
+      startTime: new Date()
     }
+    return this.httpClient.post('/game/find-number-game/start-game', startGameInfo)
   }
 
-  ngOnInit() {
-    if (isPlatformBrowser(this.platformId)) {
-      this.screenWidth.set(window.innerWidth);
+
+  callAPIFinishGame() {
+    const finishGameInfo = {
+      gameId: this.currentGameId.toString(),
+      timeToFinish: this.timer.toString(),
+      endTime: new Date()
     }
+    return this.httpClient.post('/game/find-number-game/finish-game', finishGameInfo)
   }
 
 
-  ngAfterViewInit(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      this.screenWidth.set(window.innerWidth);
-
-      setTimeout(() => {
-        this.ready = true;
-      });
-    }
-  }
-
-
-  ngOnDestroy(): void {
-    this.currentNumber.set(0);
-  }
-
-
-  private generateItems(): NumberData[] {
-    const arr = Array.from({ length: 100 }, (_, i) => i + 1);
-
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-
-    return arr.map(num => {
-      return {
-        value: num,
-        rotate: this.random(-180, 170),
-        tx: this.random(0, 100),
-        ty: this.random(0, 100),
-        fontSize: this.random(13, 20)
-      };
-    });
-  }
-
-
-  private random(min: number, max: number) {
-    return Math.random() * (max - min) + min;
-  }
-
-
-  protected shuffle() {
-    this.numbers.set(this.generateItems());
-  }
-
-
-  public selectNumber() {
-    if(this.currentNumber() < 99) {
-      this.currentNumber.update((number) => number + 1);
-      console.log('selected: ', this.currentNumber())
-      //this.shuffle();
-    }
-
-    else {
-      console.log('Finish game')
-    }
+  callAPILoadGameHistory() {
+    return this.httpClient.get('/game/find-number-game/history')
   }
 }

@@ -1,20 +1,21 @@
-<div class="wrapper">
+<div class="container">
+  @if(gameCurrentStatus() === FIND_NUMBER_GAME_STATUSES.STARTED) {
+    <div style="width: 100%;">
+      Timer: {{this.timeToDisplay()}}
+      <app-game-table></app-game-table>
+    </div>
+  }
+  @else if(gameCurrentStatus() === FIND_NUMBER_GAME_STATUSES.FINISHED) {
 
-  <button (click)="shuffle()">Shuffle 😏</button>
-
-  <div 
-    class="grid-container"
-    [style.gridTemplateColumns]="'repeat(' + columns() + ', 1fr)'"
-  >
-    @for(item of numbers(); track item) {
-      @if(ready) {
-        <app-number 
-          [data]="item"
-          [currentNumber]="currentNumber()"
-          (onSelected)="selectNumber()"></app-number>
-      }
-    }
-    
-  </div>
-
+  }
+  @else {
+    <div class="card flex flex-wrap gap-4 justify-center">
+        <p-button (click)="startGame()" label="Start Game" severity="contrast" />
+        <p-button (click)="showGameHistoriesDialog()" label="Game History" severity="info"/>
+    </div>
+  }
 </div>
+
+<p-dialog header="Header" [modal]="true" [(visible)]="visible" [style]="{ width: '50rem' }" [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [maximizable]="true">
+    <app-game-histories></app-game-histories>
+</p-dialog>
