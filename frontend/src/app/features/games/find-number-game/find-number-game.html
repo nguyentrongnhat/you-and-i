@@ -2,11 +2,12 @@
   @if(gameCurrentStatus() === FIND_NUMBER_GAME_STATUSES.STARTED) {
     <div style="width: 100%;">
       Timer: {{this.timeToDisplay()}}
-      <app-game-table></app-game-table>
+      <app-game-table (onSelectNumber)="onSelectNumber($event)" ></app-game-table>
     </div>
   }
   @else if(gameCurrentStatus() === FIND_NUMBER_GAME_STATUSES.FINISHED) {
-
+    Time to Finish: {{this.timeToDisplay()}}
+    <p-button (click)="showGameHistoriesDialog()" label="Game History" severity="info"/>
   }
   @else {
     <div class="card flex flex-wrap gap-4 justify-center">

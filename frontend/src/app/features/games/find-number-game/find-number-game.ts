@@ -41,8 +41,6 @@ export class FindNumberGame {
 
   private readonly router = inject(Router);
 
-  protected isStarted = signal<boolean>(false);
-
 	protected timer: number = 0;
 
 	protected timeToDisplay = signal<string>('00 : 00 : 00')
@@ -57,6 +55,13 @@ export class FindNumberGame {
     this.visible.set(true);
   }
 
+  onSelectNumber(num: number) {
+    console.log('number: ', num)
+    if(num === 2) {
+      this.finishGame();
+    }
+  }
+
   startGame() {
     console.log('start game')
 
@@ -64,12 +69,8 @@ export class FindNumberGame {
       next: (res: any) => {
         console.log("game info: ", res);
         this.currentGameId = res.gameId
-        this.isStarted.set(true);
-        this.timeInterval = setInterval(() => {
-          this.timer ++;
-          this.gameCurrentStatus.set(FIND_NUMBER_GAME_STATUSES.STARTED);
-          this.timeToDisplay.set(this.convertTimerToTimeDisplay(this.timer));
-        }, 1000)
+        this.gameCurrentStatus.set(FIND_NUMBER_GAME_STATUSES.STARTED);
+        this.startTimer()
       },
       error: (err) => {
         console.log(err)
@@ -79,28 +80,30 @@ export class FindNumberGame {
 
 
   startTimer(): void {
-    this.callAPIstartGame().subscribe({
-      next: (res: any) => {
-        console.log(res)
-        this.currentGameId = res.data.gameId
-        this.isStarted.set(true);
-        this.timeInterval = setInterval(() => {
-          this.timer ++;
-          this.timeToDisplay.set(this.convertTimerToTimeDisplay(this.timer));
-        }, 1000)
-      }
-    })
+    if(this.timeInterval) {
+      clearInterval(this.timeInterval);
+    }
+
+    this.timeInterval = setInterval(() => {
+      this.timer ++;
+      this.timeToDisplay.set(this.convertTimerToTimeDisplay(this.timer));
+    }, 1000)
   }
 
 
-  stopTimer(): void {
+  stopTimer() {
+    clearInterval(this.timeInterval);
+    this.timer = 0;
+  }
+
+
+  finishGame(): void {
+    this.gameCurrentStatus.set(FIND_NUMBER_GAME_STATUSES.FINISHED)
     this.callAPIFinishGame().subscribe({
       next: (res: any) => {
         console.log('finish game: ', res)
-        clearInterval(this.timeInterval);
-        this.isStarted.set(false);
-        this.timer = 0;
 
+        this.stopTimer();
         this.getHistories()
       }
     })

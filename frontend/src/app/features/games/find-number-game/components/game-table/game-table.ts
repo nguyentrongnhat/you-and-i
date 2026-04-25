@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, computed, HostListener, inject, OnDestroy, OnInit, PLATFORM_ID, signal } from '@angular/core';
+import { AfterViewInit, Component, computed, HostListener, inject, OnDestroy, OnInit, output, PLATFORM_ID, signal } from '@angular/core';
 import { NumberData } from '../../find-number-game';
 import { isPlatformBrowser } from '@angular/common';
 import { Number } from '../number/number';
@@ -20,6 +20,8 @@ export class GameTable implements OnInit, OnDestroy, AfterViewInit {
   numbers = signal<NumberData[]>(this.generateItems());
 
   currentNumber = signal<number>(0);
+
+  onSelectNumber = output<number>();
 
   ready = false;
 
@@ -84,15 +86,9 @@ export class GameTable implements OnInit, OnDestroy, AfterViewInit {
 
 
   public selectNumber() {
-    if(this.currentNumber() < 99) {
-      this.currentNumber.update((number) => number + 1);
-      console.log('selected: ', this.currentNumber())
-      //this.shuffle();
-    }
-
-    else {
-      console.log('Finish game')
-    }
+    this.currentNumber.update((number) => number + 1);
+    console.log('selected on table: ', this.currentNumber())
+    this.onSelectNumber.emit(this.currentNumber())
   }
 }
 
