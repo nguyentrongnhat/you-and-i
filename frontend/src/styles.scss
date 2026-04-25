@@ -6,17 +6,20 @@
 @tailwind utilities;
 
 :root {
-  --app-font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --app-font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
 body {
   font-family: var(--app-font-family);
   font-size: 14px;
   line-height: 1.5;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .background {
-  background-image: url('/images/jarofmessages_background.png');
+  background: url('/images/jarofmessages_background.png') center / cover no-repeat fixed;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

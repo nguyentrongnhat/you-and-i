@@ -56,7 +56,7 @@ export const routes: Routes = [
     loadComponent: () => import('./features/games/find-number-game/find-number-game').then(c => c.FindNumberGame),
     data: {
       animation: 'SignUpPage',
-      layout: LAYOUT.EMPTY_LAYOUT
+      layout: LAYOUT.LAYOUT_1
     }
   },
   {

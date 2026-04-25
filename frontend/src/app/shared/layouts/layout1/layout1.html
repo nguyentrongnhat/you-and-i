@@ -1,2 +1,22 @@
-<p>layout1 works!</p>
-<ng-content></ng-content>
+<div class="wrapper" style="width: 100%;">
+    <nav class="header">
+        <div class="topbar-logo-render" (click)="navigateToDashboard()">
+            Jar of Messages
+        </div>
+
+        <ul class="navigation-item">
+            <li>Dashboard</li>
+            <li>Activity</li>
+            <li>Messages</li>
+            <li>Play</li>
+        </ul>
+
+        <div class="account-and-setting">
+            <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" class="mr-2" shape="circle" />
+        </div>
+    </nav>
+
+    <div class="content">
+        <ng-content></ng-content>
+    </div>
+</div>

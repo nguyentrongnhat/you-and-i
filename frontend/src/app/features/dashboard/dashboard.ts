@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, model, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -8,16 +8,22 @@ import { UsernamePasswordLoginResponse } from '../../core/interfaces/user.dtos';
 import { HttpClientService } from '../../services/http-client.service';
 import { AuthService } from '../auth/services/auth.service';
 import { TableModule } from 'primeng/table';
+import { GalleriaModule } from 'primeng/galleria';
+import { PhotoService } from '../../services/photo.service';
+import { PanelModule } from 'primeng/panel';
+import { AvatarModule } from 'primeng/avatar';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [ButtonModule, CardModule, TableModule],
+  imports: [ButtonModule, CardModule, TableModule, GalleriaModule, PanelModule, AvatarModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
-export class Dashboard {
-
+export class Dashboard implements OnInit {
+  
 	private readonly authService = inject(AuthService);
+
+  private readonly photoService = inject(PhotoService);
 
 	private readonly router = inject(Router);
 
@@ -64,6 +70,18 @@ export class Dashboard {
       url: 'game/find-number-game'
     }
   ]);
+
+  protected images: any = model([]);
+
+  protected responsiveOptions: any[] = [];
+
+  ngOnInit(): void {
+    this.photoService.getImages().then((images) => {
+      this.images.set(images)
+      console.log('images: ', images)
+      console.log('signal: ', this.images())
+    });
+  }
 
 
 	getText() {
