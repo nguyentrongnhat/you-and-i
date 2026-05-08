@@ -84,38 +84,23 @@
         <div style="flex:1; min-height: 100%;">
             <p-card header="Daily Activity" [style]="{'height': '100%'}">
                 <div class="activities" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                    @for(item of dailyActivityitems(); track item) {
+                        <div (click)="navigateToDailyActivity(item.url)" class="cursor-pointer">
+                            <p-panel [showHeader]="false" [style]="{'padding-top': '15px'}">
+                                <div class="activity-content" style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div class="icon-and-title" style="display: flex; align-items: center; gap: 30px">
+                                        <span class="{{item.icon}}" style="font-size: 1.5rem;"></span>
 
-                    <div>
-                        <p-panel [showHeader]="false" [style]="{'padding-top': '15px'}">
-                            <div class="activity-content" style="display: flex; justify-content: space-between; align-items: center;">
-                                <div class="icon-and-title" style="display: flex; align-items: center; gap: 30px">
-                                    <span class="pi pi-discord" style="font-size: 1.5rem;"></span>
-
-                                    <div class="title-and-subtitle">
-                                        <h2 class="title" style="font-size: 1.2rem; font-weight: 500;">Find Number Game</h2>
-                                        <h3 class="subtitle">Chơi game và Nhớ anh</h3>
+                                        <div class="title-and-subtitle">
+                                            <h2 class="title" style="font-size: 1.2rem; font-weight: 500;">{{ item.title }}</h2>
+                                            <h3 class="subtitle">{{ item.subTitle }}</h3>
+                                        </div>
                                     </div>
+                                    <div class="action-text" style="font-size: 1rem; font-weight: 550;">PLAY</div>
                                 </div>
-                                <div class="action-text" style="font-size: 1rem; font-weight: 550;">PLAY</div>
-                            </div>
-                        </p-panel>
-                    </div>
-    
-                    <div>
-                        <p-panel [showHeader]="false" [style]="{'padding-top': '15px'}">
-                            <div class="activity-content" style="display: flex; justify-content: space-between; align-items: center;">
-                                <div class="icon-and-title" style="display: flex; align-items: center; gap: 30px">
-                                    <span class="pi pi-list-check" style="font-size: 1.5rem;"></span>
-
-                                    <div class="title-and-subtitle">
-                                        <h2 class="title" style="font-size: 1.2rem; font-weight: 500;">Find Number Game</h2>
-                                        <h3 class="subtitle">Chơi game và Nhớ anh</h3>
-                                    </div>
-                                </div>
-                                <div class="action-text" style="font-size: 1rem; font-weight: 550;">VIEW</div>
-                            </div>
-                        </p-panel>
-                    </div>
+                            </p-panel>
+                        </div>
+                    }
                 </div>
 
             </p-card>
@@ -130,7 +115,6 @@
                     [style]="{'width': '100%', 'margin-top': '20px'}"
                     severity="contrast"
                  />
-    
             </p-card>
         </div>
     </div>

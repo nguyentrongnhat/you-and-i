@@ -33,40 +33,19 @@ export class Dashboard implements OnInit {
 
 	public callGetTextNum = 0;
 
-  protected items = signal<any[]>([
+  protected dailyActivityitems = signal<any[]>([
     {
       title: 'Find Number Game',
       subTitle: 'Chơi game và Nhớ anh',
       description: 'Tìm các số lần lượt từ 1 đến 100 trong điều kiện thách thức về mặt thời gian',
-      image: 'images/find-number-game.png',
+      icon: 'pi pi-discord',
       url: 'game/find-number-game'
     },
     {
-      title: 'Find Number Game',
-      subTitle: 'Chơi game và Nhớ anh',
+      title: 'Go Go Go',
+      subTitle: 'Lên kế hoạch nào',
       description: 'Tìm các số lần lượt từ 1 đến 100 trong điều kiện thách thức về mặt thời gian',
-      image: 'images/find-number-game.png',
-      url: 'game/find-number-game'
-    },
-    {
-      title: 'Find Number Game',
-      subTitle: 'Chơi game và Nhớ anh',
-      description: 'Tìm các số lần lượt từ 1 đến 100 trong điều kiện thách thức về mặt thời gian',
-      image: 'images/find-number-game.png',
-      url: 'game/find-number-game'
-    },
-    {
-      title: 'Find Number Game',
-      subTitle: 'Chơi game và Nhớ anh',
-      description: 'Tìm các số lần lượt từ 1 đến 100 trong điều kiện thách thức về mặt thời gian',
-      image: 'images/find-number-game.png',
-      url: 'game/find-number-game'
-    },
-    {
-      title: 'Find Number Game',
-      subTitle: 'Chơi game và Nhớ anh',
-      description: 'Tìm các số lần lượt từ 1 đến 100 trong điều kiện thách thức về mặt thời gian',
-      image: 'images/find-number-game.png',
+      icon: 'pi pi-list-check',
       url: 'game/find-number-game'
     }
   ]);
@@ -122,7 +101,7 @@ export class Dashboard implements OnInit {
     })
   }
 
-  navigateToItem(url: string) {
+  navigateToDailyActivity(url: string) {
     this.router.navigateByUrl(url);
   }
 }
