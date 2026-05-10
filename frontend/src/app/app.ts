@@ -8,6 +8,7 @@ import { Layout3 } from "./shared/layouts/layout3/layout3";
 import { Layout2 } from './shared/layouts/layout2/layout2';
 import { EmptyLayout } from './shared/layouts/empty-layout/empty-layout';
 import { Toast } from 'primeng/toast';
+import { UserService } from './services/user.service';
 
 @Component({
   selector: 'app-root',
@@ -30,6 +31,8 @@ export class App implements OnInit {
 
   public destroyRef = inject(DestroyRef);
 
+  private userService = inject(UserService);
+
 
   constructor(
     public router: Router,
@@ -39,6 +42,19 @@ export class App implements OnInit {
 
   ngOnInit(): void {
     this.getRouteData();
+    this.getCurrentUser();
+  }
+
+
+  private getCurrentUser() {
+    this.userService.getCurrentUser().subscribe({
+      next: (res) => {
+        console.log('current user: ', res)
+      },
+      error: (err) => {
+        console.log('errror: ', err)
+      }
+    })
   }
 
 

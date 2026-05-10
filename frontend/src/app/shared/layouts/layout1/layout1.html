@@ -1,14 +1,15 @@
 <div class="wrapper" style="width: 100%;">
     <nav class="header">
-        <div class="topbar-logo-render" (click)="navigateToDashboard()">
+        <i class="pi pi-bars size-menu-toggle-icon"></i>
+        <div class="topbar-logo-render" (click)="navigateTo(this.ROUTE_PATHS.HOME)">
             Jar of Messages
         </div>
 
         <ul class="navigation-item">
-            <li>Dashboard</li>
-            <li>Activity</li>
-            <li>Messages</li>
-            <li>Play</li>
+            @for(item of this.navigationItems; track item.url) {
+                <li (click)="navigateTo(item.url)">{{ item.name }}</li>
+            }
+            
         </ul>
 
         <div class="account-and-setting">
@@ -16,7 +17,20 @@
         </div>
     </nav>
 
-    <div class="content">
-        <ng-content></ng-content>
+
+    <div class="side-menu-and-content">
+        <div class="mini-side-menu">
+            <ul class="navigation-item">
+                @for(item of this.navigationItems; track item.url) {
+                    <li (click)="navigateTo(item.url)">
+                        <i class="pi {{item.icon}}" style="font-size: 1.2rem"></i>
+                    </li>
+                }
+            </ul>
+        </div>
+        <div class="content max-w-[1200px] mx-auto">
+            <ng-content></ng-content>
+        </div>
     </div>
+    
 </div>

@@ -11,8 +11,33 @@ import { AvatarModule } from 'primeng/avatar';
 })
 export class Layout1 {
   private readonly router = inject(Router);
-  
-  protected navigateToDashboard(): void {
-    this.router.navigateByUrl(ROUTE_PATHS.HOME);
+
+  protected ROUTE_PATHS = ROUTE_PATHS;
+
+  protected navigationItems: any[] = [
+    {
+      name: 'Dashboard',
+      icon: 'pi-home',
+      url: this.ROUTE_PATHS.HOME
+    },
+    {
+      name: 'Activities',
+      icon: 'pi-list-check',
+      url: ''
+    },
+    {
+      name: 'Messages',
+      icon: 'pi-send',
+      url: ''
+    },
+    {
+      name: 'Game',
+      icon: 'pi-discord',
+      url: this.ROUTE_PATHS.FIND_NUMBER_GAME
+    },
+  ]
+
+  protected navigateTo(url: string): void {
+    this.router.navigateByUrl(url);
   }
 }

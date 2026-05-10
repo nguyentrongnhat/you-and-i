@@ -4,17 +4,21 @@
         align-items: center;
         justify-content: space-between;
 
-        padding: 0 24px;
-        height: 60px;
+        color: white;
+        background-color: #333;
 
-        background-color: #fff;
-        border-bottom: 1px solid #eee;
+        padding: 0 22px;
+        height: 60px;
 
         position: sticky; 
         top: 0;
         z-index: 1000;
 
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        .size-menu-toggle-icon {
+            display: none;
+            padding: 0 20px 0 0; 
+            cursor: pointer;
+        }
 
         .topbar-logo-render {
             font-weight: 600;
@@ -56,6 +60,74 @@
             justify-content: flex-end;
         }
     }
-    
-    
+
+    .side-menu-and-content {
+        display: flex;
+        .mini-side-menu {
+            display: none;
+        }
+
+        .content {
+            width: 100%;
+            padding: 0 20px;
+        }
+    }
+}
+
+@media screen and (max-width: 970px)  {
+    .wrapper {
+        .header {
+            .size-menu-toggle-icon {
+                display: inline;
+                padding: 0 20px 0 0; 
+                cursor: pointer;
+            }
+
+            .topbar-logo-render {  
+                margin-left: 10px;
+            }
+
+            .navigation-item {
+                display: none;
+            }
+        }
+
+        .side-menu-and-content {
+            .mini-side-menu {
+                color: #fff;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 30px;
+                width: 65px;
+                background-color: #333;
+
+                li {
+                    width: 50px;
+                    height: 50px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    cursor: pointer;
+                }
+            }
+
+            .content {
+                width: 100%;
+                padding: 0 7px;
+            }
+        }
+    }
+
+}
+
+@media screen and (max-width: 650px)  {
+    .wrapper {
+        .side-menu-and-content {
+            .mini-side-menu {
+                display: none;
+            }
+        }
+    }
+
 }

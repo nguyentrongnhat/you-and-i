@@ -1,11 +1,28 @@
-<div class="wrapper max-w-[1200px] mx-auto">
-    <div class="welcome-and-dating-statuses flex justify-between mt-2 items-center">
+<div class="wrapper" animate.enter="enter-animation">
+    <div class="
+            welcome-and-dating-statuses 
+            flex justify-between mt-2 items-center
+            max-[970px]:flex-col 
+            max-[970px]:items-start
+        "
+    >
         <div class="welcome-block">
-            <h1 style="font-size: 3rem; font-weight: 600;">Welcome, Bông</h1>
+            <h1 class="
+                text-5xl font-semibold leading-[72px] 
+                max-[970px]:text-4xl
+                max-[970px]:leading-[70px]
+                max-[550px]:text-3xl
+                max-[550px]:leading-[60px]
+            ">Welcome, Bông</h1>
             <p>Today is a beautiful day to create a new memory with me.</p>
         </div>
 
-        <div class="dating-statuses" style="display: flex; gap: 5rem; margin-top: 1.5rem;">
+        <div class="
+                dating-statuses 
+                flex gap-20 mt-6 
+                max-[970px]:w-full 
+                max-[970px]:justify-between
+                max-[970px]:mt-8">
             <div class="day-together">
                 <h3 style="font-weight: 80;">DAYS TOGETHER</h3>
                 <p style="font-weight: 500; font-size: 1.2rem;">1248</p>
@@ -30,7 +47,10 @@
                 [showThumbnails]="false">
                 
                 <ng-template #item let-item>
-                    <img [src]="item.itemImageSrc" style="width:100%; display: block;" class="w-full h-[500px] object-cover object-center" />
+                    <img [src]="item.itemImageSrc" 
+                            class="
+                                w-full block h-[500px] object-cover object-center
+                                max-[550px]:h-[300px]" />
                 </ng-template>
                 <ng-template #thumbnail let-item style="display: block;">
                     <img [src]="item.thumbnailImageSrc" />
@@ -43,7 +63,7 @@
         </div>
     </div>
 
-    <div class="messages-and-activity" style="display: flex; gap: 20px; margin-top: 40px;">
+    <div class="messages-and-activity flex gap-5 mt-10 max-[970px]:flex-col">
         <div style="flex:1;  min-height: 100%;">
             <p-card header="Recent Messages" [style]="{'height': '100%'}">
                 <div class="messages-list" style="margin-top: 10px">
