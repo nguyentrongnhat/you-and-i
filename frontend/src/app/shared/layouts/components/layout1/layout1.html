@@ -1,0 +1,47 @@
+<div class="wrapper" style="width: 100%;">
+    <nav class="header">
+        <i class="pi pi-bars size-menu-toggle-icon" (click)="toggleSideMenu()"></i>
+        <div class="topbar-logo-render" (click)="navigateTo(this.ROUTE_PATHS.HOME)">
+            <p-avatar image="/icons/jarofmessages.svg" class="mr-2" shape="circle" />
+            Jar of Messages
+        </div>
+
+        <ul class="navigation-item">
+            @for(item of this.navigationItems(); track item.url) {
+                <li 
+                    (click)="navigateTo(item.url)" 
+                    tooltipPosition="bottom" pTooltip="{{item.name}}" 
+                    [ngClass]="{'active': item.active}"
+                >
+                    <i class="pi {{item.icon}}" style="font-size: 1.2rem; font-weight: 400;"></i>
+                </li>
+            }
+            
+        </ul>
+
+        <div class="account-and-setting">
+            <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" class="mr-2" shape="circle" />
+        </div>
+    </nav>
+
+
+    <div class="side-menu-and-content">
+        <div class="mini-side-menu" [ngClass]="{'expand': this.expandSideMenu()}">
+            <ul class="navigation-item">
+                @for(item of this.navigationItems(); track item.url) {
+                    <li 
+                        (click)="navigateTo(item.url)" 
+                        tooltipPosition="right" pTooltip="{{item.name}}" 
+                        [ngClass]="{'active': item.active}"
+                    >
+                            <i class="pi {{item.icon}}" style="font-size: 1.2rem"></i>
+                    </li>
+                }
+            </ul>
+        </div>
+        <div class="content max-w-[1200px] mx-auto">
+            <ng-content></ng-content>
+        </div>
+    </div>
+    
+</div>

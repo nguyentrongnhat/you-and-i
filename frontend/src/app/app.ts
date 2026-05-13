@@ -1,14 +1,16 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, effect, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
-import { LAYOUT } from './core/enums';
-import { Layout1 } from "./shared/layouts/layout1/layout1";
-import { Layout3 } from "./shared/layouts/layout3/layout3";
-import { Layout2 } from './shared/layouts/layout2/layout2';
-import { EmptyLayout } from './shared/layouts/empty-layout/empty-layout';
 import { Toast } from 'primeng/toast';
 import { UserService } from './services/user.service';
+import { Layout1 } from './shared/layouts/components/layout1/layout1';
+import { Layout2 } from './shared/layouts/components/layout2/layout2';
+import { Layout3 } from './shared/layouts/components/layout3/layout3';
+import { EmptyLayout } from './shared/layouts/components/empty-layout/empty-layout';
+import { LAYOUT } from './core/enums';
+import { AuthService } from './features/auth/services/auth.service';
+import { UsernamePasswordLoginResponse } from './core/interfaces/user.dtos';
 
 @Component({
   selector: 'app-root',
@@ -31,32 +33,40 @@ export class App implements OnInit {
 
   public destroyRef = inject(DestroyRef);
 
-  private userService = inject(UserService);
+  private readonly authService = inject(AuthService);
 
 
   constructor(
     public router: Router,
     public activatedRoute: ActivatedRoute,
-  ) {}
+  ) {
+    effect(() => {
+      const userinfo = this.authService.userInfo();
+      if (!userinfo) return;
+      console.log('userinfo: ', userinfo);
+    })
+  }
 
 
   ngOnInit(): void {
     this.getRouteData();
-    this.getCurrentUser();
+    this.getAccessToken();
   }
 
-
-  private getCurrentUser() {
-    this.userService.getCurrentUser().subscribe({
-      next: (res) => {
-        console.log('current user: ', res)
+  private refreshToken() {
+    this.authService.refreshToken().subscribe({
+      next: (res: UsernamePasswordLoginResponse) => {
+        this.authService.setAccessToken(res.accessToken);
       },
-      error: (err) => {
-        console.log('errror: ', err)
+      error: err => {
+        console.log('Login error: ', err);
       }
     })
   }
 
+  private getAccessToken() {
+    this.refreshToken();
+  }
 
   private getRouteData() {
     this.router.events

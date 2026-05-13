@@ -1,4 +1,4 @@
-import { inject, Injectable, signal } from "@angular/core";
+import { computed, inject, Injectable, signal } from "@angular/core";
 import { HttpClientService } from "../../../services/http-client.service";
 import { UsernamePasswordLoginResponse } from "../../../core/interfaces/user.dtos";
 import { API_ENDPOINTS } from "../../../core/constants/api-endpoints";
@@ -11,6 +11,12 @@ export class AuthService {
     private readonly httpService = inject(HttpClientService);
     private readonly _accessToken = signal<string>('')
     public readonly accessToken = this._accessToken.asReadonly();
+
+    public readonly userInfo = computed(() => {
+        const accessToken = this._accessToken();
+        if (!accessToken) return {};
+        return this.parseJwt(accessToken);
+    })
 
     public setAccessToken(token: string) {
         this._accessToken.set(token);
@@ -31,5 +37,18 @@ export class AuthService {
     public signup(signupData: SignupModel) {
         console.log('Sign up for: ', signupData)
         return this.httpService.post<UsernamePasswordLoginResponse>(API_ENDPOINTS.AUTH.SIGNUP, signupData);
+    }
+
+    public parseJwt(token: string) {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+            atob(base64)
+            .split('')
+            .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+            .join('')
+        );
+
+        return JSON.parse(jsonPayload);
     }
 }

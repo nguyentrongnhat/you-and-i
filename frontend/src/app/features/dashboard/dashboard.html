@@ -35,8 +35,8 @@
         </div>
     </div>
 
-    <div class="lastest-dating-images" style="width: 100%; margin-top: 40px;">
-        <div class="card" style="width: 100%; margin: auto;">
+    <div class="lastest-dating-images w-full mt-10">
+        <div class="card w-full m-auto">
             <p-galleria 
                 [value]="images()" 
                 [responsiveOptions]="responsiveOptions" 
@@ -116,7 +116,9 @@
                                             <h3 class="subtitle">{{ item.subTitle }}</h3>
                                         </div>
                                     </div>
-                                    <div class="action-text" style="font-size: 1rem; font-weight: 550;">PLAY</div>
+                                    <div class="action-text" style="font-size: 1rem;">
+                                        <i class="pi pi-chevron-right"></i>
+                                    </div>
                                 </div>
                             </p-panel>
                         </div>
@@ -138,39 +140,4 @@
             </p-card>
         </div>
     </div>
-
-    <!-- <div class="mb-4 p-5 flex flex-wrap gap-5 max-w-[1300px] mx-auto">
-
-        @for(item of items(); track item) {
-            <p-card 
-                (click)="navigateToItem(item.url)"
-                [style]="{ overflow: 'hidden' }" 
-                class="
-                        mx-auto md:mx-0 w-[25rem] md:w-[17rem] 
-                        cursor-pointer 
-                        hover:scale-105 active:scale-95 transition duration-150
-                        ">
-                <ng-template #header>
-                    <img alt="Card" class="w-full" src="{{ item.image }}" />
-                </ng-template>
-                <ng-template #title> {{ item.title }} </ng-template>
-                <ng-template #subtitle> {{ item.subTitle }} </ng-template>
-                <p>
-                    {{ item.description }}
-                </p>
-            </p-card>
-        }
-
-        
-    </div> -->
-
-    <!-- <div class="mb-4 p-5 flex flex-wrap gap-5">
-        {{myDisplayText()}}
-
-        <div style="display: flex; flex-direction: column; height: 300px; justify-content: space-around;">
-            <p-button onkeydown="" (click)="getText()">get Hello</p-button>
-            <p-button onkeydown="" (click)="sendMail()">Test mail</p-button>
-            <p-button onkeydown="" (click)="refreshToken()">refresh token</p-button>
-        </div>
-    </div> -->
 </div>

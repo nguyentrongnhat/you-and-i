@@ -1,4 +1,6 @@
 .wrapper {
+    height: 100vh;
+
     .header {
         display: flex;
         align-items: center;
@@ -7,8 +9,8 @@
         color: white;
         background-color: #333;
 
-        padding: 0 22px;
-        height: 60px;
+        padding: 0 18px;
+        height: 50px;
 
         position: sticky; 
         top: 0;
@@ -21,34 +23,57 @@
         }
 
         .topbar-logo-render {
-            font-weight: 600;
+            font-weight: 800;
             font-size: 18px;
             cursor: pointer;
             width: 100%;
             flex: 1;
+
+            display: flex;
+            align-items: center;
         }
 
         .navigation-item {
             display: flex;
-            gap: 24px;
+            gap: 5px;
+
+            flex: 2; 
+            justify-content: center;
+            align-items: center;
 
             list-style: none;
             margin: 0;
             padding: 0;
 
-            flex: 2; 
-            justify-content: center;
             width: 100%;
+            height: 100%;
         }
 
         .navigation-item li {
             cursor: pointer;
             font-size: 14px;
             transition: color 0.2s;
+            width: 5rem;
+            height: 80%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+
+            &:hover {
+                background-color: #3B3D3E;
+            }
         }
 
-        .navigation-item li:hover {
-            color: #007bff;
+        .navigation-item li.active {
+            border-bottom: 2px solid #fff;
+            font-size: 1.6rem;
+            height: 100%;
+            border-radius: 0px;
+
+            &:hover {
+                background-color: #333;
+            }
         }
         
         .account-and-setting {
@@ -63,6 +88,9 @@
 
     .side-menu-and-content {
         display: flex;
+        
+        height: calc(100vh - 50px);
+        
         .mini-side-menu {
             display: none;
         }
@@ -70,6 +98,18 @@
         .content {
             width: 100%;
             padding: 0 20px;
+        }
+    }
+}
+
+@media screen and (max-width: 1100px)  {
+    .wrapper {
+        .header {
+            height: 50px;
+            .topbar-logo-render {
+                font-weight: 500;
+                font-size: 16px;
+            }
         }
     }
 }
@@ -83,38 +123,61 @@
                 cursor: pointer;
             }
 
-            .topbar-logo-render {  
-                margin-left: 10px;
-            }
-
             .navigation-item {
                 display: none;
             }
         }
 
         .side-menu-and-content {
-            .mini-side-menu {
+            .mini-side-menu.expand {
                 color: #fff;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
                 gap: 30px;
-                width: 65px;
+                width: 50px;
                 background-color: #333;
 
-                li {
-                    width: 50px;
-                    height: 50px;
+                .navigation-item {
                     display: flex;
-                    justify-content: center;
+                    flex-direction: column;
                     align-items: center;
-                    cursor: pointer;
+                    gap: 15px;
+
+                    li {
+                        width: 46px;
+                        height: 60px;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        cursor: pointer;
+                        border-radius: 10px;
+                        background-color: #333;
+
+                        &:hover {
+                            background-color: #3B3D3E;
+                        }
+                    }
+
+                    li.active {
+                        border-left: 2px solid #fff;
+                        font-size: 1.6rem;
+                        width: 50px;
+                        height: 50px;
+                        border-radius: 0px;
+
+                        &:hover {
+                            background-color: #333;
+                        }
+                    }
                 }
             }
 
             .content {
                 width: 100%;
                 padding: 0 7px;
+                overflow-y: auto;
+                height: 100%;
             }
         }
     }

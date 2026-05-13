@@ -12,10 +12,11 @@ import { GalleriaModule } from 'primeng/galleria';
 import { PhotoService } from '../../services/photo.service';
 import { PanelModule } from 'primeng/panel';
 import { AvatarModule } from 'primeng/avatar';
+import { AnimateOnScrollModule } from 'primeng/animateonscroll';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [ButtonModule, CardModule, TableModule, GalleriaModule, PanelModule, AvatarModule],
+  imports: [ButtonModule, CardModule, TableModule, GalleriaModule, PanelModule, AvatarModule, AnimateOnScrollModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss',
 })
@@ -74,20 +75,6 @@ export class Dashboard implements OnInit {
 			}
 		});
 	}
-
-
-  refreshToken() {
-    console.log('refresh token')
-    this.authService.refreshToken().subscribe({
-      next: (res: UsernamePasswordLoginResponse) => {
-        this.authService.setAccessToken(res.accessToken);
-      },
-      error: err => {
-        console.log('Login error: ', err);
-      }
-    })
-  }
-
 
   sendMail() {
     console.log('send mail')

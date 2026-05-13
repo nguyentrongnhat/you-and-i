@@ -29,6 +29,7 @@ public class FilterChainConfig {
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, BasicAuthenticationFilter.class)
