@@ -20,6 +20,6 @@ public class UsernamePasswordSignupRequest {
     @NotBlank(message = ErrorConstant.PASSWORD_REQUIRED)
     private String password;
 
-    @NotBlank(message = ErrorConstant.CONFIRN_PASSWORD_REQUIRED)
+    @NotBlank(message = ErrorConstant.CONFIRM_PASSWORD_REQUIRED)
     private String confirmPassword;
 }

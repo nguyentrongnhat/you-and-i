@@ -1,5 +1,6 @@
 package com.nguyen_trong_nhat.you_and_i.common.security.service.impl;
 
+import com.nguyen_trong_nhat.you_and_i.common.dto.EmailVerificationRequest;
 import com.nguyen_trong_nhat.you_and_i.common.dto.UsernamePasswordSignupRequest;
 import com.nguyen_trong_nhat.you_and_i.common.exception.BadRequestException;
 import com.nguyen_trong_nhat.you_and_i.common.exception.ErrorConstant;
@@ -12,6 +13,7 @@ import com.nguyen_trong_nhat.you_and_i.features.user.entity.UserVerification;
 import com.nguyen_trong_nhat.you_and_i.features.user.repository.UserRepository;
 import com.nguyen_trong_nhat.you_and_i.features.user.repository.UserVerificationRepository;
 import com.nguyen_trong_nhat.you_and_i.features.user.service.UserService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -59,6 +62,7 @@ public class AuthServiceImpl implements AuthService {
         return (UserDetails) validateResult.getPrincipal();
     }
 
+    @Transactional
     @Override
     public void signup (UsernamePasswordSignupRequest signupData) {
 
@@ -87,5 +91,22 @@ public class AuthServiceImpl implements AuthService {
                 "Mail Test - Signup flow",
                 String.format("Your verify code is: %s.", uv.getVerificationCode())
         );
+    }
+
+    @Transactional
+    public void verifyAccount(EmailVerificationRequest emailVerificationRequest) {
+        MyUserDetail registeredUser = userRepository.findByUsername(emailVerificationRequest.getEmail())
+                .orElseThrow(() -> new BadRequestException(ErrorConstant.USER_NOT_REGISTERED));
+
+        if(registeredUser.isEmailVerified()) {
+            throw new BadRequestException(ErrorConstant.EMAIL_ALREADY_VERIFIED);
+        }
+
+        List<UserVerification> userVerificationList = userVerificationRepository.findUserVerificationByUser(registeredUser);
+        if(userVerificationList.isEmpty()) {
+            throw new RuntimeException("Not found any verification code for this account. Please get your verification code first!");
+        }
+
+
     }
 }

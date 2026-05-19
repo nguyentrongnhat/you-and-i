@@ -1,5 +1,6 @@
 package com.nguyen_trong_nhat.you_and_i.common.security.provider;
 
+import com.nguyen_trong_nhat.you_and_i.common.config.Constants;
 import com.nguyen_trong_nhat.you_and_i.common.security.authentication.JwtAccessTokenAuthentication;
 import com.nguyen_trong_nhat.you_and_i.common.security.authentication.JwtRefreshTokenAuthentication;
 import com.nguyen_trong_nhat.you_and_i.common.security.service.impl.JwtServiceImpl;
@@ -22,7 +23,7 @@ public class JwtRefreshTokenAuthenticationProvider implements AuthenticationProv
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String token = (String) authentication.getCredentials();
 
-        if (!jwtService.isTokenValid(token)) {
+        if (!jwtService.isTokenValid(token, Constants.TOKEN_TYPE_REFRESH_TOKEN)) {
             return null;
         }
 

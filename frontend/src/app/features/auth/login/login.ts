@@ -71,9 +71,9 @@ export class Login {
 
   protected router = inject(Router);
   
-  protected loginModel = signal<LoginModel>(initialData);
+  protected loginFormData = signal<LoginModel>(initialData);
 
-  protected loginForm = form(this.loginModel, loginSchema);
+  protected loginForm = form(this.loginFormData, loginSchema);
 
   protected showPassword = signal<boolean>(false);
 
@@ -86,7 +86,7 @@ export class Login {
   protected onSubmit() {
     if (this.loginForm().invalid()) return;
 
-    const payload = this.loginModel();
+    const payload = this.loginFormData();
     const { username, password } = payload;
 
     this.login(username, password);

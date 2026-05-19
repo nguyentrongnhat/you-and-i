@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { email, form, FormField, required, schema } from '@angular/forms/signals';
+import { email, form, FormField, required, schema, validate } from '@angular/forms/signals';
 import { Router } from '@angular/router';
 import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
@@ -44,8 +44,32 @@ export enum PASSWORD_FIELD_TYPE {
 
 export const signupSchema = schema<SignupModel>((root) => {
   required(root.username, { message: 'user name is required'});
-  email(root.username, { message: 'Please enter the valid email address'})
-  required(root.isAcceptedTerm, { message: 'Accept term is required'})
+  email(root.username, { message: 'Please enter the valid email address'});
+  required(root.password, { message: 'password is required'});
+  required(root.confirmPassword, { message: 'confirm password is required'});
+  required(root.isAcceptedTerm, { message: 'Accept term is required'});
+  validate(root.password, (ctx) => {
+    const password = ctx.value();
+    const confirmPassword = ctx.valueOf(root.confirmPassword);
+    if(password && confirmPassword && password != confirmPassword) {
+      return {
+        kind: 'password mismatch',
+        message: 'password and confirm password are not the same!'
+      }
+    }
+    return null;
+  });
+  validate(root.confirmPassword, (ctx) => {
+    const confirmPassword = ctx.value();
+    const password = ctx.valueOf(root.password);
+    if(password && confirmPassword && password != confirmPassword) {
+      return {
+        kind: 'password mismatch',
+        message: 'password and confirm password are not the same!'
+      }
+    }
+    return null;
+  })
 })
 
 @Component({
@@ -82,9 +106,9 @@ export class Signup {
 
   protected router = inject(Router);
   
-  protected signupModel = signal<SignupModel>(initialData);
+  protected signupFormData = signal<SignupModel>(initialData);
 
-  protected signupForm = form(this.signupModel)//, signupSchema);
+  protected signupForm = form(this.signupFormData, signupSchema);
 
   protected showPassword = signal<boolean>(false);
 
@@ -101,7 +125,7 @@ export class Signup {
 
   protected onSubmit() {
     if (this.signupForm().invalid()) return;
-    this.signup(this.signupModel());
+    this.signup(this.signupFormData());
   }
 
 

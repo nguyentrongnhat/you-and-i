@@ -1,5 +1,6 @@
 package com.nguyen_trong_nhat.you_and_i.common.security.provider;
 
+import com.nguyen_trong_nhat.you_and_i.common.config.Constants;
 import com.nguyen_trong_nhat.you_and_i.common.security.authentication.JwtAccessTokenAuthentication;
 import com.nguyen_trong_nhat.you_and_i.common.security.service.impl.JwtServiceImpl;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class JwtAccessTokenAuthenticationProvider implements AuthenticationProvi
 
         String token = (String) authentication.getCredentials();
 
-        if (!jwtService.isTokenValid(token)) {
+        if (!jwtService.isTokenValid(token, Constants.TOKEN_TYPE_ACCESS_TOKEN)) {
             return null;
         }
 

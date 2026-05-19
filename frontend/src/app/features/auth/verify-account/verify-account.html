@@ -4,8 +4,8 @@
         <h1>Jar of Messages</h1> 
     </div>
 
-    @if(!this.isRequested()) {
-        <form pFocusTrap class="form" (ngSubmit)="onSubmit()">
+    @if(!this.isRequestedCode()) {
+        <form pFocusTrap class="form" (ngSubmit)="onSubmitRequestCode()">
             <p-iconfield>
                 <p-inputicon>
                     <i class="pi pi-envelope"> </i>
@@ -15,34 +15,37 @@
                     type="email" 
                     placeholder="Email" 
                     [fluid]="true" 
-                    [formField]="signupForm.username" />
+                    [formField]="getVerificationCodeForm.email" />
             </p-iconfield>
 
             <p-button 
                 type="submit"
                 label="Get verify code" 
                 [style]="{'width': '100%'}"
-                [severity]="submitButtonSeverity()"
-                [disabled]="signupForm().invalid()"/>
+                [severity]="submitGetVerificationCodeButtonSeverity()"
+                [disabled]="getVerificationCodeForm().invalid()"/>
         </form>
     }
     @else {
-        <form pFocusTrap class="form" (ngSubmit)="onSubmit()" animate.enter="enter-animation">
-            <p-inputotp size="large" [length]="6" [style]="{'margin': 'auto'}" required="true" [integerOnly]="true" />
+        <form pFocusTrap class="form" (ngSubmit)="onSubmitVerificationCode()" animate.enter="enter-animation">
+            <p-inputotp size="large" [length]="6" [style]="{'margin': 'auto'}" required="true" [integerOnly]="true" [formField]="emailVerificationForm.verificationCode" />
 
-            <div class="action-buttons" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-                <p-button 
-                    label="Resend Code" 
-                    [style]="{'width': '100%'}"
-                    severity="success"
-                    [disabled]="signupForm().invalid()"/>
+            <div class="action-buttons" style="display: grid; grid-template-columns: 1fr; gap: 1rem;">
     
                 <p-button 
+                    type="submit" 
                     label="Verify" 
                     [style]="{'width': '100%'}"
-                    [severity]="submitButtonSeverity()"
-                    [disabled]="signupForm().invalid()"/>
-            
+                    [severity]="submitEmailVerificationButtonSeverity()"
+                    [disabled]="emailVerificationForm().invalid()"/>
+
+                <p-button 
+                    label="Get Code Again {{this.timeRemainingToGetCodeAgain() > 0 ? `(${this.timeRemainingToGetCodeAgain()}s)`: ''}}" 
+                    [style]="{'width': '100%'}"
+                    (click)="getCodeAgain()"
+                    severity="success"
+                    [disabled]="emailVerificationForm().invalid() && this.timeRemainingToGetCodeAgain() > 0"/>
+
             </div>
         </form>
     }

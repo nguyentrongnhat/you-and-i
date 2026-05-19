@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { form, FormField } from '@angular/forms/signals';
+import { email, form, FormField, minLength, required, schema } from '@angular/forms/signals';
 import { Router } from '@angular/router';
 import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
@@ -18,24 +18,27 @@ import { ToastService } from '../../../services/toast.service';
 import { AuthService } from '../services/auth.service';
 import { VerifyAccountService } from '../services/verify-account.service';
 
-export interface SignupModel {
-  username: string,
-  password: string,
-  confirmPassword: string,
-  isAcceptedTerm: boolean
+export interface EmailVerificationModel {
+  email: string,
+  verificationCode: string,
 }
 
-export const initialData: SignupModel = {
-  username: 'admin@admin.com',
-  password: '',
-  confirmPassword: '',
-  isAcceptedTerm: true
+export const initialData: EmailVerificationModel = {
+  email: 'admin@admin.com',
+  verificationCode: ''
 }
 
-export enum PASSWORD_FIELD_TYPE {
-  PASSWORD = 'password',
-  CONFIRM_PASSWORD = 'confirm_password'
-}
+export const getVerificationCodeSchema = schema<EmailVerificationModel>((root) => {
+  required(root.email, { message: 'Email is required'});
+  email(root.email, { message: 'Please enter the valid email address'});
+})
+
+export const emailVerificationSchema = schema<EmailVerificationModel>((root) => {
+  required(root.email, { message: 'Email is required'});
+  required(root.verificationCode, { message: 'Verification code is required'});
+  email(root.email, { message: 'Please enter the valid email address'});
+  minLength(root.verificationCode, 6, { message: 'min length 6'});
+})
 
 @Component({
   selector: 'app-verify-account',
@@ -56,7 +59,7 @@ export enum PASSWORD_FIELD_TYPE {
   templateUrl: './verify-account.html',
   styleUrl: './verify-account.scss',
 })
-export class VerifyAccount implements OnInit {
+export class VerifyAccount implements OnInit, OnDestroy {
   
   protected platformService = inject(PlatformService);
 
@@ -70,29 +73,87 @@ export class VerifyAccount implements OnInit {
 
   protected router = inject(Router);
   
-  protected signupModel = signal<SignupModel>(initialData);
+  protected emailVerificationFormData = signal<EmailVerificationModel>(initialData);
 
-  protected signupForm = form(this.signupModel)//, signupSchema);
+  protected getVerificationCodeForm = form(this.emailVerificationFormData, getVerificationCodeSchema);
 
-  protected submitButtonSeverity = computed(() =>
-    this.signupForm().invalid() ? 'secondary' : 'contrast'
+  protected emailVerificationForm = form(this.emailVerificationFormData, emailVerificationSchema);
+
+  protected timeRemainingToGetCodeAgain = signal<number>(10);
+
+  protected submitGetVerificationCodeButtonSeverity = computed(() =>
+    this.getVerificationCodeForm().invalid() ? 'secondary' : 'contrast'
   );
 
-  protected isRequested = signal<boolean>(false);
+  protected submitEmailVerificationButtonSeverity = computed(() =>
+    this.emailVerificationForm().invalid() ? 'secondary' : 'contrast'
+  );
+
+  protected isRequestedCode = signal<boolean>(false);
+
+  private countDownInterval!: ReturnType<typeof setInterval>;
+
+  constructor() {
+    effect(() => {
+      const isRequestedCode = this.isRequestedCode()
+      console.log('chay effect: ', isRequestedCode)
+      if(!isRequestedCode) return;
+      this.availableResendCodeCountdown();
+    })
+
+    effect(() => {
+      const timer = this.timeRemainingToGetCodeAgain()
+      if(timer <= 0) {
+        clearInterval(this.countDownInterval);
+      }
+    })
+  }
+
+
+  ngOnDestroy(): void {
+    clearInterval(this.countDownInterval);
+  }
+  
 
   ngOnInit(): void {
     if(this.verifyAccountService.emailToBeVerified) {
-      initialData.username = this.verifyAccountService.emailToBeVerified;
-      this.signupModel.set(initialData);
+      initialData.email = this.verifyAccountService.emailToBeVerified;
+      this.emailVerificationFormData.set(initialData);
     }
     if(this.verifyAccountService.isVerificationCodeSent) {
-      this.isRequested.set(true);
+      this.isRequestedCode.set(true);
       this.verifyAccountService.isVerificationCodeSent = false;
     }
   }
 
-  protected onSubmit() {
-    console.log('submit code')
-    setTimeout(() => { this.isRequested.set(true) }, 500)
+
+  availableResendCodeCountdown() {
+    clearInterval(this.countDownInterval);
+    this.countDownInterval = setInterval(() => {
+      if(this.timeRemainingToGetCodeAgain() > 0) {
+        this.timeRemainingToGetCodeAgain.update(v => v-1);
+      }
+    }, 1000)
+  }
+
+
+  protected onSubmitRequestCode() {
+    console.log('request verification code for: ', this.getVerificationCodeForm())
+    setTimeout(() => { 
+      this.isRequestedCode.set(true) 
+      console.log('set thanh true')
+    }, 500)
+  }
+
+
+  protected onSubmitVerificationCode() {
+    console.log('verify ne')
+    console.log('verify form: ', this.emailVerificationFormData())
+  }
+
+
+  protected getCodeAgain() {
+    this.timeRemainingToGetCodeAgain.set(10);
+    this.isRequestedCode.set(false);
   }
 }

@@ -1,6 +1,7 @@
 package com.nguyen_trong_nhat.you_and_i.common.security.controller;
 
 import com.nguyen_trong_nhat.you_and_i.common.config.Constants;
+import com.nguyen_trong_nhat.you_and_i.common.dto.EmailVerificationRequest;
 import com.nguyen_trong_nhat.you_and_i.common.dto.LoginResponse;
 import com.nguyen_trong_nhat.you_and_i.common.dto.UsernamePasswordLoginRequest;
 import com.nguyen_trong_nhat.you_and_i.common.dto.UsernamePasswordSignupRequest;
@@ -73,6 +74,12 @@ public class AuthController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
                 .body(loginResponse);
+    }
+
+    @PostMapping("/verify-account")
+    public ResponseEntity<@NonNull LoginResponse> verifyAccount(@RequestBody @Valid EmailVerificationRequest emailVerificationRequest) {
+        authService.verifyAccount(emailVerificationRequest);
+        return ResponseEntity.ok().body(null);
     }
 }
 

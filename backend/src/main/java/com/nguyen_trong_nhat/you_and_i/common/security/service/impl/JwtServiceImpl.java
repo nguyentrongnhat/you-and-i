@@ -2,6 +2,7 @@ package com.nguyen_trong_nhat.you_and_i.common.security.service.impl;
 
 import com.nguyen_trong_nhat.you_and_i.common.config.Constants;
 import com.nguyen_trong_nhat.you_and_i.common.security.service.JwtService;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
@@ -43,35 +44,23 @@ public class JwtServiceImpl implements JwtService {
                 .compact();
     }
 
-    public boolean isTokenValid(String token) {
+    public boolean isTokenValid(String token, String tokenType) {
         try {
-            Date expiration = Jwts.parser()
-                    .verifyWith(key)
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload()
-                    .getExpiration();
-            return expiration != null && expiration.after(Date.from(Instant.now()));
+            Claims tokenClaims = extractAllClaims(token);
+            Date expiration = tokenClaims.getExpiration();
+            String type = tokenClaims.get("type", String.class);
+            return expiration != null && expiration.after(Date.from(Instant.now())) && tokenType.equals(type);
         } catch (Exception e) {
             return false;
         }
     }
 
     public String extractUsername(String token) {
-        return Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
+        return extractAllClaims(token).getSubject();
     }
 
     public List<String> extractRoles(String token) {
-        Object roles = Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload().get("roles");
+        Object roles = extractAllClaims(token).get("roles");
 
         if (roles instanceof List<?>) {
             return ((List<?>) roles).stream()
@@ -79,5 +68,13 @@ public class JwtServiceImpl implements JwtService {
                     .toList();
         }
         return Collections.emptyList();
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 }
