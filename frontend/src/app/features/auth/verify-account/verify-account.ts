@@ -3,7 +3,7 @@ import { Component, computed, effect, inject, OnDestroy, OnInit, signal } from '
 import { FormsModule } from '@angular/forms';
 import { email, form, FormField, minLength, required, schema } from '@angular/forms/signals';
 import { Router } from '@angular/router';
-import { AutoFocusModule } from 'primeng/autofocus';
+import { AutoFocusModule } from 'primeng/autofocus'; // This module is not used in the template.
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
 import { FocusTrapModule } from 'primeng/focustrap';
@@ -12,11 +12,12 @@ import { InputIconModule } from 'primeng/inputicon';
 import { InputOtp } from 'primeng/inputotp';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
-import { PlatformService } from '../../../services/platform.service';
+import { HttpClientService } from '../../../services/http-client.service';
 import { SessionStorageService } from '../../../services/session-storage.service';
 import { ToastService } from '../../../services/toast.service';
-import { AuthService } from '../services/auth.service';
 import { VerifyAccountService } from '../services/verify-account.service';
+import { ROUTE_PATHS } from '../../../core/constants/route-paths';
+import { MESSAGE_TYPE } from '../../../core/enums';
 
 export interface EmailVerificationModel {
   email: string,
@@ -24,7 +25,7 @@ export interface EmailVerificationModel {
 }
 
 export const initialData: EmailVerificationModel = {
-  email: 'admin@admin.com',
+  email: 'lordabsolute99@gmail.com',
   verificationCode: ''
 }
 
@@ -60,10 +61,6 @@ export const emailVerificationSchema = schema<EmailVerificationModel>((root) => 
   styleUrl: './verify-account.scss',
 })
 export class VerifyAccount implements OnInit, OnDestroy {
-  
-  protected platformService = inject(PlatformService);
-
-  private readonly authService = inject(AuthService);
 
   private readonly verifyAccountService = inject(VerifyAccountService);
 
@@ -72,6 +69,8 @@ export class VerifyAccount implements OnInit, OnDestroy {
   protected toastService = inject(ToastService);
 
   protected router = inject(Router);
+
+  private readonly httpService = inject(HttpClientService);
   
   protected emailVerificationFormData = signal<EmailVerificationModel>(initialData);
 
@@ -136,22 +135,48 @@ export class VerifyAccount implements OnInit, OnDestroy {
     }, 1000)
   }
 
-
+  /**
+   * Handles the submission for requesting a new verification code.
+   */
   protected onSubmitRequestCode() {
-    console.log('request verification code for: ', this.getVerificationCodeForm())
-    setTimeout(() => { 
-      this.isRequestedCode.set(true) 
-      console.log('set thanh true')
-    }, 500)
+    if(this.getVerificationCodeForm().invalid()) return;
+
+    this.verifyAccountService.requestVerificationCode(this.emailVerificationFormData().email).subscribe({
+      next: (res) => {
+        this.isRequestedCode.set(true);
+        this.availableResendCodeCountdown();
+      },
+      error: (err) => {
+        console.log(err)
+      },
+      complete: () => console.log('complete')
+    })
   }
 
-
+  /**
+   * Handles the submission for verifying the email with the provided code.
+   */
   protected onSubmitVerificationCode() {
-    console.log('verify ne')
-    console.log('verify form: ', this.emailVerificationFormData())
+    if(this.emailVerificationForm().invalid()) return;
+    const {email, verificationCode} = this.emailVerificationFormData();
+    this.verifyAccountService.verifyEmail(email, verificationCode).subscribe({
+      next: (res) => {
+        this.router.navigateByUrl(ROUTE_PATHS.HOME);
+      },
+      error: (err) => {
+        console.log(err.error.message)
+        const toastSummary = 'Verification failed';
+        const toastDetail = err.error.message;
+        console.log('Login error: ', err.error);
+        this.toastService.showToast(MESSAGE_TYPE.WARN, toastSummary, toastDetail);
+      },
+      complete: () => console.log('complete')
+    })
   }
 
-
+  /**
+   * Resets the countdown and allows requesting the code again.
+   */
   protected getCodeAgain() {
     this.timeRemainingToGetCodeAgain.set(10);
     this.isRequestedCode.set(false);

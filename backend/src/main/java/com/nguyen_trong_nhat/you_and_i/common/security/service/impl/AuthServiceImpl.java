@@ -37,6 +37,7 @@ public class AuthServiceImpl implements AuthService {
     private final MailService mailService;
     private final UserService userService;
 
+
     @Override
     public LoginResponse usernamePasswordAuthenticate(String username, String password) {
         Authentication authentication = new UsernamePasswordAuthenticationToken(username, password);
@@ -45,6 +46,7 @@ public class AuthServiceImpl implements AuthService {
         String refreshToken = jwtService.generateRefreshToken(user);
         return new LoginResponse(accessToken, refreshToken, user.getUsername());
     }
+
 
     @Override
     public LoginResponse refreshTokenAuthenticate(String refreshToken) {
@@ -55,6 +57,7 @@ public class AuthServiceImpl implements AuthService {
         return new LoginResponse(accessToken, newRefreshToken, user.getUsername());
     }
 
+
     @Override
     public UserDetails authenticate(Authentication authentication) {
         Authentication validateResult = authenticationManager.authenticate(authentication);
@@ -62,10 +65,10 @@ public class AuthServiceImpl implements AuthService {
         return (UserDetails) validateResult.getPrincipal();
     }
 
+
     @Transactional
     @Override
     public void signup (UsernamePasswordSignupRequest signupData) {
-
         if(!signupData.getPassword().equals(signupData.getConfirmPassword())) {
             throw new BadRequestException(ErrorConstant.PASSWORDS_DO_NOT_MATCH);
         }
@@ -77,36 +80,52 @@ public class AuthServiceImpl implements AuthService {
         }
 
         MyUserDetail newUser = userService.createUserWithUsernameAndPassword(signupData.getUsername(), signupData.getPassword());
-
         newUser = userRepository.save(newUser);
-
-        UserVerification uv = userService.createUserVerificationCode(newUser);
-
-        userVerificationRepository.save(uv);
-
-        log.info("{}: {}", "activeCode", uv.getVerificationCode());
-
-        mailService.sendHtmlMail(
-                signupData.getUsername(),
-                "Mail Test - Signup flow",
-                String.format("Your verify code is: %s.", uv.getVerificationCode())
-        );
+        this.createAndSendVerificationCodeForAccount(newUser.getUsername());
     }
+
 
     @Transactional
     public void verifyAccount(EmailVerificationRequest emailVerificationRequest) {
-        MyUserDetail registeredUser = userRepository.findByUsername(emailVerificationRequest.getEmail())
+        MyUserDetail userNeedToVerify = userRepository.findByUsername(emailVerificationRequest.getEmail())
                 .orElseThrow(() -> new BadRequestException(ErrorConstant.USER_NOT_REGISTERED));
 
-        if(registeredUser.isEmailVerified()) {
+        if(userNeedToVerify.isEmailVerified()) {
             throw new BadRequestException(ErrorConstant.EMAIL_ALREADY_VERIFIED);
         }
 
-        List<UserVerification> userVerificationList = userVerificationRepository.findUserVerificationByUser(registeredUser);
+        List<UserVerification> userVerificationList = userVerificationRepository.findUserVerificationByUser(userNeedToVerify);
         if(userVerificationList.isEmpty()) {
             throw new RuntimeException("Not found any verification code for this account. Please get your verification code first!");
         }
 
+        UserVerification userVerification = userVerificationList.stream()
+                .filter(item -> item.getVerificationCode().equals(emailVerificationRequest.getVerificationCode())
+                ).findFirst().orElseThrow(() -> new BadRequestException("Verification code is not correct"));
 
+        userVerification.setUsed(true);
+        userVerificationRepository.save(userVerification);
+        userNeedToVerify.setEmailVerified(true);
+        userRepository.save(userNeedToVerify);
+    }
+
+
+    public void createAndSendVerificationCodeForAccount(String username) {
+        MyUserDetail userNeedToVerify = userRepository.findByUsername(username)
+                .orElseThrow(() -> new BadRequestException(ErrorConstant.USER_NOT_REGISTERED));
+
+        if(userNeedToVerify.isEmailVerified()) {
+            throw new BadRequestException(ErrorConstant.EMAIL_ALREADY_VERIFIED);
+        }
+
+        UserVerification uv = userService.createUserVerificationCode(userNeedToVerify);
+        userVerificationRepository.save(uv);
+        log.info("{}: {}", "Verification Code", uv.getVerificationCode());
+
+        mailService.sendHtmlMail(
+                userNeedToVerify.getUsername(),
+                "Jar of Messages - Verify your account",
+                String.format("Your verification code is: %s.", uv.getVerificationCode())
+        );
     }
 }
