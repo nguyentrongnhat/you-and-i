@@ -1,0 +1,16 @@
+<p-table [value]="users()" [paginator]="true" [rows]="5" [tableStyle]="{ 'min-width': '25rem' }" [rowsPerPageOptions]="[5, 10, 20]">
+        <ng-template #header>
+            <tr>
+                <th>username</th>
+                <th>enabled</th>
+                <th>verified</th>
+            </tr>
+        </ng-template>
+        <ng-template #body let-user>
+            <tr>
+                <td>{{ user.username }}</td>
+                <td>{{ user.enabled }}</td>
+                <td>{{ user.emailVerified }}</td>
+            </tr>
+        </ng-template>
+    </p-table>

@@ -105,7 +105,7 @@
             <p-card header="Daily Activity" [style]="{'height': '100%'}">
                 <div class="activities" style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
                     @for(item of dailyActivityitems(); track item) {
-                        <div (click)="navigateToDailyActivity(item.url)" class="cursor-pointer">
+                        <div (click)="navigateTo(item.url)" class="cursor-pointer">
                             <p-panel [showHeader]="false" [style]="{'padding-top': '15px'}">
                                 <div class="activity-content" style="display: flex; justify-content: space-between; align-items: center;">
                                     <div class="icon-and-title" style="display: flex; align-items: center; gap: 30px">

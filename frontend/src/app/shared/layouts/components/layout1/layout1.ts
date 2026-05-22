@@ -55,6 +55,12 @@ export class Layout1 implements OnInit {
         url: this.ROUTE_PATHS.FIND_NUMBER_GAME,
         active: false
       },
+      {
+        name: 'Users Management',
+        icon: 'pi-users',
+        url: this.ROUTE_PATHS.USER_MANAGEMENT,
+        active: false
+      },
     ]
   );
 

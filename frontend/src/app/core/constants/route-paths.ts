@@ -3,5 +3,6 @@ export const ROUTE_PATHS = {
     LOGIN: 'login',
     SIGNUP: 'signup',
     VERIFY_ACCOUNT: 'signup/verify-account',
-    FIND_NUMBER_GAME: 'game/find-number-game'
+    FIND_NUMBER_GAME: 'game/find-number-game',
+    USER_MANAGEMENT: 'user-management'
 } as const;

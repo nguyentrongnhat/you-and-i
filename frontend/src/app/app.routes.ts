@@ -60,6 +60,14 @@ export const routes: Routes = [
     }
   },
   {
+    path: ROUTE_PATHS.USER_MANAGEMENT,
+    loadComponent: () => import('./features/user-management/user-management').then(c => c.UserManagement),
+    data: {
+      animation: 'SignUpPage',
+      layout: LAYOUT.LAYOUT_1
+    }
+  },
+  {
     path: '**',
     redirectTo: ''
   }

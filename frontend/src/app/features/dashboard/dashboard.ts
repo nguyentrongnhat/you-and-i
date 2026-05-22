@@ -1,18 +1,13 @@
-import { DatePipe } from '@angular/common';
 import { Component, inject, model, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { AnimateOnScrollModule } from 'primeng/animateonscroll';
+import { AvatarModule } from 'primeng/avatar';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
-import { take } from 'rxjs';
-import { UsernamePasswordLoginResponse } from '../../core/interfaces/user.dtos';
-import { HttpClientService } from '../../services/http-client.service';
-import { AuthService } from '../auth/services/auth.service';
-import { TableModule } from 'primeng/table';
 import { GalleriaModule } from 'primeng/galleria';
-import { PhotoService } from '../../services/photo.service';
 import { PanelModule } from 'primeng/panel';
-import { AvatarModule } from 'primeng/avatar';
-import { AnimateOnScrollModule } from 'primeng/animateonscroll';
+import { TableModule } from 'primeng/table';
+import { PhotoService } from '../../services/photo.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -21,18 +16,14 @@ import { AnimateOnScrollModule } from 'primeng/animateonscroll';
   styleUrl: './dashboard.scss',
 })
 export class Dashboard implements OnInit {
-  
-	private readonly authService = inject(AuthService);
 
   private readonly photoService = inject(PhotoService);
 
 	private readonly router = inject(Router);
 
-	private readonly httpClient = inject(HttpClientService)
+  protected images: any = model([]);
 
-	protected myDisplayText = signal<string>('')
-
-	public callGetTextNum = 0;
+  protected responsiveOptions: any[] = [];
 
   protected dailyActivityitems = signal<any[]>([
     {
@@ -51,44 +42,15 @@ export class Dashboard implements OnInit {
     }
   ]);
 
-  protected images: any = model([]);
-
-  protected responsiveOptions: any[] = [];
 
   ngOnInit(): void {
     this.photoService.getImages().then((images) => {
       this.images.set(images)
-      console.log('images: ', images)
-      console.log('signal: ', this.images())
     });
   }
 
 
-	getText() {
-		this.httpClient.get('', { responseType: 'text' }).pipe(take(1)).subscribe({
-			next: res => {
-				this.callGetTextNum++;
-				this.myDisplayText.set(res + ' : ' + this.callGetTextNum)
-			},
-			error: (err) => {
-				console.log(err)
-			}
-		});
-	}
-
-  sendMail() {
-    console.log('send mail')
-    this.httpClient.get('/mail/test').pipe(take(1)).subscribe({
-      next: (res) => {
-        console.log('OK');
-      },
-      error: (err) => {
-        console.log(err)
-      }
-    })
-  }
-
-  navigateToDailyActivity(url: string) {
+  navigateTo(url: string) {
     this.router.navigateByUrl(url);
   }
 }

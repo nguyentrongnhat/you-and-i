@@ -50,7 +50,6 @@ export class App implements OnInit {
 
   ngOnInit(): void {
     this.getRouteData();
-    this.getAccessToken();
   }
 
   private refreshToken() {
@@ -65,6 +64,8 @@ export class App implements OnInit {
   }
 
   private getAccessToken() {
+    const userinfo = this.authService.userInfo();
+    if (userinfo && !this.authService.isAccessTokenExp()) return;
     this.refreshToken();
   }
 
@@ -74,6 +75,7 @@ export class App implements OnInit {
       filter(event => event instanceof NavigationEnd),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe((event) => {
+      this.getAccessToken();
       this.getLayoutConfigData(this.activatedRoute);
     })
   }
