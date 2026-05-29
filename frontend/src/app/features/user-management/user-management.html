@@ -2,15 +2,19 @@
         <ng-template #header>
             <tr>
                 <th>username</th>
+                @if(!this.platformService.isSmallMobileDevice()) {
+                    <th>verified</th>
+                }
                 <th>enabled</th>
-                <th>verified</th>
             </tr>
         </ng-template>
         <ng-template #body let-user>
-            <tr>
+            <tr class="cursor-pointer" (click)="displayUserDetailDialog()">
                 <td>{{ user.username }}</td>
+                @if(!this.platformService.isSmallMobileDevice()) {
+                    <td>{{ user.emailVerified }}</td>
+                }
                 <td>{{ user.enabled }}</td>
-                <td>{{ user.emailVerified }}</td>
             </tr>
         </ng-template>
     </p-table>

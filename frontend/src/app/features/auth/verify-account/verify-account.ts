@@ -147,7 +147,11 @@ export class VerifyAccount implements OnInit, OnDestroy {
         this.availableResendCodeCountdown();
       },
       error: (err) => {
-        console.log(err)
+        console.log(err.error.message)
+        const toastSummary = 'Verification failed';
+        const toastDetail = err.error.message;
+        console.log('Login error: ', err.error);
+        this.toastService.showToast(MESSAGE_TYPE.WARN, toastSummary, toastDetail);
       },
       complete: () => console.log('complete')
     })
@@ -161,7 +165,7 @@ export class VerifyAccount implements OnInit, OnDestroy {
     const {email, verificationCode} = this.emailVerificationFormData();
     this.verifyAccountService.verifyEmail(email, verificationCode).subscribe({
       next: (res) => {
-        this.router.navigateByUrl(ROUTE_PATHS.HOME);
+        this.router.navigateByUrl(ROUTE_PATHS.LOGIN);
       },
       error: (err) => {
         console.log(err.error.message)
