@@ -1,30 +1,18 @@
 import { Routes } from '@angular/router';
-import { LAYOUT } from './core/enums';
+import { authGuard } from './core/auth/auth.guard';
+import { browserOnlyMatchGuard } from './core/auth/browser-only-match.guard';
 import { ROUTE_PATHS } from './core/constants/route-paths';
+import { LAYOUT } from './core/enums';
 
 export const routes: Routes = [
   {
     path: ROUTE_PATHS.HOME,
     loadComponent: () => import('./features/dashboard/dashboard').then(c => c.Dashboard),
+    canMatch: [browserOnlyMatchGuard],
+    canActivate: [authGuard],
     data: {
       animation: 'DashboardPage',
       layout: LAYOUT.LAYOUT_1
-    }
-  },
-  {
-    path: 'layout2',
-    loadComponent: () => import('./features/dashboard/dashboard').then(c => c.Dashboard),
-    data: {
-      animation: 'DashboardPage',
-      layout: LAYOUT.LAYOUT_2
-    }
-  },
-  {
-    path: 'layout3',
-    loadComponent: () => import('./features/dashboard/dashboard').then(c => c.Dashboard),
-    data: {
-      animation: 'DashboardPage',
-      layout: LAYOUT.LAYOUT_3
     }
   },
   {
@@ -54,6 +42,8 @@ export const routes: Routes = [
   {
     path: ROUTE_PATHS.FIND_NUMBER_GAME,
     loadComponent: () => import('./features/games/find-number-game/find-number-game').then(c => c.FindNumberGame),
+    canMatch: [browserOnlyMatchGuard],
+    canActivate: [authGuard],
     data: {
       animation: 'SignUpPage',
       layout: LAYOUT.LAYOUT_1
@@ -62,6 +52,8 @@ export const routes: Routes = [
   {
     path: ROUTE_PATHS.USER_MANAGEMENT,
     loadComponent: () => import('./features/user-management/user-management').then(c => c.UserManagement),
+    canMatch: [browserOnlyMatchGuard],
+    canActivate: [authGuard],
     data: {
       animation: 'SignUpPage',
       layout: LAYOUT.LAYOUT_1

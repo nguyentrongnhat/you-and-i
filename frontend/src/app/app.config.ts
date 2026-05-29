@@ -6,9 +6,9 @@ import { provideClientHydration, withEventReplay } from '@angular/platform-brows
 import { routes } from './app.routes';
 
 import Aura from '@primeuix/themes/aura';
+import { MessageService } from 'primeng/api';
 import { providePrimeNG } from 'primeng/config';
 import { authInterceptor } from './core/interceptors/auth-interceptor';
-import { MessageService } from 'primeng/api';
 
 const primengConfig = {
   theme: {

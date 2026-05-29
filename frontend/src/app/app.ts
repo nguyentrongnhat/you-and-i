@@ -1,16 +1,14 @@
 import { Component, DestroyRef, effect, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
-import { filter } from 'rxjs';
 import { Toast } from 'primeng/toast';
-import { UserService } from './services/user.service';
+import { filter } from 'rxjs';
+import { LAYOUT } from './core/enums';
+import { AuthService } from './features/auth/services/auth.service';
+import { EmptyLayout } from './shared/layouts/components/empty-layout/empty-layout';
 import { Layout1 } from './shared/layouts/components/layout1/layout1';
 import { Layout2 } from './shared/layouts/components/layout2/layout2';
 import { Layout3 } from './shared/layouts/components/layout3/layout3';
-import { EmptyLayout } from './shared/layouts/components/empty-layout/empty-layout';
-import { LAYOUT } from './core/enums';
-import { AuthService } from './features/auth/services/auth.service';
-import { UsernamePasswordLoginResponse } from './core/interfaces/user.dtos';
 
 @Component({
   selector: 'app-root',
@@ -40,6 +38,7 @@ export class App implements OnInit {
     public router: Router,
     public activatedRoute: ActivatedRoute,
   ) {
+
     effect(() => {
       const userinfo = this.authService.userInfo();
       if (!userinfo) return;
@@ -52,22 +51,6 @@ export class App implements OnInit {
     this.getRouteData();
   }
 
-  private refreshToken() {
-    this.authService.refreshToken().subscribe({
-      next: (res: UsernamePasswordLoginResponse) => {
-        this.authService.setAccessToken(res.accessToken);
-      },
-      error: err => {
-        console.log('Login error: ', err);
-      }
-    })
-  }
-
-  private getAccessToken() {
-    const userinfo = this.authService.userInfo();
-    if (userinfo && !this.authService.isAccessTokenExp()) return;
-    this.refreshToken();
-  }
 
   private getRouteData() {
     this.router.events
@@ -75,7 +58,6 @@ export class App implements OnInit {
       filter(event => event instanceof NavigationEnd),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe((event) => {
-      this.getAccessToken();
       this.getLayoutConfigData(this.activatedRoute);
     })
   }

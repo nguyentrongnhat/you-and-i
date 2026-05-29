@@ -17,6 +17,7 @@ export class PlatformService {
   }
 
   public isSmallMobileDevice(): boolean {
+    if (!this.isBrowser()) return false;
     const deviceWidth = window.innerWidth;
     return this.isMobile() && deviceWidth < this.MOBILE_DEVICE_WIDTH;
   }

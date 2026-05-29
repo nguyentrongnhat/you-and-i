@@ -55,11 +55,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
             if (!isRefreshingToken) { 
                 isRefreshingToken = true;
                 refreshTokenSubject.next(null);
-
                 return authService.refreshToken().pipe(
                     switchMap(res => {
                         isRefreshingToken = false;
-                        authService.setAccessToken(res.accessToken);
                         refreshTokenSubject.next(res.accessToken);
 
                         return next(
@@ -72,8 +70,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
                     }),
                     catchError(refreshErr => {
                         isRefreshingToken = false;
-                        authService.clearAccessToken();
-                        router.navigateByUrl(ROUTE_PATHS.LOGIN);
+                        authService.logout();
                         return throwError(() => refreshErr);
                     })
                 );

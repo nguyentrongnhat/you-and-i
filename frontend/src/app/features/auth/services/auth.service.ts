@@ -3,6 +3,10 @@ import { HttpClientService } from "../../../services/http-client.service";
 import { UsernamePasswordLoginResponse } from "../../../core/interfaces/user.dtos";
 import { API_ENDPOINTS } from "../../../core/constants/api-endpoints";
 import { SignupModel } from "../signup/signup";
+import { catchError, map, Observable, of, switchMap, tap, throwError } from "rxjs";
+import { Router } from "@angular/router";
+import { ROUTE_PATHS } from "../../../core/constants/route-paths";
+import { PlatformService } from "../../../services/platform.service";
 
 @Injectable({
     providedIn: 'root'
@@ -14,6 +18,9 @@ export class AuthService {
 
     public readonly accessToken = this._accessToken.asReadonly();
 
+    private readonly router = inject(Router);
+
+    private readonly platformService = inject(PlatformService);
 
     public readonly userInfo = computed(() => {
 
@@ -23,6 +30,21 @@ export class AuthService {
 
         return this.parseJwt(accessToken);
     })
+
+
+    public isAccessTokenValid = computed<boolean>(() => {
+        return !!this._accessToken() && !this.isAccessTokenExp();
+    })
+
+
+    public isAuthenticated() {
+        if(this.isAccessTokenValid()) return of(true);
+        
+        return this.refreshToken().pipe(
+            map(() => true),
+            catchError(() => of(false))
+        );
+    }
 
 
     public setAccessToken(token: string) {
@@ -36,18 +58,30 @@ export class AuthService {
 
 
     public login(username: string, password: string) {
-        return this.httpService.post<UsernamePasswordLoginResponse>(API_ENDPOINTS.AUTH.LOGIN, { username, password });
+        return this.httpService.post<UsernamePasswordLoginResponse>(API_ENDPOINTS.AUTH.LOGIN, { username, password })
+            .pipe(
+                tap(res => this.setAccessToken(res.accessToken))
+            );
     }
 
 
     public refreshToken() {
-        return this.httpService.post<UsernamePasswordLoginResponse>(API_ENDPOINTS.AUTH.REFRESH_TOKEN, {});
+        return this.httpService.post<UsernamePasswordLoginResponse>(API_ENDPOINTS.AUTH.REFRESH_TOKEN, {})
+            .pipe(
+                tap(res => this.setAccessToken(res.accessToken)),
+            );
     }
 
 
     public signup(signupData: SignupModel) {
         console.log('Sign up for: ', signupData)
         return this.httpService.post<UsernamePasswordLoginResponse>(API_ENDPOINTS.AUTH.SIGNUP, signupData);
+    }
+
+
+    public logout() {
+        this.clearAccessToken();
+        this.router.navigateByUrl(ROUTE_PATHS.LOGIN);
     }
     
 
@@ -65,7 +99,7 @@ export class AuthService {
 
 
     public isAccessTokenExp(): boolean {
-        if(!this.userInfo()) return true;
+        if(!this._accessToken()) return true;
         const expTime = this.userInfo().exp;
         return Number(expTime) < Date.now() / 1000;
     }

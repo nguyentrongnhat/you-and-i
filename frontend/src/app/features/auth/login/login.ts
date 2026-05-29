@@ -95,10 +95,7 @@ export class Login {
   private login(username: string, password: string) {
     this.authService.login(username, password).subscribe({
       next: (res: UsernamePasswordLoginResponse) => {
-      
-        this.authService.setAccessToken(res.accessToken);
         const redirectUrl = this.sessionStorageService.getItem(STORAGE_KEY.REDIRECT_URL);
-
         if (redirectUrl) {
           this.sessionStorageService.removeItem(STORAGE_KEY.REDIRECT_URL);
           this.router.navigateByUrl(redirectUrl);
