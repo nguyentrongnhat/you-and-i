@@ -45,6 +45,9 @@ public class MyUserDetail extends BaseEntity implements UserDetails {
     @Column(name = "email_verified")
     private boolean emailVerified = false;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserProfile profile;
+
     @Column(name = "enable_at")
     private LocalDateTime enableAt;
 

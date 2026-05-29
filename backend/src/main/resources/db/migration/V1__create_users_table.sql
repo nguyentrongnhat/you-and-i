@@ -49,6 +49,33 @@ CREATE TABLE IF NOT EXISTS user_verifications (
 CREATE INDEX idx_user_verifications_user_id_used
     ON user_verifications(user_id, used);
 
+
+-- =========================
+-- USER_PROFILE
+CREATE TABLE IF NOT EXISTS user_profile (
+    id UUID PRIMARY KEY DEFAULT uuidv7(),
+
+    user_id UUID NOT NULL,
+    full_name VARCHAR(100),
+    display_name VARCHAR(150),
+    avatar_url TEXT,
+    phone VARCHAR(20),
+    date_of_birth DATE,
+    gender VARCHAR(20),
+    bio TEXT,
+    address TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_user_profile_user
+    FOREIGN KEY (user_id)
+    REFERENCES users(id)
+    ON DELETE CASCADE
+    );
+
+CREATE UNIQUE INDEX IF NOT EXISTS uk_user_profile_user_id
+    ON user_profile(user_id);
+
 -- =========================
 -- Seed roles data
 INSERT INTO roles (name)

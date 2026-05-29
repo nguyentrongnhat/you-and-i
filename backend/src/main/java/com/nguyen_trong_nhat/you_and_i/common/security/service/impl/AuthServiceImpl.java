@@ -107,6 +107,7 @@ public class AuthServiceImpl implements AuthService {
         userVerificationRepository.save(userVerification);
         userNeedToVerify.setEmailVerified(true);
         userRepository.save(userNeedToVerify);
+        userService.createUserProfile(userNeedToVerify);
     }
 
 

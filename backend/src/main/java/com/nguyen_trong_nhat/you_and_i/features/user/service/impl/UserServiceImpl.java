@@ -5,10 +5,13 @@ import com.nguyen_trong_nhat.you_and_i.common.exception.BadRequestException;
 import com.nguyen_trong_nhat.you_and_i.common.util.OtpGenerator;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.Role;
+import com.nguyen_trong_nhat.you_and_i.features.user.entity.UserProfile;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.UserVerification;
 import com.nguyen_trong_nhat.you_and_i.features.user.repository.RoleRepository;
+import com.nguyen_trong_nhat.you_and_i.features.user.repository.UserProfileRepository;
 import com.nguyen_trong_nhat.you_and_i.features.user.repository.UserRepository;
 import com.nguyen_trong_nhat.you_and_i.features.user.service.UserService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,6 +28,7 @@ public class UserServiceImpl implements UserService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final UserProfileRepository userProfileRepository;
 
     @Override
     public MyUserDetail createUserWithUsernameAndPassword(String username, String password) {
@@ -61,5 +65,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<MyUserDetail> getAllUser() {
         return userRepository.findAll();
+    }
+
+    @Override
+    @Transactional
+    public UserProfile createUserProfile(MyUserDetail user) {
+        Optional<UserProfile> userProfileOpt = userProfileRepository.findUserProfileByUser(user);
+        if(userProfileOpt.isPresent()) {
+            return userProfileOpt.get();
+        }
+
+        UserProfile newUserProfile = new UserProfile();
+        newUserProfile.setUser(user);
+        newUserProfile.setDisplayName(user.getUsername());
+        return userProfileRepository.save(newUserProfile);
     }
 }
