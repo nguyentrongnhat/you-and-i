@@ -86,13 +86,6 @@ VALUES
 ON CONFLICT (name) DO NOTHING;
 
 -- =========================
--- Seed admin user
--- Password: 'admin123' encoded with BCrypt
-INSERT INTO users(username, password, enabled,  email_verified)
-VALUES ('admin@admin.com', '$2a$12$P9cuc9ycb.ApZ63gGUSE1OCd9Keh5jPmnXzhkrZ5JzllFJttoqX32', TRUE, TRUE)
-ON CONFLICT (username) DO NOTHING;
-
--- =========================
 -- Assign admin role to the admin user
 INSERT INTO user_roles(user_id, role_id)
 SELECT u.id, r.id

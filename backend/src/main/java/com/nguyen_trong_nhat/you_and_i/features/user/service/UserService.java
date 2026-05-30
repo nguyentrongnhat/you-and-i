@@ -14,4 +14,6 @@ public interface UserService {
     List<MyUserDetail> getAllUser();
 
     UserProfile createUserProfile(MyUserDetail user);
+
+    void initSuperAdminAccount(String username, String password);
 }

@@ -1,6 +1,7 @@
 package com.nguyen_trong_nhat.you_and_i.features.user.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.nguyen_trong_nhat.you_and_i.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -46,6 +47,7 @@ public class MyUserDetail extends BaseEntity implements UserDetails {
     private boolean emailVerified = false;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private UserProfile profile;
 
     @Column(name = "enable_at")

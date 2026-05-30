@@ -1,15 +1,16 @@
 package com.nguyen_trong_nhat.you_and_i.common.security.service.impl;
 
 import com.nguyen_trong_nhat.you_and_i.common.dto.EmailVerificationRequest;
+import com.nguyen_trong_nhat.you_and_i.common.dto.LoginResponse;
 import com.nguyen_trong_nhat.you_and_i.common.dto.UsernamePasswordSignupRequest;
 import com.nguyen_trong_nhat.you_and_i.common.exception.BadRequestException;
 import com.nguyen_trong_nhat.you_and_i.common.exception.ErrorConstant;
-import com.nguyen_trong_nhat.you_and_i.common.dto.LoginResponse;
 import com.nguyen_trong_nhat.you_and_i.common.security.authentication.JwtRefreshTokenAuthentication;
 import com.nguyen_trong_nhat.you_and_i.common.security.service.AuthService;
 import com.nguyen_trong_nhat.you_and_i.features.mail.service.MailService;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.UserVerification;
+import com.nguyen_trong_nhat.you_and_i.features.user.repository.UserProfileRepository;
 import com.nguyen_trong_nhat.you_and_i.features.user.repository.UserRepository;
 import com.nguyen_trong_nhat.you_and_i.features.user.repository.UserVerificationRepository;
 import com.nguyen_trong_nhat.you_and_i.features.user.service.UserService;
@@ -36,6 +37,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserVerificationRepository userVerificationRepository;
     private final MailService mailService;
     private final UserService userService;
+    private final UserProfileRepository userProfileRepository;
 
 
     @Override
@@ -107,7 +109,7 @@ public class AuthServiceImpl implements AuthService {
         userVerificationRepository.save(userVerification);
         userNeedToVerify.setEmailVerified(true);
         userRepository.save(userNeedToVerify);
-        userService.createUserProfile(userNeedToVerify);
+        userProfileRepository.save(userService.createUserProfile(userNeedToVerify));
     }
 
 

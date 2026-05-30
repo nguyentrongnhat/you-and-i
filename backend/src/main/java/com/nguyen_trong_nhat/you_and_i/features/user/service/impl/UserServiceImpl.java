@@ -2,6 +2,7 @@ package com.nguyen_trong_nhat.you_and_i.features.user.service.impl;
 
 import com.nguyen_trong_nhat.you_and_i.common.config.Constants;
 import com.nguyen_trong_nhat.you_and_i.common.exception.BadRequestException;
+import com.nguyen_trong_nhat.you_and_i.common.exception.NotFoundException;
 import com.nguyen_trong_nhat.you_and_i.common.util.OtpGenerator;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.Role;
@@ -78,6 +79,39 @@ public class UserServiceImpl implements UserService {
         UserProfile newUserProfile = new UserProfile();
         newUserProfile.setUser(user);
         newUserProfile.setDisplayName(user.getUsername());
-        return userProfileRepository.save(newUserProfile);
+        return newUserProfile;
+    }
+
+    @Override
+    @Transactional
+    public void initSuperAdminAccount(String username, String password) {
+        Optional<MyUserDetail> existingAccountOpt = userRepository.findByUsername(username);
+
+        Role superAdminRole = roleRepository
+                .findByName(Constants.ROLE_SUPER_ADMIN)
+                .orElseThrow(() -> new NotFoundException("Super-Admin role does not exist in the system."));
+
+        if(existingAccountOpt.isPresent()) {
+            MyUserDetail existingAccount = existingAccountOpt.get();
+            existingAccount.getRoles().add(superAdminRole);
+            userRepository.save(existingAccount);
+            return;
+        };
+
+        List<MyUserDetail> superAdminAccounts = userRepository.findAllByRoles_Name(superAdminRole.getName());
+
+        if(!superAdminAccounts.isEmpty()) {
+            userRepository.deleteAll(superAdminAccounts);
+        }
+
+        MyUserDetail superAdmin = this.createUserWithUsernameAndPassword(username, password);
+        superAdmin.setRoles(Set.of(superAdminRole));
+        superAdmin.setEnabled(true);
+        superAdmin.setEmailVerified(true);
+
+        superAdmin = userRepository.save(superAdmin);
+        UserProfile superAdminProfile = this.createUserProfile(superAdmin);
+        superAdminProfile.setDisplayName("Super-Admin");
+        userProfileRepository.save(superAdminProfile);
     }
 }

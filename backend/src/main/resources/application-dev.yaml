@@ -26,4 +26,9 @@ gmail:
     refresh-token: ${GMAIL_REFRESH_TOKEN}
     email: ${GMAIL_EMAIL}
 
+account:
+  super-admin:
+    username: ${SUPER_ADMIN_USERNAME}
+    password: ${SUPER_ADMIN_PASSWORD}
+
 
