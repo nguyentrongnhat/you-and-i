@@ -1,12 +1,11 @@
 import { computed, inject, Injectable, signal } from "@angular/core";
-import { HttpClientService } from "../../../services/http-client.service";
-import { UsernamePasswordLoginResponse } from "../../../core/interfaces/user.dtos";
-import { API_ENDPOINTS } from "../../../core/constants/api-endpoints";
-import { SignupModel } from "../signup/signup";
-import { catchError, map, Observable, of, switchMap, tap, throwError } from "rxjs";
 import { Router } from "@angular/router";
+import { catchError, map, of, tap } from "rxjs";
+import { API_ENDPOINTS } from "../../../core/constants/api-endpoints";
 import { ROUTE_PATHS } from "../../../core/constants/route-paths";
-import { PlatformService } from "../../../services/platform.service";
+import { UsernamePasswordLoginResponse } from "../../../core/interfaces/user.dtos";
+import { HttpClientService } from "../../../services/http-client.service";
+import { SignupModel } from "../signup/signup";
 
 @Injectable({
     providedIn: 'root'
@@ -20,9 +19,8 @@ export class AuthService {
 
     private readonly router = inject(Router);
 
-    private readonly platformService = inject(PlatformService);
 
-    public readonly userInfo = computed(() => {
+    public readonly accessTokenPayload = computed(() => {
 
         const accessToken = this._accessToken();
 
@@ -100,7 +98,7 @@ export class AuthService {
 
     public isAccessTokenExp(): boolean {
         if(!this._accessToken()) return true;
-        const expTime = this.userInfo().exp;
+        const expTime = this.accessTokenPayload().exp;
         return Number(expTime) < Date.now() / 1000;
     }
 }

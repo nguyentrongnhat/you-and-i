@@ -33,16 +33,15 @@ export class App implements OnInit {
 
   private readonly authService = inject(AuthService);
 
-
   constructor(
     public router: Router,
     public activatedRoute: ActivatedRoute,
   ) {
 
     effect(() => {
-      const userinfo = this.authService.userInfo();
+      const userinfo = this.authService.accessTokenPayload();
       if (!userinfo) return;
-      console.log('userinfo: ', userinfo);
+      console.log('access token payload: ', userinfo);
     })
   }
 

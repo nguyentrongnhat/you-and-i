@@ -2,6 +2,7 @@ package com.nguyen_trong_nhat.you_and_i.common.security.service.impl;
 
 import com.nguyen_trong_nhat.you_and_i.common.config.Constants;
 import com.nguyen_trong_nhat.you_and_i.common.security.service.JwtService;
+import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -27,6 +28,7 @@ public class JwtServiceImpl implements JwtService {
                 .subject(user.getUsername())
                 .claim("type", Constants.TOKEN_TYPE_ACCESS_TOKEN)
                 .claim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
+                .claim("profile", ((MyUserDetail) user).getProfile())
                 .issuedAt(new Date())
                 .expiration(Date.from(Instant.now().plusSeconds(Constants.ACCESS_TOKEN_MAX_AGE)))
                 .signWith(key, Jwts.SIG.HS256)

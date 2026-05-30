@@ -13,7 +13,7 @@
                 max-[970px]:leading-[70px]
                 max-[550px]:text-3xl
                 max-[550px]:leading-[60px]
-            ">Welcome, Bông</h1>
+            ">Welcome, {{ this.userService.userProfile()?.displayName }}</h1>
             <p>Today is a beautiful day to create a new memory with me.</p>
         </div>
 

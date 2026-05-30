@@ -8,6 +8,7 @@ import { GalleriaModule } from 'primeng/galleria';
 import { PanelModule } from 'primeng/panel';
 import { TableModule } from 'primeng/table';
 import { PhotoService } from '../../services/photo.service';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -18,6 +19,8 @@ import { PhotoService } from '../../services/photo.service';
 export class Dashboard implements OnInit {
 
   private readonly photoService = inject(PhotoService);
+
+  protected readonly userService = inject(UserService);
 
 	private readonly router = inject(Router);
 
