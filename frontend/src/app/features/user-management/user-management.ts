@@ -4,10 +4,12 @@ import { TableModule } from 'primeng/table';
 import { PlatformService } from '../../services/platform.service';
 import { UserService } from '../../services/user.service';
 import { UserDetail } from './components/user-detail/user-detail';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-user-management',
-  imports: [TableModule],
+  imports: [TableModule, ToggleSwitchModule, FormsModule],
   templateUrl: './user-management.html',
   styleUrl: './user-management.scss',
   providers: [DialogService]
@@ -47,5 +49,10 @@ export class UserManagement {
             '640px': '90vw'
         },
     });
+  }
+
+
+  toggleUserAccount(user: any) {
+    console.log('toggle user account', user);
   }
 }
