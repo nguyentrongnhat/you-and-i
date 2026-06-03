@@ -72,7 +72,6 @@ export class AuthService {
 
 
     public signup(signupData: SignupModel) {
-        console.log('Sign up for: ', signupData)
         return this.httpService.post<UsernamePasswordLoginResponse>(API_ENDPOINTS.AUTH.SIGNUP, signupData);
     }
 

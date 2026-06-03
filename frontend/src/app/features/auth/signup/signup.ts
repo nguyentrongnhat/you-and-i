@@ -130,11 +130,8 @@ export class Signup {
 
 
   private signup(signupData: SignupModel) {
-    console.log('sign up username: ', signupData)
     this.authService.signup(signupData).subscribe({
       next: (res: UsernamePasswordLoginResponse) => {
-        console.log('res sign up: ', res)
-
         const toastSummary = 'Registration successful!';
         const toastDetail = 'We\'ve sent a verification code to your email. Please enter the code to confirm your email address.';
         this.toastService.showToast(MESSAGE_TYPE.SUCCESS, toastSummary, toastDetail);

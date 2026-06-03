@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
@@ -6,6 +6,8 @@ import { take } from 'rxjs';
 import { HttpClientService } from '../../../services/http-client.service';
 import { GameHistories } from './components/game-histories/game-histories';
 import { GameTable } from './components/game-table/game-table';
+import { FindNumberGameService } from './services/findnumber.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export type NumberData = {
   value: number;
@@ -29,17 +31,17 @@ export enum FIND_NUMBER_GAME_STATUSES {
   styleUrl: './find-number-game.scss',
 })
 export class FindNumberGame {
-  FIND_NUMBER_GAME_STATUSES = FIND_NUMBER_GAME_STATUSES;
+  protected FIND_NUMBER_GAME_STATUSES = FIND_NUMBER_GAME_STATUSES;
 
-  gameCurrentStatus = signal<FIND_NUMBER_GAME_STATUSES>(FIND_NUMBER_GAME_STATUSES.NONE);
+  protected gameCurrentStatus = signal<FIND_NUMBER_GAME_STATUSES>(FIND_NUMBER_GAME_STATUSES.NONE);
 
-  gameFinished = signal<boolean>(false);
+  protected gameFinished = signal<boolean>(false);
 
-  visible = signal<boolean>(false);
+  protected visible = signal<boolean>(false);
 
-  private readonly httpClient = inject(HttpClientService);
+  private readonly findNumberGameService = inject(FindNumberGameService);
 
-  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
 	protected timer: number = 0;
 
@@ -51,23 +53,23 @@ export class FindNumberGame {
 
 	protected gameHistories = signal<any[]>([]);
 
-  showGameHistoriesDialog() {
+  protected showGameHistoriesDialog() {
     this.visible.set(true);
   }
 
-  onSelectNumber(num: number) {
-    console.log('number: ', num)
+
+  protected onSelectNumber(num: number) {
     if(num === 2) {
       this.finishGame();
     }
   }
 
-  startGame() {
-    console.log('start game')
 
-    this.httpClient.post('/game/find-number-game', {startTime: new Date()}).pipe(take(1)).subscribe({
+  protected startGame() {
+    this.findNumberGameService.startGame()
+    .pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe({
       next: (res: any) => {
-        console.log("game info: ", res);
         this.currentGameId = res.gameId
         this.gameCurrentStatus.set(FIND_NUMBER_GAME_STATUSES.STARTED);
         this.startTimer()
@@ -79,7 +81,7 @@ export class FindNumberGame {
   }
 
 
-  startTimer(): void {
+  private startTimer(): void {
     if(this.timeInterval) {
       clearInterval(this.timeInterval);
     }
@@ -91,18 +93,18 @@ export class FindNumberGame {
   }
 
 
-  stopTimer() {
+  private stopTimer() {
     clearInterval(this.timeInterval);
     this.timer = 0;
   }
 
 
-  finishGame(): void {
+  protected finishGame(): void {
     this.gameCurrentStatus.set(FIND_NUMBER_GAME_STATUSES.FINISHED)
-    this.callAPIFinishGame().subscribe({
+    this.findNumberGameService.finishGame(this.currentGameId, this.timer)
+    .pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe({
       next: (res: any) => {
-        console.log('finish game: ', res)
-
         this.stopTimer();
         this.getHistories()
       }
@@ -110,8 +112,9 @@ export class FindNumberGame {
   }
 
 
-  getHistories() {
-    this.callAPILoadGameHistory().subscribe({
+  protected getHistories() {
+    this.findNumberGameService.getGameHistories()
+    .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (res: any) => {
         console.log('game history: ', res)
         this.gameHistories.set(res)
@@ -121,34 +124,10 @@ export class FindNumberGame {
   }
 
 
-  convertTimerToTimeDisplay(seconds: number) {
+  protected convertTimerToTimeDisplay(seconds: number) {
     const hh = Math.floor(seconds / 3600)
     const mm = Math.floor((seconds % 3600) / 60)
     const ss = Math.floor(((seconds % 3600) % 60) % 60)
     return `${hh > 9 ? hh : 0 + hh.toString()} : ${mm > 9 ? mm : 0 + mm.toString()} : ${ss > 9 ? ss : 0 + ss.toString()}`
-  }
-
-
-  callAPIstartGame() {
-    const startGameInfo = {
-      userId: 1,
-      startTime: new Date()
-    }
-    return this.httpClient.post('/game/find-number-game/start-game', startGameInfo)
-  }
-
-
-  callAPIFinishGame() {
-    const finishGameInfo = {
-      gameId: this.currentGameId.toString(),
-      timeToFinish: this.timer.toString(),
-      endTime: new Date()
-    }
-    return this.httpClient.post('/game/find-number-game/finish-game', finishGameInfo)
-  }
-
-
-  callAPILoadGameHistory() {
-    return this.httpClient.get('/game/find-number-game/history')
   }
 }
