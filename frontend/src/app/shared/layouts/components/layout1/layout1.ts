@@ -6,6 +6,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { CommonModule } from '@angular/common';
 import { PlatformService } from '../../../../services/platform.service';
 import { filter } from 'rxjs';
+import { AuthService } from '../../../../features/auth/services/auth.service';
 
 @Component({
   selector: 'app-layout1',
@@ -22,6 +23,8 @@ export class Layout1 implements OnInit {
   protected expandSideMenu = signal<boolean>(false);
 
   private readonly platformService = inject(PlatformService);
+
+  private readonly authService = inject(AuthService);
 
   protected navigationItems = signal(
     [
@@ -99,5 +102,10 @@ export class Layout1 implements OnInit {
     this.hideSideMenuTimeout = setTimeout(() => {
       if(this.platformService.isSmallMobileDevice()) this.expandSideMenu.set(false);
     }, 3000);
+  }
+
+
+  protected signOut(): void {
+    this.authService.logout();
   }
 }

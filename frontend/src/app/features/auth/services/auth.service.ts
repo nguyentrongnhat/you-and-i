@@ -63,6 +63,18 @@ export class AuthService {
     }
 
 
+    public logout() {
+        this.clearAccessToken();
+        this.httpService.post(API_ENDPOINTS.AUTH.SIGNOUT, {}).subscribe({
+            next: () => {
+                console.log('Logged out successfully');
+                this.router.navigateByUrl(ROUTE_PATHS.LOGIN);
+            },
+            error: (err) => console.log('Error during logout:', err)
+        });
+    }
+
+
     public refreshToken() {
         return this.httpService.post<UsernamePasswordLoginResponse>(API_ENDPOINTS.AUTH.REFRESH_TOKEN, {})
             .pipe(
@@ -73,12 +85,6 @@ export class AuthService {
 
     public signup(signupData: SignupModel) {
         return this.httpService.post<UsernamePasswordLoginResponse>(API_ENDPOINTS.AUTH.SIGNUP, signupData);
-    }
-
-
-    public logout() {
-        this.clearAccessToken();
-        this.router.navigateByUrl(ROUTE_PATHS.LOGIN);
     }
     
 

@@ -84,5 +84,24 @@ public class AuthController {
                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
                 .body(loginResponse);
     }
+
+    @PostMapping("/signout")
+    public ResponseEntity<Void> signout(@CookieValue(name = "refresh_token", required = false) String refreshToken) {
+        // Optional: invalidate server-side refresh token if your authService provides such functionality
+        // if (refreshToken != null) { authService.invalidateRefreshToken(refreshToken); }
+
+        // Overwrite the refresh_token cookie with maxAge=0 to remove it from the client
+        ResponseCookie deleteCookie = ResponseCookie.from("refresh_token", "")
+                .httpOnly(true)
+                .sameSite("Lax")
+                .secure(false) // set true if using HTTPS
+                .path("/api/auth/refresh")
+                .maxAge(0)
+                .build();
+
+        return ResponseEntity.noContent()
+                .header(HttpHeaders.SET_COOKIE, deleteCookie.toString())
+                .build();
+    }
 }
 
