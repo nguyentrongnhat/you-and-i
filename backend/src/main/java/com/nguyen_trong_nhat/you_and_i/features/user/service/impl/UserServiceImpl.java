@@ -4,10 +4,12 @@ import com.nguyen_trong_nhat.you_and_i.common.config.Constants;
 import com.nguyen_trong_nhat.you_and_i.common.exception.BadRequestException;
 import com.nguyen_trong_nhat.you_and_i.common.exception.NotFoundException;
 import com.nguyen_trong_nhat.you_and_i.common.util.OtpGenerator;
+import com.nguyen_trong_nhat.you_and_i.features.user.dto.UserDetailDTO;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.Role;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.UserProfile;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.UserVerification;
+import com.nguyen_trong_nhat.you_and_i.features.user.mapper.UserDataMapper;
 import com.nguyen_trong_nhat.you_and_i.features.user.repository.RoleRepository;
 import com.nguyen_trong_nhat.you_and_i.features.user.repository.UserProfileRepository;
 import com.nguyen_trong_nhat.you_and_i.features.user.repository.UserRepository;
@@ -30,6 +32,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final UserProfileRepository userProfileRepository;
+    private final UserDataMapper userDataMapper;
 
     @Override
     public MyUserDetail createUserWithUsernameAndPassword(String username, String password) {
@@ -64,8 +67,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<MyUserDetail> getAllUser() {
-        return userRepository.findAll();
+    public List<UserDetailDTO> getAllUser() {
+        List<MyUserDetail> allUserFromDB = userRepository.findAll();
+        return allUserFromDB.stream()
+                .map(userDataMapper::toUserDetailDTO)
+                .toList();
     }
 
     @Override
@@ -107,11 +113,28 @@ public class UserServiceImpl implements UserService {
         MyUserDetail superAdmin = this.createUserWithUsernameAndPassword(username, password);
         superAdmin.setRoles(Set.of(superAdminRole));
         superAdmin.setEnabled(true);
+        superAdmin.setEnableAt(LocalDateTime.now());
         superAdmin.setEmailVerified(true);
 
         superAdmin = userRepository.save(superAdmin);
         UserProfile superAdminProfile = this.createUserProfile(superAdmin);
         superAdminProfile.setDisplayName("Super-Admin");
         userProfileRepository.save(superAdminProfile);
+    }
+
+    @Transactional
+    @Override
+    public UserDetailDTO updateUserData(UserDetailDTO userDetailDTO) {
+        Optional<MyUserDetail> existingAccountOpt = userRepository.findByUsername(userDetailDTO.getUsername());
+        if (existingAccountOpt.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
+        MyUserDetail existingAccount = existingAccountOpt.get();
+
+        existingAccount = userDataMapper.updateEntityFromDTO(userDetailDTO, existingAccount);
+
+        userRepository.save(existingAccount);
+
+        return userDataMapper.toUserDetailDTO(existingAccount);
     }
 }

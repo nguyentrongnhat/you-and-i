@@ -2,10 +2,11 @@ import { Component, inject, signal } from '@angular/core';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { TableModule } from 'primeng/table';
 import { PlatformService } from '../../services/platform.service';
-import { UserService } from '../../services/user.service';
+import { UserService } from './services/user.service';
 import { UserDetail } from './components/user-detail/user-detail';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { FormsModule } from '@angular/forms';
+import { HttpClientService } from '../../services/http-client.service';
 
 @Component({
   selector: 'app-user-management',
@@ -22,6 +23,8 @@ export class UserManagement {
   protected platformService = inject(PlatformService);
 
   private readonly dialogService = inject(DialogService);
+
+  private readonly httpClientService = inject(HttpClientService);
 
   userDetailRef: DynamicDialogRef | null = null;
 
@@ -52,7 +55,16 @@ export class UserManagement {
   }
 
 
-  toggleUserAccount(user: any) {
+  protected toggleActiveUserAccount(user: any) {
     console.log('toggle user account', user);
+    this.userService.updateUserData(user).subscribe({
+      next: (res) => {
+        console.log('User data updated successfully:', res);
+      },
+      error: (err) => {
+        console.log('Error updating user data:', err);
+        user.enabled = !user.enabled;
+      }
+    })
   }
 }

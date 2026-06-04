@@ -1,6 +1,6 @@
 import { computed, inject, Injectable } from "@angular/core";
-import { HttpClientService } from "./http-client.service";
-import { AuthService } from "../features/auth/services/auth.service";
+import { HttpClientService } from "../../../services/http-client.service";
+import { AuthService } from "../../auth/services/auth.service";
 
 @Injectable({
     providedIn: 'root'
@@ -26,5 +26,9 @@ export class UserService {
 
     public getAllUsers() {
         return this.httpClientService.get('/user/all');
+    }
+
+    public updateUserData(userData: any) {
+        return this.httpClientService.put('/user/update', userData);
     }
 }

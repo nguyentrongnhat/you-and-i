@@ -1,5 +1,6 @@
 package com.nguyen_trong_nhat.you_and_i.features.user.service;
 
+import com.nguyen_trong_nhat.you_and_i.features.user.dto.UserDetailDTO;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.UserProfile;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.UserVerification;
@@ -11,9 +12,11 @@ public interface UserService {
 
     UserVerification createUserVerificationCode(MyUserDetail user);
 
-    List<MyUserDetail> getAllUser();
+    List<UserDetailDTO> getAllUser();
 
     UserProfile createUserProfile(MyUserDetail user);
 
     void initSuperAdminAccount(String username, String password);
+
+    UserDetailDTO updateUserData(UserDetailDTO userDetailDTO);
 }

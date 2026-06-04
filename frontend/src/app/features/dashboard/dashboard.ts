@@ -8,7 +8,7 @@ import { GalleriaModule } from 'primeng/galleria';
 import { PanelModule } from 'primeng/panel';
 import { TableModule } from 'primeng/table';
 import { PhotoService } from '../../services/photo.service';
-import { UserService } from '../../services/user.service';
+import { UserService } from '../user-management/services/user.service';
 
 @Component({
   selector: 'app-dashboard',
