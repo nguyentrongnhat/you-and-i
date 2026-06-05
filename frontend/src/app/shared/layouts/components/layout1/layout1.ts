@@ -31,7 +31,7 @@ export class Layout1 implements OnInit {
       {
         name: 'Dashboard',
         icon: 'pi-home',
-        url: this.ROUTE_PATHS.HOME,
+        url: this.ROUTE_PATHS.HOME.fullPath,
         active: true
       },
       {
@@ -55,13 +55,13 @@ export class Layout1 implements OnInit {
       {
         name: 'Game',
         icon: 'pi-discord',
-        url: this.ROUTE_PATHS.FIND_NUMBER_GAME,
+        url: this.ROUTE_PATHS.GAME.children.FIND_NUMBER_GAME.fullPath,
         active: false
       },
       {
         name: 'Users Management',
         icon: 'pi-users',
-        url: this.ROUTE_PATHS.USER_MANAGEMENT,
+        url: this.ROUTE_PATHS.USER.children.MANAGEMENT.fullPath,
         active: false
       },
     ]
@@ -86,7 +86,7 @@ export class Layout1 implements OnInit {
   }
 
   protected navigateTo(url: string): void {
-    if(url === '#') url = ROUTE_PATHS.HOME
+    if(url === '#') url = ROUTE_PATHS.HOME.fullPath;
     this.router.navigateByUrl(url);
   }
 

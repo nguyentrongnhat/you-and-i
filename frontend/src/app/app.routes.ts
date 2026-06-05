@@ -6,7 +6,7 @@ import { LAYOUT } from './core/enums';
 
 export const routes: Routes = [
   {
-    path: ROUTE_PATHS.HOME,
+    path: ROUTE_PATHS.HOME.path,
     loadComponent: () => import('./features/dashboard/dashboard').then(c => c.Dashboard),
     canMatch: [browserOnlyMatchGuard],
     canActivate: [authGuard],
@@ -16,48 +16,64 @@ export const routes: Routes = [
     }
   },
   {
-    path: ROUTE_PATHS.LOGIN,
-    loadComponent: () => import('./features/auth/login/login').then(c => c.Login),
-    data: {
-      animation: 'LoginPage',
-      layout: LAYOUT.EMPTY_LAYOUT
-    }
+    path: ROUTE_PATHS.AUTH.path,
+    children: [
+      {
+        path: ROUTE_PATHS.AUTH.children.LOGIN.path,
+        loadComponent: () => import('./features/auth/login/login').then(c => c.Login),
+        data: {
+          animation: 'LoginPage',
+          layout: LAYOUT.EMPTY_LAYOUT
+        }
+      },
+      {
+        path: ROUTE_PATHS.AUTH.children.SIGNUP.path,
+        loadComponent: () => import('./features/auth/signup/signup').then(c => c.Signup),
+        data: {
+          animation: 'SignUpPage',
+          layout: LAYOUT.EMPTY_LAYOUT
+        }
+      },
+      {
+        path: ROUTE_PATHS.AUTH.children.VERIFY_ACCOUNT.path,
+        loadComponent: () => import('./features/auth/verify-account/verify-account').then(c => c.VerifyAccount),
+        data: {
+          animation: 'SignUpPage',
+          layout: LAYOUT.EMPTY_LAYOUT
+        }
+      }
+    ]
   },
+  // Game group: /game/find-number-game
   {
-    path: ROUTE_PATHS.SIGNUP,
-    loadComponent: () => import('./features/auth/signup/signup').then(c => c.Signup),
-    data: {
-      animation: 'SignUpPage',
-      layout: LAYOUT.EMPTY_LAYOUT
-    }
-  },
-  {
-    path: ROUTE_PATHS.VERIFY_ACCOUNT,
-    loadComponent: () => import('./features/auth/verify-account/verify-account').then(c => c.VerifyAccount),
-    data: {
-      animation: 'SignUpPage',
-      layout: LAYOUT.EMPTY_LAYOUT
-    }
-  },
-  {
-    path: ROUTE_PATHS.FIND_NUMBER_GAME,
-    loadComponent: () => import('./features/games/find-number-game/find-number-game').then(c => c.FindNumberGame),
+    path: ROUTE_PATHS.GAME.path,
     canMatch: [browserOnlyMatchGuard],
     canActivate: [authGuard],
-    data: {
-      animation: 'SignUpPage',
-      layout: LAYOUT.LAYOUT_1
-    }
+    children: [
+      {
+        path: ROUTE_PATHS.GAME.children.FIND_NUMBER_GAME.path,
+        loadComponent: () => import('./features/games/find-number-game/find-number-game').then(c => c.FindNumberGame),
+        data: {
+          animation: 'SignUpPage',
+          layout: LAYOUT.LAYOUT_1
+        }
+      }
+    ]
   },
   {
-    path: ROUTE_PATHS.USER_MANAGEMENT,
-    loadComponent: () => import('./features/user-management/user-management').then(c => c.UserManagement),
+    path: ROUTE_PATHS.USER.path,
     canMatch: [browserOnlyMatchGuard],
     canActivate: [authGuard],
-    data: {
-      animation: 'SignUpPage',
-      layout: LAYOUT.LAYOUT_1
-    }
+    children: [
+        {
+          path: ROUTE_PATHS.USER.children.MANAGEMENT.path,
+          loadComponent: () => import('./features/user-management/user-management').then(c => c.UserManagement),
+          data: {
+            animation: 'SignUpPage',
+            layout: LAYOUT.LAYOUT_1
+          }
+        }
+    ]
   },
   {
     path: '**',

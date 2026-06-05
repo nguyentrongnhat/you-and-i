@@ -1,13 +1,10 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
-import { take } from 'rxjs';
-import { HttpClientService } from '../../../services/http-client.service';
 import { GameHistories } from './components/game-histories/game-histories';
 import { GameTable } from './components/game-table/game-table';
 import { FindNumberGameService } from './services/findnumber.service';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export type NumberData = {
   value: number;

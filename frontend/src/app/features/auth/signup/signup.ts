@@ -154,7 +154,7 @@ export class Signup {
 
 
   protected navigateToVerifyAccountPage(): void {
-    this.router.navigateByUrl(ROUTE_PATHS.VERIFY_ACCOUNT)
+    this.router.navigateByUrl(ROUTE_PATHS.AUTH.children.VERIFY_ACCOUNT.fullPath);
   }
 
 

@@ -8,12 +8,12 @@
     >
         <div class="welcome-block">
             <h1 class="
-                text-5xl font-semibold leading-[72px] 
-                max-[970px]:text-4xl
+                text-3xl font-semibold leading-[72px] 
+                max-[970px]:text-2xl
                 max-[970px]:leading-[70px]
-                max-[550px]:text-3xl
+                max-[550px]:text-xl
                 max-[550px]:leading-[60px]
-            ">Welcome, {{ this.userService.userProfile()?.displayName }}</h1>
+            ">Welcome, {{ this.userService.currentUser()?.profile?.displayName }}</h1>
             <p>Today is a beautiful day to create a new memory with me.</p>
         </div>
 

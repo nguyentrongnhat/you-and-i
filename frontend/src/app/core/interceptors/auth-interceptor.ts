@@ -28,7 +28,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         return next(req).pipe(
             catchError(err => {
                 if (platformService.isBrowser()) {
-                    router.navigateByUrl(ROUTE_PATHS.LOGIN);
+                    router.navigateByUrl(ROUTE_PATHS.AUTH.children.LOGIN.fullPath);
                 }
                 return throwError(() => err);
             })

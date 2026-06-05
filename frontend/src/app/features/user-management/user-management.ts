@@ -24,9 +24,7 @@ export class UserManagement {
 
   private readonly dialogService = inject(DialogService);
 
-  private readonly httpClientService = inject(HttpClientService);
-
-  userDetailRef: DynamicDialogRef | null = null;
+  private userDetailRef: DynamicDialogRef | null = null;
 
   constructor() {
     this.userService.getAllUsers().subscribe({

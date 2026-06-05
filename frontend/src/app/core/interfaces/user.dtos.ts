@@ -3,3 +3,25 @@ export interface UsernamePasswordLoginResponse {
     refreshToken: string,
     userName: string
 }
+
+
+export interface UserProfile {
+    fullName: string;
+    displayName: string;
+    avatarUrl: string;
+    phone: string;
+    dateOfBirth: string;
+    gender: string;
+    bio: string;
+    address: string;
+}
+
+
+export interface UserDetails {
+    id: string;
+    username: string;
+    profile: UserProfile;
+    roles: string[];
+    enabled?: boolean;
+    emailVerified?: boolean;
+}

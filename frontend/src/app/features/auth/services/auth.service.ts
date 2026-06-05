@@ -68,7 +68,7 @@ export class AuthService {
         this.httpService.post(API_ENDPOINTS.AUTH.SIGNOUT, {}).subscribe({
             next: () => {
                 console.log('Logged out successfully');
-                this.router.navigateByUrl(ROUTE_PATHS.LOGIN);
+                this.router.navigateByUrl(ROUTE_PATHS.AUTH.children.LOGIN.fullPath);
             },
             error: (err) => console.log('Error during logout:', err)
         });

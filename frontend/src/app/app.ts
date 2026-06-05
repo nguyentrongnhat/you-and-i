@@ -9,6 +9,7 @@ import { EmptyLayout } from './shared/layouts/components/empty-layout/empty-layo
 import { Layout1 } from './shared/layouts/components/layout1/layout1';
 import { Layout2 } from './shared/layouts/components/layout2/layout2';
 import { Layout3 } from './shared/layouts/components/layout3/layout3';
+import { UserService } from './features/user-management/services/user.service';
 
 @Component({
   selector: 'app-root',
@@ -33,6 +34,8 @@ export class App implements OnInit {
 
   private readonly authService = inject(AuthService);
 
+  private readonly userService = inject(UserService);
+
   constructor(
     public router: Router,
     public activatedRoute: ActivatedRoute,
@@ -42,6 +45,7 @@ export class App implements OnInit {
       const userinfo = this.authService.accessTokenPayload();
       if (!userinfo) return;
       console.log('access token payload: ', userinfo);
+      console.log('user profile from user service: ', this.userService.currentUser());
     })
   }
 

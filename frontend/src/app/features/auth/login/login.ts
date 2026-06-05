@@ -101,7 +101,7 @@ export class Login {
           this.router.navigateByUrl(redirectUrl);
         } 
         else {
-          this.router.navigateByUrl(ROUTE_PATHS.HOME);
+          this.router.navigateByUrl(ROUTE_PATHS.HOME.fullPath);
         }
       },
       error: err => {
@@ -114,7 +114,7 @@ export class Login {
   }
 
   protected navigateToSignupPage(): void {
-    this.router.navigateByUrl(ROUTE_PATHS.SIGNUP)
+    this.router.navigateByUrl(ROUTE_PATHS.AUTH.children.SIGNUP.fullPath);
   }
 
   protected toggleWithAutoHidePassword() {

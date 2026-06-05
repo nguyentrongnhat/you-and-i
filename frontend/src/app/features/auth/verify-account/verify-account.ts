@@ -165,7 +165,7 @@ export class VerifyAccount implements OnInit, OnDestroy {
     const {email, verificationCode} = this.emailVerificationFormData();
     this.verifyAccountService.verifyEmail(email, verificationCode).subscribe({
       next: (res) => {
-        this.router.navigateByUrl(ROUTE_PATHS.LOGIN);
+        this.router.navigateByUrl(ROUTE_PATHS.AUTH.children.LOGIN.fullPath);
       },
       error: (err) => {
         console.log(err.error.message)

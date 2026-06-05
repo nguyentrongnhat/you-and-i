@@ -1,6 +1,9 @@
-import { inject } from "@angular/core";
+import { inject, Injectable } from "@angular/core";
 import { HttpClientService } from "../../../../services/http-client.service";
 
+@Injectable({
+    providedIn: 'root'
+})
 export class FindNumberGameService {
     private readonly httpClient = inject(HttpClientService);
 
