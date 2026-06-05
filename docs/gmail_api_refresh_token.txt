@@ -1,0 +1,59 @@
+Bước 1: Enable gmail API:
+- vào: https://console.cloud.google.com/
+- Đăng nhập với email dùng để gữi mail trong back end.
+- Chọn: APIs & Services
+- Search: Gmail API
+- Vào manage API -> Enable API
+- Vào OAuth Consent Screen -> Audience -> Kiểm tra Publish status có đang là "In production" không (Nếu là "Testing" thì chuyển sang "In production" - Vì nếu là "Testing" thì refresh token sẽ hết hạn sau 7 ngày - Sau thời gian đó thì BE không gữi mail được nữa).
+
+Bước 2: Tạo Credential để dùng API
+- Vào Oauth Consent Screen -> Clients -> Create credentials -> Điền form để tạo client -> Lấy client ID và client secret
+- Lưu ý: Trong Form tao Credental cho clien, Có mục Authorized redirect URIs. Hãy nhập vào: https://developers.google.com/oauthplayground/ (Tí nữa sẽ dụng trang này để lấy refresh token cho api)
+
+Bước 3: Config scope cho credential:
+- Vào OAuth Consent Screen -> Data access -> Add or Remove scope -> Chọn only send.
+
+Bước 3: Lấy refresh token để Back end dùng đổi access token -> dùng access token để dùng api gữi mail:
+- Vào OAuth 2.0 Playground: https://developers.google.com/oauthplayground
+
+- Bấm biểu tượng ⚙️ (Settings) ở góc trên bên phải.
+
+- Tick: Use your own OAuth credentials
+
+- Nhập: Client ID và Client Secret của project Google Cloud của anh.
+
+- Chọn scope Gmail, Ví dụ chỉ gửi mail: https://www.googleapis.com/auth/gmail.send
+
+- Sau đó bấm: Authorize APIs
+
+- Đăng nhập Google. Nếu gặp: Error 400: redirect_uri_mismatch
+
+	Nguyên nhân - Cấu hình trong Oauth Consent chưa :
+
+		Authorized redirect URIs: https://developers.google.com/oauthplayground
+		Actual redirect URI: https://developers.google.com/oauthplayground/
+
+	hoặc ngược lại.
+
+	Google yêu cầu khớp chính xác.
+
+- Đăng nhập tài khoản Gmail anh muốn sử dụng.
+
+- Cho phép quyền truy cập.
+
+- Exchange authorization code
+
+- Sau khi consent xong, Playground sẽ nhận authorization code.
+
+- Bấm: Exchange authorization code for tokens
+
+- Lấy refresh token:
+
+Google sẽ trả về:
+
+{
+  "access_token": "ya29....",
+  "refresh_token": "1//0gxxxxxxxxxxxx",
+  "expires_in": 3599,
+  "token_type": "Bearer"
+}
