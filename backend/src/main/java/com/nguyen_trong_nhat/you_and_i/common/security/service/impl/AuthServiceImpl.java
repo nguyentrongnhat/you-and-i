@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -97,6 +98,7 @@ public class AuthServiceImpl implements AuthService {
         }
 
         List<UserVerification> userVerificationList = userVerificationRepository.findUserVerificationByUser(userNeedToVerify);
+
         if(userVerificationList.isEmpty()) {
             throw new RuntimeException("Not found any verification code for this account. Please get your verification code first!");
         }
@@ -104,6 +106,10 @@ public class AuthServiceImpl implements AuthService {
         UserVerification userVerification = userVerificationList.stream()
                 .filter(item -> item.getVerificationCode().equals(emailVerificationRequest.getVerificationCode())
                 ).findFirst().orElseThrow(() -> new BadRequestException("Verification code is not correct"));
+
+        if(userVerification.getExpiry().isBefore(LocalDateTime.now())) {
+            throw new BadRequestException(ErrorConstant.VERIFICATION_CODE_EXPIRED);
+        }
 
         userVerification.setUsed(true);
         userVerificationRepository.save(userVerification);

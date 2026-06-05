@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
         UserVerification uv = new UserVerification();
         uv.setUser(user);
         uv.setVerificationCode(verificationCode);
-        uv.setExpiry(LocalDateTime.now().plusMinutes(5));
+        uv.setExpiry(LocalDateTime.now().plusMinutes(30));
 
         return uv;
     }

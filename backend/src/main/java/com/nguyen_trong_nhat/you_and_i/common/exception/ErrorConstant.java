@@ -10,4 +10,5 @@ public class ErrorConstant {
     public static final String PASSWORD_REQUIRED = "Password cannot be empty";
     public static final String CONFIRM_PASSWORD_REQUIRED = "Confirm Password cannot be empty";
     public static final String VERIFICATION_CODE_REQUIRED = "Verification code cannot be empty";
+    public static final String VERIFICATION_CODE_EXPIRED = "Verification code has expired. Please request a new one";
 }
