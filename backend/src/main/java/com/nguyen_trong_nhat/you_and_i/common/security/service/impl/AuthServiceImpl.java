@@ -127,8 +127,19 @@ public class AuthServiceImpl implements AuthService {
 
         mailService.sendHtmlMail(
                 userNeedToVerify.getUsername(),
-                "Jar of Messages - Verify your account",
-                String.format("Your verification code is: %s.", uv.getVerificationCode())
+                "Your verification code for Jar of Messages",
+                """
+                <html>
+                <body>
+                    <h2>Jar of Messages</h2>
+                    <p>Your verification code is:</p>
+                    <h1>%s</h1>
+                    <p>This code will expire in 30 minutes.</p>
+                    <p>If you did not request this verification code, please ignore this email.</p>
+                </body>
+                </html>
+                """.formatted(uv.getVerificationCode())
         );
+        log.info("Email has been sent to {}", userNeedToVerify.getUsername());
     }
 }

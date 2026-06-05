@@ -47,6 +47,7 @@ public class MailServiceImpl implements MailService {
 
     private String buildRawEmail(String to, String subject, String html) {
         String mail =
+                "From: Jar of Messages <jar.of.messages@gmail.com>\r\n" +
                 "To: " + to + "\r\n" +
                         "Subject: " + subject + "\r\n" +
                         "Content-Type: text/html; charset=UTF-8\r\n\r\n" +

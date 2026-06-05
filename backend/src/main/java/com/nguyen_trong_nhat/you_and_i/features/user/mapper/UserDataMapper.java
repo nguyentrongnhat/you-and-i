@@ -135,7 +135,7 @@ public class UserDataMapper {
         userProfile.setBio(userProfileDTO.getBio());
         userProfile.setAddress(userProfileDTO.getAddress());
     }
-    
+
 
     private Set<Role> convertStringSetToRoleSet(Set<String> roleNames) {
         if (roleNames == null || roleNames.isEmpty()) {
