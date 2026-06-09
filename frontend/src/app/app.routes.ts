@@ -1,6 +1,5 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/auth.guard';
-import { browserOnlyMatchGuard } from './core/auth/browser-only-match.guard';
 import { ROUTE_PATHS } from './core/constants/route-paths';
 import { LAYOUT } from './core/enums';
 
@@ -64,9 +63,17 @@ export const routes: Routes = [
     children: [
         {
           path: ROUTE_PATHS.USER.children.MANAGEMENT.path,
-          loadComponent: () => import('./features/user-management/user-management').then(c => c.UserManagement),
+          loadComponent: () => import('./features/user-management/pages/user-management/user-management').then(c => c.UserManagement),
           data: {
             animation: 'SignUpPage',
+            layout: LAYOUT.LAYOUT_1
+          }
+        },
+        {
+          path: ROUTE_PATHS.USER.children.DETAIL.path,
+          loadComponent: () => import('./features/user-management/pages/user-detail/user-detail').then(c => c.UserDetail),
+          data: {
+            animation: 'UserDetailsPage',
             layout: LAYOUT.LAYOUT_1
           }
         }

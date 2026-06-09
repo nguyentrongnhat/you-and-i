@@ -1,12 +1,13 @@
 import { Component, inject, signal } from '@angular/core';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { TableModule } from 'primeng/table';
-import { PlatformService } from '../../services/platform.service';
-import { UserService } from './services/user.service';
-import { UserDetail } from './components/user-detail/user-detail';
+import { PlatformService } from '../../../../services/platform.service';
+import { UserService } from '../../services/user.service';
+import { UserDetail } from '../user-detail/user-detail';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { FormsModule } from '@angular/forms';
-import { HttpClientService } from '../../services/http-client.service';
+import { HttpClientService } from '../../../../services/http-client.service';
+import { UserDetails } from '../../../../core/interfaces/user.dtos';
 
 @Component({
   selector: 'app-user-management',
@@ -18,7 +19,7 @@ import { HttpClientService } from '../../services/http-client.service';
 export class UserManagement {
   private readonly userService = inject(UserService);
 
-  protected users = signal<any[]>([]);
+  protected users = signal<UserDetails[]>([]);
 
   protected platformService = inject(PlatformService);
 
@@ -28,7 +29,7 @@ export class UserManagement {
 
   constructor() {
     this.userService.getAllUsers().subscribe({
-      next: (res: any) => {
+      next: (res: UserDetails[]) => {
         console.log(res);
         this.users.set(res);
       },
@@ -53,7 +54,7 @@ export class UserManagement {
   }
 
 
-  protected toggleActiveUserAccount(user: any) {
+  protected toggleActiveUserAccount(user: UserDetails) {
     console.log('toggle user account', user);
     this.userService.updateUserData(user).subscribe({
       next: (res) => {
