@@ -1,20 +1,18 @@
 import { Component, inject, signal } from '@angular/core';
-import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TableModule } from 'primeng/table';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
+import { ROUTE_PATHS } from '../../../../core/constants/route-paths';
+import { UserDetails } from '../../../../core/interfaces/user.dtos';
 import { PlatformService } from '../../../../services/platform.service';
 import { UserService } from '../../services/user.service';
-import { UserDetail } from '../user-detail/user-detail';
-import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { FormsModule } from '@angular/forms';
-import { HttpClientService } from '../../../../services/http-client.service';
-import { UserDetails } from '../../../../core/interfaces/user.dtos';
 
 @Component({
   selector: 'app-user-management',
   imports: [TableModule, ToggleSwitchModule, FormsModule],
   templateUrl: './user-management.html',
   styleUrl: './user-management.scss',
-  providers: [DialogService]
 })
 export class UserManagement {
   private readonly userService = inject(UserService);
@@ -23,11 +21,14 @@ export class UserManagement {
 
   protected platformService = inject(PlatformService);
 
-  private readonly dialogService = inject(DialogService);
-
-  private userDetailRef: DynamicDialogRef | null = null;
+  private readonly router = inject(Router);
 
   constructor() {
+    this.getAllUsers();
+  }
+
+  
+  private getAllUsers(): void {
     this.userService.getAllUsers().subscribe({
       next: (res: UserDetails[]) => {
         console.log(res);
@@ -37,21 +38,7 @@ export class UserManagement {
         console.log(err);
       }
     })
-  }
-
-
-  displayUserDetailDialog() {
-    this.userDetailRef = this.dialogService.open(UserDetail, {
-        header: 'Select a Product',
-        width: '50vw',
-        modal: true,
-        closable: true,
-        breakpoints: {
-            '960px': '75vw',
-            '640px': '90vw'
-        },
-    });
-  }
+  };
 
 
   protected toggleActiveUserAccount(user: UserDetails) {
@@ -66,4 +53,10 @@ export class UserManagement {
       }
     })
   }
+
+
+  protected navigateToUserDetail(user: UserDetails) {
+    this.router.navigateByUrl(ROUTE_PATHS.USER.children.DETAIL.fullPath.replace(':id', user.id));
+  }
+
 }

@@ -9,7 +9,7 @@
             </tr>
         </ng-template>
         <ng-template #body let-user>
-            <tr class="cursor-pointer" (click)="displayUserDetailDialog()">
+            <tr class="cursor-pointer" (click)="navigateToUserDetail(user)">
                 <td>{{ user.username }}</td>
                 @if(!this.platformService.isSmallMobileDevice()) {
                     <td>{{ user.emailVerified }}</td>

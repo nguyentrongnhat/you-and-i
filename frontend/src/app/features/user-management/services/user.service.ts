@@ -1,9 +1,7 @@
-import { computed, inject, Injectable } from "@angular/core";
-import { HttpClientService } from "../../../services/http-client.service";
-import { AuthService } from "../../auth/services/auth.service";
-import { UserDetails, UserProfile } from "../../../core/interfaces/user.dtos";
+import { computed, inject, Injectable, signal } from "@angular/core";
 import { Observable } from "rxjs";
-import { PlatformService } from "../../../services/platform.service";
+import { UserDetails } from "../../../core/interfaces/user.dtos";
+import { HttpClientService } from "../../../services/http-client.service";
 
 @Injectable({
     providedIn: 'root'
@@ -11,34 +9,14 @@ import { PlatformService } from "../../../services/platform.service";
 export class UserService {
     private readonly httpClientService = inject(HttpClientService);
 
-    private readonly authService = inject(AuthService);
-
-    private readonly platformService = inject(PlatformService);
-
-    public currentUser = computed<UserDetails | undefined>(() => {
-        
-        if (!this.platformService.isBrowser()) return undefined; // Return undefined on the server side
-        
-        const profile: UserProfile = this.authService.accessTokenPayload().profile;
-        const roles: string[] = this.authService.accessTokenPayload().roles;
-
-        const userInfo: UserDetails = {
-            id: '',
-            profile,
-            roles,
-            username: this.authService.accessTokenPayload()?.sub || '',
-        };
-        
-        return userInfo;
-    })
+    public currentUser = signal<UserDetails | undefined>(undefined);
 
     public readonly userRoles = computed<string[]>(() => {
-        const payload = this.authService.accessTokenPayload();
-        return payload?.roles || [];
+        return this.currentUser()?.roles || [];
     })
 
-    public getUserDetails(): Observable<UserDetails> {
-        return this.httpClientService.get('/user');
+    public getUserDetailsById(id: string): Observable<UserDetails> {
+        return this.httpClientService.get(`/user/${id}`);
     }
 
     public getAllUsers(): Observable<UserDetails[]> {

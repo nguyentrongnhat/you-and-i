@@ -28,7 +28,6 @@ public class JwtServiceImpl implements JwtService {
                 .subject(user.getUsername())
                 .claim("type", Constants.TOKEN_TYPE_ACCESS_TOKEN)
                 .claim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
-                .claim("profile", ((MyUserDetail) user).getProfile())
                 .issuedAt(new Date())
                 .expiration(Date.from(Instant.now().plusSeconds(Constants.ACCESS_TOKEN_MAX_AGE)))
                 .signWith(key, Jwts.SIG.HS256)

@@ -1,5 +1,6 @@
 package com.nguyen_trong_nhat.you_and_i.common.dto;
 
+import com.nguyen_trong_nhat.you_and_i.features.user.dto.UserDetailDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,5 +13,5 @@ import lombok.Setter;
 public class LoginResponse {
     private String accessToken;
     private String refreshToken;
-    private String username;
+    private UserDetailDTO userInfo;
 }

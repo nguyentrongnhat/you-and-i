@@ -41,4 +41,10 @@ public class UserController {
 
         return userService.updateUserData(userDetailDTO);
     }
+
+
+    @GetMapping("/{userId}")
+    public UserDetailDTO getUserDetailById(@PathVariable String userId) {
+        return userService.getUserDetailsById(userId);
+    }
 }

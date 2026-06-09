@@ -19,4 +19,6 @@ public interface UserService {
     void initSuperAdminAccount(String username, String password);
 
     UserDetailDTO updateUserData(UserDetailDTO userDetailDTO);
+
+    UserDetailDTO getUserDetailsById(String id);
 }

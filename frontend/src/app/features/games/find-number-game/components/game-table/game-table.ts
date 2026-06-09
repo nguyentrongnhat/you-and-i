@@ -80,14 +80,8 @@ export class GameTable implements OnInit, OnDestroy, AfterViewInit {
   }
 
 
-  protected shuffle() {
-    this.numbers.set(this.generateItems());
-  }
-
-
   public selectNumber() {
     this.currentNumber.update((number) => number + 1);
-    console.log('selected on table: ', this.currentNumber())
     this.onSelectNumber.emit(this.currentNumber())
   }
 }

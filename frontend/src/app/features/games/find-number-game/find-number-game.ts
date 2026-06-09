@@ -1,10 +1,13 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
+import { ProgressBarModule } from 'primeng/progressbar';
+import { TagModule } from 'primeng/tag';
 import { GameHistories } from './components/game-histories/game-histories';
 import { GameTable } from './components/game-table/game-table';
 import { FindNumberGameService } from './services/findnumber.service';
+import { PlatformService } from '../../../services/platform.service';
 
 export type NumberData = {
   value: number;
@@ -23,11 +26,13 @@ export enum FIND_NUMBER_GAME_STATUSES {
 
 @Component({
   selector: 'app-find-number-game',
-  imports: [GameTable, ButtonModule, DialogModule, GameHistories],
+  imports: [GameTable, ButtonModule, DialogModule, ProgressBarModule, TagModule, GameHistories],
   templateUrl: './find-number-game.html',
   styleUrl: './find-number-game.scss',
 })
-export class FindNumberGame {
+export class FindNumberGame implements OnInit {
+  protected readonly TOTAL_NUMBERS = 100;
+
   protected FIND_NUMBER_GAME_STATUSES = FIND_NUMBER_GAME_STATUSES;
 
   protected gameCurrentStatus = signal<FIND_NUMBER_GAME_STATUSES>(FIND_NUMBER_GAME_STATUSES.NONE);
@@ -48,7 +53,45 @@ export class FindNumberGame {
 
 	protected currentGameId: number = 0;
 
-	protected gameHistories = signal<any[]>([]);
+  /** Số lượng đã tìm đúng trong ván hiện tại */
+  protected progress = signal<number>(0);
+
+  /** Thời gian (giây) của ván vừa hoàn thành */
+  protected lastFinishTime = signal<number>(0);
+
+  /** Kỷ lục tốt nhất trước khi vào ván hiện tại */
+  private previousBest = signal<number | null>(null);
+
+  /** % tiến độ ván hiện tại */
+  protected progressPercent = computed(() =>
+    Math.min(100, Math.round((this.progress() / this.TOTAL_NUMBERS) * 100))
+  );
+
+  /** Tổng số ván đã chơi */
+  protected totalGames = computed(() => this.findNumberGameService.gameHistories().length);
+
+  /** Thời gian tốt nhất (giây) từ lịch sử */
+  protected bestTime = computed<number | null>(() => {
+    const histories = this.findNumberGameService.gameHistories();
+    if (!histories.length) return null;
+    return Math.min(...histories.map((h) => h.timeToFinish));
+  });
+
+  /** Hiển thị thời gian tốt nhất dạng chuỗi */
+  protected bestTimeDisplay = computed(() => {
+    const best = this.bestTime();
+    return best === null ? '--' : this.findNumberGameService.convertTimerToTimeDisplay(best);
+  });
+
+  /** Ván vừa rồi có phá kỷ lục cũ không */
+  protected isNewRecord = computed(() => {
+    const prev = this.previousBest();
+    return prev !== null && this.lastFinishTime() > 0 && this.lastFinishTime() < prev;
+  });
+
+  ngOnInit(): void {
+    this.getHistories();
+  }
 
   protected showGameHistoriesDialog() {
     this.visible.set(true);
@@ -56,6 +99,7 @@ export class FindNumberGame {
 
 
   protected onSelectNumber(num: number) {
+    this.progress.set(num);
     if(num === 2) {
       this.finishGame();
     }
@@ -68,6 +112,9 @@ export class FindNumberGame {
     .subscribe({
       next: (res: any) => {
         this.currentGameId = res.gameId
+        this.previousBest.set(this.bestTime());
+        this.lastFinishTime.set(0);
+        this.progress.set(0);
         this.gameCurrentStatus.set(FIND_NUMBER_GAME_STATUSES.STARTED);
         this.startTimer()
       },
@@ -85,7 +132,7 @@ export class FindNumberGame {
 
     this.timeInterval = setInterval(() => {
       this.timer ++;
-      this.timeToDisplay.set(this.convertTimerToTimeDisplay(this.timer));
+      this.timeToDisplay.set(this.findNumberGameService.convertTimerToTimeDisplay(this.timer));
     }, 1000)
   }
 
@@ -97,6 +144,7 @@ export class FindNumberGame {
 
 
   protected finishGame(): void {
+    this.lastFinishTime.set(this.timer);
     this.gameCurrentStatus.set(FIND_NUMBER_GAME_STATUSES.FINISHED)
     this.findNumberGameService.finishGame(this.currentGameId, this.timer)
     .pipe(takeUntilDestroyed(this.destroyRef))
@@ -111,20 +159,6 @@ export class FindNumberGame {
 
   protected getHistories() {
     this.findNumberGameService.getGameHistories()
-    .pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (res: any) => {
-        console.log('game history: ', res)
-        this.gameHistories.set(res)
-        console.log('game history: ', this.gameHistories())
-      }
-    })
-  }
-
-
-  protected convertTimerToTimeDisplay(seconds: number) {
-    const hh = Math.floor(seconds / 3600)
-    const mm = Math.floor((seconds % 3600) / 60)
-    const ss = Math.floor(((seconds % 3600) % 60) % 60)
-    return `${hh > 9 ? hh : 0 + hh.toString()} : ${mm > 9 ? mm : 0 + mm.toString()} : ${ss > 9 ? ss : 0 + ss.toString()}`
+    .pipe(takeUntilDestroyed(this.destroyRef)).subscribe()
   }
 }

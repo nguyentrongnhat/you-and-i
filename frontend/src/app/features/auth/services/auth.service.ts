@@ -6,6 +6,7 @@ import { ROUTE_PATHS } from "../../../core/constants/route-paths";
 import { UsernamePasswordLoginResponse } from "../../../core/interfaces/user.dtos";
 import { HttpClientService } from "../../../services/http-client.service";
 import { SignupModel } from "../signup/signup";
+import { UserService } from "../../user-management/services/user.service";
 
 @Injectable({
     providedIn: 'root'
@@ -18,6 +19,8 @@ export class AuthService {
     public readonly accessToken = this._accessToken.asReadonly();
 
     private readonly router = inject(Router);
+
+    private readonly userService = inject(UserService);
 
 
     public readonly accessTokenPayload = computed(() => {
@@ -58,7 +61,10 @@ export class AuthService {
     public login(username: string, password: string) {
         return this.httpService.post<UsernamePasswordLoginResponse>(API_ENDPOINTS.AUTH.LOGIN, { username, password })
             .pipe(
-                tap(res => this.setAccessToken(res.accessToken))
+                tap(res => {
+                    this.setAccessToken(res.accessToken);
+                    this.userService.currentUser.set(res.userInfo);
+                })
             );
     }
 
@@ -78,7 +84,10 @@ export class AuthService {
     public refreshToken() {
         return this.httpService.post<UsernamePasswordLoginResponse>(API_ENDPOINTS.AUTH.REFRESH_TOKEN, {})
             .pipe(
-                tap(res => this.setAccessToken(res.accessToken)),
+                tap(res => {
+                    this.setAccessToken(res.accessToken);
+                    this.userService.currentUser.set(res.userInfo);
+                }),
             );
     }
 

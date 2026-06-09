@@ -70,7 +70,6 @@ export class Number implements AfterViewInit {
     const numberData: number = this.data()?.value ?? -1
     if(numberData <= currentNumber) {
       this.isSelected.set(true);
-      console.log('set selected to false')
     }
   }
 
@@ -78,7 +77,6 @@ export class Number implements AfterViewInit {
   protected upDateIndicate(currentNumber: number) {
     const numberData: number = this.data()?.value ?? -1
     this.isIndicate.set(currentNumber + 1 === numberData);
-    console.log('set indicate equal true')
   }
 
 
@@ -95,8 +93,9 @@ export class Number implements AfterViewInit {
       canvas.height = size;
       ctx.clearRect(0, 0, size, size);
 
-      ctx.fillStyle = 'black';
-      ctx.font = `${drawData?.fontSize}px Arial`;
+      const textColor = getComputedStyle(canvas).color || '#111827';
+      ctx.fillStyle = textColor;
+      ctx.font = `600 ${drawData?.fontSize}px Inter, Arial, sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 

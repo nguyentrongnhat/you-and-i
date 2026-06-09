@@ -10,6 +10,7 @@ import com.nguyen_trong_nhat.you_and_i.common.security.service.AuthService;
 import com.nguyen_trong_nhat.you_and_i.features.mail.service.MailService;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.UserVerification;
+import com.nguyen_trong_nhat.you_and_i.features.user.mapper.UserDataMapper;
 import com.nguyen_trong_nhat.you_and_i.features.user.repository.UserProfileRepository;
 import com.nguyen_trong_nhat.you_and_i.features.user.repository.UserRepository;
 import com.nguyen_trong_nhat.you_and_i.features.user.repository.UserVerificationRepository;
@@ -39,6 +40,7 @@ public class AuthServiceImpl implements AuthService {
     private final MailService mailService;
     private final UserService userService;
     private final UserProfileRepository userProfileRepository;
+    private final UserDataMapper userDataMapper;
 
 
     @Override
@@ -47,7 +49,7 @@ public class AuthServiceImpl implements AuthService {
         UserDetails user = this.authenticate(authentication);
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
-        return new LoginResponse(accessToken, refreshToken, user.getUsername());
+        return new LoginResponse(accessToken, refreshToken, userDataMapper.toUserDetailDTO((MyUserDetail) user));
     }
 
 
@@ -57,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
         UserDetails user = this.authenticate(authentication);
         String accessToken = jwtService.generateAccessToken(user);
         String newRefreshToken = jwtService.generateRefreshToken(user);
-        return new LoginResponse(accessToken, newRefreshToken, user.getUsername());
+        return new LoginResponse(accessToken, newRefreshToken, userDataMapper.toUserDetailDTO((MyUserDetail) user));
     }
 
 

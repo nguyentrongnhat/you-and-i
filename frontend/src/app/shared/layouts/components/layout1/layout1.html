@@ -7,7 +7,7 @@
         </div>
 
         <ul class="navigation-item">
-            @for(item of this.navigationItems(); track item.url) {
+            @for(item of this.navigationItems(); track item) {
                 <li 
                     (click)="navigateTo(item.url)" 
                     tooltipPosition="bottom" pTooltip="{{item.name}}" 
@@ -28,7 +28,7 @@
     <div class="side-menu-and-content">
         <div class="mini-side-menu" [ngClass]="{'expand': this.expandSideMenu()}">
             <ul class="navigation-item">
-                @for(item of this.navigationItems(); track item.url) {
+                @for(item of this.navigationItems(); track item) {
                     <li 
                         (click)="navigateTo(item.url)" 
                         tooltipPosition="right" pTooltip="{{item.name}}" 

@@ -45,7 +45,7 @@ export class App implements OnInit {
       const userinfo = this.authService.accessTokenPayload();
       if (!userinfo) return;
       console.log('access token payload: ', userinfo);
-      console.log('user profile from user service: ', this.userService.currentUser());
+      console.log('current user info from user service: ', this.userService.currentUser());
     })
   }
 

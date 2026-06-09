@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -136,5 +137,12 @@ public class UserServiceImpl implements UserService {
         userRepository.save(existingAccount);
 
         return userDataMapper.toUserDetailDTO(existingAccount);
+    }
+
+    @Override
+    public UserDetailDTO getUserDetailsById(String id) {
+        UUID userId = UUID.fromString(id);
+        MyUserDetail user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
+        return userDataMapper.toUserDetailDTO(user);
     }
 }

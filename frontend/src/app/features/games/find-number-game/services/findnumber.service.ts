@@ -1,11 +1,16 @@
-import { inject, Injectable } from "@angular/core";
+import { inject, Injectable, signal } from "@angular/core";
 import { HttpClientService } from "../../../../services/http-client.service";
+import { tap } from "rxjs";
 
 @Injectable({
     providedIn: 'root'
 })
 export class FindNumberGameService {
     private readonly httpClient = inject(HttpClientService);
+
+
+    public gameHistories = signal<any[]>([]);
+
 
     public startGame() {
         return this.httpClient.post('/game/find-number-game', {startTime: new Date()})
@@ -23,6 +28,18 @@ export class FindNumberGameService {
 
 
     public getGameHistories() {
-        return this.httpClient.get('/game/find-number-game/history')
+        return this.httpClient.get('/game/find-number-game/history').pipe(
+            tap((histories: any) => {
+                this.gameHistories.set(histories);
+            })
+        )
+    }
+
+
+    public convertTimerToTimeDisplay(seconds: number) {
+        const hh = Math.floor(seconds / 3600)
+        const mm = Math.floor((seconds % 3600) / 60)
+        const ss = Math.floor(((seconds % 3600) % 60) % 60)
+        return `${hh > 9 ? hh : 0 + hh.toString()} : ${mm > 9 ? mm : 0 + mm.toString()} : ${ss > 9 ? ss : 0 + ss.toString()}`
     }
 }   

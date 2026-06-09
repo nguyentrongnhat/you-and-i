@@ -20,6 +20,7 @@ import { PlatformService } from '../../../services/platform.service';
 import { SessionStorageService } from '../../../services/session-storage.service';
 import { ToastService } from '../../../services/toast.service';
 import { AuthService } from '../services/auth.service';
+import { UserService } from '../../user-management/services/user.service';
 
 export interface LoginModel {
   username: string,
@@ -79,6 +80,8 @@ export class Login {
 
   private togglePasswordTimeout?: ReturnType<typeof setTimeout>;
 
+  private readonly userService = inject(UserService);
+
   protected submitButtonSeverity = computed(() =>
     this.loginForm().invalid() ? 'secondary' : 'info'
   );
@@ -95,6 +98,7 @@ export class Login {
   private login(username: string, password: string) {
     this.authService.login(username, password).subscribe({
       next: (res: UsernamePasswordLoginResponse) => {
+        this.userService.currentUser.set(res.userInfo);
         const redirectUrl = this.sessionStorageService.getItem(STORAGE_KEY.REDIRECT_URL);
         if (redirectUrl) {
           this.sessionStorageService.removeItem(STORAGE_KEY.REDIRECT_URL);

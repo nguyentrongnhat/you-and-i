@@ -1,12 +1,15 @@
 import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
-import { Observable } from "rxjs";
+import { EMPTY, Observable } from "rxjs";
 import { environment } from "../../enviroments/environments";
 import { ApiOptions, RequestDTO } from "../core/interfaces/request.dtos";
+import { PlatformService } from "./platform.service";
 
 @Injectable({providedIn: 'root'})
 export class HttpClientService {
     private readonly http = inject(HttpClient);
+
+    private readonly platformService = inject(PlatformService);
 
     private readonly BASE_URL = environment.apiBaseUrl;
 
@@ -17,17 +20,26 @@ export class HttpClientService {
         };
     }
 
-    public request<T>(requestDto: RequestDTO) {
+    public request<T>(requestDto: RequestDTO, onlyBrowser: boolean = true): Observable<T> {
+        if (onlyBrowser && !this.platformService.isBrowser()) {
+            return EMPTY;
+        }
         let { host, url, ...options } = requestDto;
         url = (host ?? this.BASE_URL) + url;
         return this.http.request<T>(requestDto.method, url, options);
     }
 
-    public get<T>(url: string, options?: ApiOptions): Observable<T> {
+    public get<T>(url: string, options?: ApiOptions, onlyBrowser: boolean = true): Observable<T> {
+        if (onlyBrowser && !this.platformService.isBrowser()) {
+            return EMPTY;
+        }
         return this.http.get<T>(this.BASE_URL + url, this.buildOptions(options));
     }
 
-    public post<T, B = unknown>(url: string, body: B, options?: ApiOptions): Observable<T> {
+    public post<T, B = unknown>(url: string, body: B, options?: ApiOptions, onlyBrowser: boolean = true): Observable<T> {
+        if (onlyBrowser && !this.platformService.isBrowser()) {
+            return EMPTY;
+        }
         return this.http.post<T>(
             this.BASE_URL + url,
             body,
@@ -35,7 +47,10 @@ export class HttpClientService {
         );
     }
 
-    public put<T, B = unknown>(url: string, body: B, options?: ApiOptions): Observable<T> {
+    public put<T, B = unknown>(url: string, body: B, options?: ApiOptions, onlyBrowser: boolean = true): Observable<T> {
+        if (onlyBrowser && !this.platformService.isBrowser()) {
+            return EMPTY;
+        }
         return this.http.put<T>(
             this.BASE_URL + url,
             body,
@@ -43,7 +58,10 @@ export class HttpClientService {
         );
     }
 
-    public delete<T>(url: string, options?: ApiOptions): Observable<T> {
+    public delete<T>(url: string, options?: ApiOptions, onlyBrowser: boolean = true): Observable<T> {
+        if (onlyBrowser && !this.platformService.isBrowser()) {
+            return EMPTY;
+        }
         return this.http.delete<T>(
             this.BASE_URL + url,
             this.buildOptions(options)

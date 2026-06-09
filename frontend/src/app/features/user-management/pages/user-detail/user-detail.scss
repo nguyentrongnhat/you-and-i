@@ -1,0 +1,157 @@
+@use "variables" as v;
+
+:host {
+  display: block;
+}
+
+.user-detail {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 0.3rem;
+  margin-top: 1rem;
+  padding-bottom: 50px;
+
+  &__toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  /* Profile header */
+  &__profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.35rem;
+  }
+
+  &__avatar {
+    width: 6rem;
+    height: 6rem;
+    font-size: 2rem;
+
+    &--text {
+      background: var(--p-primary-color, #6366f1);
+      color: #fff;
+      font-weight: 600;
+    }
+  }
+
+  &__name {
+    margin: 0.75rem 0 0;
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.3;
+    word-break: break-word;
+  }
+
+  &__username {
+    color: var(--p-text-muted-color, #6b7280);
+    font-size: 0.9rem;
+  }
+
+  &__status {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-top: 1rem;
+  }
+
+  &__roles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-top: 0.75rem;
+  }
+
+  &__divider {
+    border: none;
+    border-top: 1px solid var(--p-content-border-color, #e5e7eb);
+    margin: 1.5rem 0;
+  }
+
+  /* Details form (used for both view and edit) */
+  &__form {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem 1.5rem;
+
+    @media (max-width: v.$breakpoint-xs) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-width: 0;
+
+    &--full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--p-text-color, #111827);
+    }
+  }
+
+  &__error {
+    color: var(--p-red-500, #ef4444);
+    font-size: 0.78rem;
+  }
+
+  /* Sticky save bar */
+  &__save-bar {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    margin-top: 0.5rem;
+    padding: 1rem 0;
+    background: var(--p-content-background, #fff);
+    border-top: 1px solid var(--p-content-border-color, #e5e7eb);
+  }
+
+  /* Loading skeleton */
+  &__skeleton-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  /* Empty / not found */
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.75rem;
+    padding: 4rem 1.5rem;
+    color: var(--p-text-muted-color, #6b7280);
+
+    h3 {
+      margin: 0;
+      color: var(--p-text-color, #111827);
+    }
+
+    p {
+      margin: 0 0 0.5rem;
+      max-width: 360px;
+    }
+  }
+
+  &__empty-icon {
+    font-size: 3.5rem;
+    color: var(--p-text-muted-color, #9ca3af);
+  }
+}
