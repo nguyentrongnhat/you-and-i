@@ -8,7 +8,6 @@ export const routes: Routes = [
   {
     path: ROUTE_PATHS.HOME.path,
     loadComponent: () => import('./features/dashboard/dashboard').then(c => c.Dashboard),
-    canMatch: [browserOnlyMatchGuard],
     canActivate: [authGuard],
     data: {
       animation: 'DashboardPage',
@@ -47,7 +46,6 @@ export const routes: Routes = [
   // Game group: /game/find-number-game
   {
     path: ROUTE_PATHS.GAME.path,
-    canMatch: [browserOnlyMatchGuard],
     canActivate: [authGuard],
     children: [
       {
@@ -62,7 +60,6 @@ export const routes: Routes = [
   },
   {
     path: ROUTE_PATHS.USER.path,
-    canMatch: [browserOnlyMatchGuard],
     canActivate: [authGuard],
     children: [
         {

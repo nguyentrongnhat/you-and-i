@@ -24,8 +24,7 @@ export const ROUTE_PATHS = {
         fullPath: 'user',
         children: {
             MANAGEMENT: { path: 'management', fullPath: 'user/management' },
-            EDIT_PROFILE: { path: 'edit-profile', fullPath: 'user/edit-profile' },
-            DETAIL: { path: 'detail/:id', fullPath: 'user/detail/:id' }
+            DETAIL: { path: 'details/:id', fullPath: 'user/details/:id' }
         }
     }
 } as const;

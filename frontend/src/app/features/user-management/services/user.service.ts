@@ -3,6 +3,7 @@ import { HttpClientService } from "../../../services/http-client.service";
 import { AuthService } from "../../auth/services/auth.service";
 import { UserDetails, UserProfile } from "../../../core/interfaces/user.dtos";
 import { Observable } from "rxjs";
+import { PlatformService } from "../../../services/platform.service";
 
 @Injectable({
     providedIn: 'root'
@@ -12,7 +13,12 @@ export class UserService {
 
     private readonly authService = inject(AuthService);
 
+    private readonly platformService = inject(PlatformService);
+
     public currentUser = computed<UserDetails | undefined>(() => {
+        
+        if (!this.platformService.isBrowser()) return undefined; // Return undefined on the server side
+        
         const profile: UserProfile = this.authService.accessTokenPayload().profile;
         const roles: string[] = this.authService.accessTokenPayload().roles;
 
