@@ -22,6 +22,11 @@ export class Layout1 implements OnInit {
 
   protected expandSideMenu = signal<boolean>(false);
 
+  /** Ẩn bottom navigation khi cuộn xuống, hiện lại khi cuộn lên */
+  protected hideBottomNav = signal<boolean>(false);
+
+  private lastScrollTop = 0;
+
   private readonly platformService = inject(PlatformService);
 
   private readonly authService = inject(AuthService);
@@ -100,8 +105,26 @@ export class Layout1 implements OnInit {
     if (!this.expandSideMenu()) return;
 
     this.hideSideMenuTimeout = setTimeout(() => {
-      if(this.platformService.isSmallMobileDevice()) this.expandSideMenu.set(false);
+      if(this.platformService.isMediumDevice()) this.expandSideMenu.set(false);
     }, 3000);
+  }
+
+  /**
+   * Ẩn bottom navigation khi cuộn xuống, hiện lại khi cuộn lên.
+   * Handler chỉ chạy trên browser nên SSR-safe.
+   */
+  protected onContentScroll(event: Event): void {
+    const current = (event.target as HTMLElement).scrollTop;
+
+    if (current <= 0) {
+      this.hideBottomNav.set(false);
+    } else if (current > this.lastScrollTop + 6) {
+      this.hideBottomNav.set(true);
+    } else if (current < this.lastScrollTop - 6) {
+      this.hideBottomNav.set(false);
+    }
+
+    this.lastScrollTop = current;
   }
 
 

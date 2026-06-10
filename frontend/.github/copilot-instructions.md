@@ -137,3 +137,86 @@ If unsure:
 → assume code runs on server
 → avoid browser APIs
 → use PlatformService check
+
+---
+
+# 15. UI Design Standard (Tables, Cards & Pagination)
+
+This is the single source of truth for designing data tables and similar surfaces.
+All new tables MUST follow this standard so the app stays visually consistent.
+
+## 15.0 Space & layout principle (applies to ALL surfaces)
+- AVOID wrapping elements inside a card/row — prefer keeping a logical row on a
+  single line (`flex-wrap: nowrap`) to make the most of horizontal space.
+- Elements on the same row SHOULD span the full width of the row and distribute
+  spacing evenly. Use `display: flex; width: 100%` with `justify-content: space-between`
+  (or `gap` + a flexible `flex: 1` element) instead of fixed-width clusters.
+- Let the primary flexible element grow (`flex: 1 1 auto`) so the row never leaves
+  empty gaps; secondary controls keep their intrinsic size.
+- Only allow wrapping as a responsive fallback at `v.$breakpoint-xs` and below.
+
+## 15.1 Theming
+- ALWAYS use PrimeNG theme CSS variables with a fallback, e.g.
+  `var(--p-text-color, #111827)`, `var(--p-content-border-color, #e5e7eb)`,
+  `var(--p-primary-color, #6366f1)`, `var(--p-content-hover-background, #f9fafb)`.
+- NEVER hardcode raw colors without a theme variable (keeps light/dark in sync).
+- Import shared breakpoints in SCSS: `@use "variables" as v;` and use
+  `v.$breakpoint-xs` etc. for responsive rules.
+
+## 15.2 Card wrapper
+- Wrap every `<p-table>` in a card container `&__card`:
+  - `border-radius: 16px`
+  - `border: 1px solid var(--p-content-border-color, #e5e7eb)`
+  - subtle two-layer shadow:
+    `0 1px 2px rgba(16,24,40,0.04), 0 1px 3px rgba(16,24,40,0.06)`
+  - DO NOT set `overflow: hidden` on the card — it clips the rows-per-page
+    dropdown overlay. Round corners on the header cells and paginator instead.
+
+## 15.3 Table styling (via `::ng-deep` scoped by a table styleClass)
+- Give the table a unique class (e.g. `styleClass="feature__table p-datatable-sm"`)
+  and scope deep styles as `:host ::ng-deep .feature__table { ... }`.
+- Header `th`: muted uppercase labels —
+  `font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em;
+  text-transform: uppercase;` with `background: var(--p-content-hover-background)`.
+  Round top corners on first/last `th` (16px) to match the card.
+- Body `td`: `padding: 0.75rem 1rem`, thin row divider
+  `border-bottom: 1px solid var(--p-content-border-color, #f1f3f5)`,
+  `vertical-align: middle`. Remove the divider on the last row.
+- Clickable rows use a `&__row` class with `cursor: pointer` and a hover
+  background `var(--p-content-hover-background)`.
+
+## 15.4 Pagination (MANDATORY look)
+- Scope under the table class: `:host ::ng-deep .feature__table .p-paginator`.
+- The paginator is a full-width row: `display: flex; width: 100%; flex-wrap: nowrap`.
+  Spread items evenly — current-page report on the left (`margin-right: auto`),
+  page buttons in the middle, rows-per-page select on the right (`margin-left: auto`).
+- Page / nav buttons: `min-width/height: 2.1rem; border-radius: 9px;` muted color,
+  hover background, active `transform: scale(0.93)`.
+- Selected page: `background: var(--p-primary-color)`,
+  `color: var(--p-primary-contrast-color, #fff)`, `font-weight: 600`,
+  subtle shadow `0 1px 2px rgba(99,102,241,0.35)`.
+- Rows-per-page select: `height: 2.1rem; min-width: 4.5rem; border-radius: 9px`.
+- ALWAYS add this rule so all options are visible:
+  `:host ::ng-deep .p-select-overlay .p-select-list-container { max-height: 16rem; }`
+- Enable the report: `currentPageReportTemplate="Hiển thị {first} – {last} trong {totalRecords}"`
+  with `[showCurrentPageReport]="true"`.
+- Only wrap + center the items as a fallback at `v.$breakpoint-xs`.
+
+## 15.5 User / entity cells
+- Show an avatar + 2-line info (name + muted `@username` / secondary line).
+- Avatar fallback uses initials with `background: var(--p-primary-color)` and a
+  white ring; truncate long text with ellipsis.
+
+## 15.6 Empty state
+- Use `#emptymessage` with a centered block: large muted `pi` icon + short text,
+  generous padding (~2.75rem). Class `&__empty`.
+
+## 15.7 Responsiveness
+- Hide non-essential columns on small mobile via `PlatformService.isSmallMobileDevice()`
+  (never via raw `window` checks).
+- Keep the same column-hiding pattern in both header and body templates, and update
+  the empty `colspan` accordingly.
+
+## 15.8 Reference implementations
+- `features/user-management/pages/user-management` (full pattern)
+- `features/games/find-number-game/components/game-histories` (compact pattern)

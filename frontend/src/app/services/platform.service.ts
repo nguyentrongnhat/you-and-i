@@ -10,10 +10,18 @@ export class PlatformService {
 
   private readonly platformId = inject(PLATFORM_ID);
 
+  protected readonly MEDIUM_DEVICE_WIDTH = 970;
+
   protected MOBILE_DEVICE_WIDTH = 768;
 
   public isMobile(): boolean {
     return this.platform.IOS || this.platform.ANDROID;
+  }
+
+  public isMediumDevice(): boolean {
+    if (!this.isBrowser()) return false;
+    const deviceWidth = window.innerWidth;
+    return deviceWidth < this.MEDIUM_DEVICE_WIDTH;
   }
 
   public isSmallMobileDevice(): boolean {

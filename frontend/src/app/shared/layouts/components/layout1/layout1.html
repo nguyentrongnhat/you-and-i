@@ -13,7 +13,7 @@
                     tooltipPosition="bottom" pTooltip="{{item.name}}" 
                     [ngClass]="{'active': item.active}"
                 >
-                    <i class="pi {{item.icon}}" style="font-size: 1.2rem; font-weight: 400;"></i>
+                    <i class="pi {{item.icon}}"></i>
                 </li>
             }
             
@@ -34,14 +34,31 @@
                         tooltipPosition="right" pTooltip="{{item.name}}" 
                         [ngClass]="{'active': item.active}"
                     >
-                            <i class="pi {{item.icon}}" style="font-size: 1.2rem"></i>
+                            <i class="pi {{item.icon}}"></i>
                     </li>
                 }
             </ul>
         </div>
-        <div class="content max-w-[1200px] mx-auto">
+        <div class="content max-w-[1200px] mx-auto" (scroll)="onContentScroll($event)">
             <ng-content></ng-content>
         </div>
     </div>
-    
+
+    <!-- Mobile bottom navigation -->
+    <nav class="bottom-nav" [ngClass]="{ 'bottom-nav--hidden': hideBottomNav() }">
+        <ul class="bottom-nav__list">
+            @for (item of this.navigationItems(); track item) {
+            <li
+                class="bottom-nav__item"
+                [ngClass]="{ 'active': item.active }"
+                (click)="navigateTo(item.url)"
+                pTooltip="{{ item.name }}"
+                tooltipPosition="top"
+            >
+                <i class="pi {{ item.icon }}"></i>
+            </li>
+            }
+        </ul>
+    </nav>
+
 </div>

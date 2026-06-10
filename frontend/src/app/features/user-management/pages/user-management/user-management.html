@@ -1,22 +1,125 @@
-<p-table [value]="users()" [paginator]="true" [rows]="5" [tableStyle]="{ 'min-width': '25rem' }" [rowsPerPageOptions]="[5, 10, 20]">
-        <ng-template #header>
-            <tr>
-                <th>username</th>
-                @if(!this.platformService.isSmallMobileDevice()) {
-                    <th>verified</th>
-                }
-                <th>enabled</th>
-            </tr>
-        </ng-template>
-        <ng-template #body let-user>
-            <tr class="cursor-pointer" (click)="navigateToUserDetail(user)">
-                <td>{{ user.username }}</td>
-                @if(!this.platformService.isSmallMobileDevice()) {
-                    <td>{{ user.emailVerified }}</td>
-                }
-                <td class="alig">
-                    <p-toggleswitch (click)="toggleActiveUserAccount(user); $event.stopPropagation()" severity="contrast" [(ngModel)]="user.enabled" />
-                </td>
-            </tr>
-        </ng-template>
+<div class="user-management">
+  <!-- Header -->
+  <div class="user-management__header">
+    <div class="user-management__heading">
+      <h2 class="user-management__title">
+        <i class="pi pi-users"></i>
+        Quản lý người dùng
+      </h2>
+      <p class="user-management__subtitle">
+        Tổng <strong>{{ users().length }}</strong> người dùng ·
+        <strong>{{ enabledCount() }}</strong> đang hoạt động
+      </p>
+    </div>
+
+    <p-iconfield iconPosition="left" class="user-management__search">
+      <p-inputicon styleClass="pi pi-search" />
+      <input
+        pInputText
+        type="text"
+        placeholder="Tìm theo tên hoặc username..."
+        [ngModel]="searchTerm()"
+        (ngModelChange)="onSearch($event)"
+        fluid
+      />
+    </p-iconfield>
+  </div>
+
+  <!-- Table -->
+  <div class="user-management__card">
+    <p-table
+      [value]="filteredUsers()"
+      [paginator]="true"
+      [rows]="10"
+      [loading]="loading()"
+      [rowsPerPageOptions]="[10, 20, 50]"
+      [tableStyle]="{ 'min-width': '20rem' }"
+      styleClass="user-management__table p-datatable-sm"
+      currentPageReportTemplate="Hiển thị {first} – {last} trong {totalRecords}"
+      [showCurrentPageReport]="true"
+    >
+      <ng-template #header>
+        <tr>
+          <th>Người dùng</th>
+          @if (!platformService.isSmallMobileDevice()) {
+          <th>Vai trò</th>
+          <th class="user-management__col-center">Xác thực</th>
+          }
+          <th class="user-management__col-center">Hoạt động</th>
+        </tr>
+      </ng-template>
+
+      <ng-template #body let-user>
+        <tr class="user-management__row" (click)="navigateToUserDetail(user)">
+          <td>
+            <div class="user-management__user-cell">
+              @if (user.profile?.avatarUrl) {
+              <p-avatar
+                [image]="user.profile.avatarUrl"
+                shape="circle"
+                size="normal"
+                styleClass="user-management__avatar"
+              />
+              } @else {
+              <p-avatar
+                [label]="initials(user)"
+                shape="circle"
+                size="normal"
+                styleClass="user-management__avatar user-management__avatar--text"
+              />
+              }
+              <div class="user-management__user-info">
+                <span class="user-management__user-name">
+                  {{ displayName(user) }}
+                </span>
+                <span class="user-management__user-username">
+                  &#64;{{ user.username }}
+                </span>
+              </div>
+            </div>
+          </td>
+
+          @if (!platformService.isSmallMobileDevice()) {
+          <td>
+            <div class="user-management__roles">
+              @for (role of user.roles; track role) {
+              <p-tag [value]="role" severity="secondary" />
+              } @empty {
+              <span class="user-management__muted">—</span>
+              }
+            </div>
+          </td>
+          <td class="user-management__col-center">
+            <p-tag
+              [value]="user.emailVerified ? 'Đã xác thực' : 'Chưa'"
+              [severity]="user.emailVerified ? 'success' : 'warn'"
+              [icon]="
+                user.emailVerified ? 'pi pi-verified' : 'pi pi-exclamation-circle'
+              "
+            />
+          </td>
+          }
+
+          <td class="user-management__col-center">
+            <p-toggleswitch
+              [(ngModel)]="user.enabled"
+              (click)="toggleActiveUserAccount(user); $event.stopPropagation()"
+            />
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template #emptymessage>
+        <tr>
+          <td
+            [attr.colspan]="platformService.isSmallMobileDevice() ? 2 : 4"
+            class="user-management__empty"
+          >
+            <i class="pi pi-inbox"></i>
+            <span>Không tìm thấy người dùng nào.</span>
+          </td>
+        </tr>
+      </ng-template>
     </p-table>
+  </div>
+</div>
