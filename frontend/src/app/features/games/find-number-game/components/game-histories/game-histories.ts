@@ -5,22 +5,22 @@ import { TagModule } from 'primeng/tag';
 import { FindNumberGameService } from '../../services/findnumber.service';
 
 @Component({
-  selector: 'app-game-histories',
-  imports: [DatePipe, TableModule, TagModule],
-  templateUrl: './game-histories.html',
-  styleUrl: './game-histories.scss',
+	selector: 'app-game-histories',
+	imports: [DatePipe, TableModule, TagModule],
+	templateUrl: './game-histories.html',
+	styleUrl: './game-histories.scss',
 })
 export class GameHistories {
 
-  protected readonly findNumberGameService = inject(FindNumberGameService);
+	protected readonly findNumberGameService = inject(FindNumberGameService);
 
-  protected readonly gameHistories = computed(() => this.findNumberGameService.gameHistories());
+	protected readonly gameHistories = computed(() => this.findNumberGameService.gameHistories());
 
-  /** Thời gian tốt nhất (giây) để đánh dấu kỷ lục */
-  protected bestTime = computed<number | null>(() => {
-    const histories = this.gameHistories();
-    if (!histories.length) return null;
-    return Math.min(...histories.map((h) => h.timeToFinish));
-  });
+	/** Thời gian tốt nhất (giây) để đánh dấu kỷ lục */
+	protected bestTime = computed<number | null>(() => {
+		const histories = this.gameHistories();
+		if (!histories.length) return null;
+		return Math.min(...histories.map((h) => h.timeToFinish));
+	});
 
 }

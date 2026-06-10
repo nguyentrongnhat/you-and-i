@@ -4,85 +4,85 @@ import { isPlatformBrowser } from '@angular/common';
 import { Number } from '../number/number';
 
 @Component({
-  selector: 'app-game-table',
-  imports: [Number],
-  templateUrl: './game-table.html',
-  styleUrl: './game-table.scss',
+	selector: 'app-game-table',
+	imports: [Number],
+	templateUrl: './game-table.html',
+	styleUrl: './game-table.scss',
 })
 export class GameTable implements OnInit, OnDestroy, AfterViewInit {
- 
-  private readonly platformId = inject(PLATFORM_ID);
 
-  screenWidth = signal(0);
+	private readonly platformId = inject(PLATFORM_ID);
 
-  columns = computed(() => this.screenWidth() < 768 ? 5 : 10);
+	screenWidth = signal(0);
 
-  numbers = signal<NumberData[]>(this.generateItems());
+	columns = computed(() => this.screenWidth() < 768 ? 5 : 10);
 
-  currentNumber = signal<number>(0);
+	numbers = signal<NumberData[]>(this.generateItems());
 
-  onSelectNumber = output<number>();
+	currentNumber = signal<number>(0);
 
-  ready = false;
+	onSelectNumber = output<number>();
 
-  @HostListener('window:resize')
-  onResize() {
-    if (isPlatformBrowser(this.platformId)) {
-      this.screenWidth.set(window.innerWidth);
-    }
-  }
+	ready = false;
 
-  ngOnInit(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      this.screenWidth.set(window.innerWidth);
-    }
-  }
+	@HostListener('window:resize')
+	onResize() {
+		if (isPlatformBrowser(this.platformId)) {
+			this.screenWidth.set(window.innerWidth);
+		}
+	}
 
-
-  ngAfterViewInit(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      this.screenWidth.set(window.innerWidth);
-
-      setTimeout(() => {
-        this.ready = true;
-      });
-    }
-  }
+	ngOnInit(): void {
+		if (isPlatformBrowser(this.platformId)) {
+			this.screenWidth.set(window.innerWidth);
+		}
+	}
 
 
-  ngOnDestroy(): void {
-    this.currentNumber.set(0);
-  }
+	ngAfterViewInit(): void {
+		if (isPlatformBrowser(this.platformId)) {
+			this.screenWidth.set(window.innerWidth);
+
+			setTimeout(() => {
+				this.ready = true;
+			});
+		}
+	}
 
 
-  private generateItems(): NumberData[] {
-    const arr = Array.from({ length: 100 }, (_, i) => i + 1);
-
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-
-    return arr.map(num => {
-      return {
-        value: num,
-        rotate: this.random(-180, 170),
-        tx: this.random(0, 100),
-        ty: this.random(0, 100),
-        fontSize: this.random(13, 20)
-      };
-    });
-  }
+	ngOnDestroy(): void {
+		this.currentNumber.set(0);
+	}
 
 
-  private random(min: number, max: number) {
-    return Math.random() * (max - min) + min;
-  }
+	private generateItems(): NumberData[] {
+		const arr = Array.from({ length: 100 }, (_, i) => i + 1);
+
+		for (let i = arr.length - 1; i > 0; i--) {
+			const j = Math.floor(Math.random() * (i + 1));
+			[arr[i], arr[j]] = [arr[j], arr[i]];
+		}
+
+		return arr.map(num => {
+			return {
+				value: num,
+				rotate: this.random(-180, 170),
+				tx: this.random(0, 100),
+				ty: this.random(0, 100),
+				fontSize: this.random(13, 20)
+			};
+		});
+	}
 
 
-  public selectNumber() {
-    this.currentNumber.update((number) => number + 1);
-    this.onSelectNumber.emit(this.currentNumber())
-  }
+	private random(min: number, max: number) {
+		return Math.random() * (max - min) + min;
+	}
+
+
+	public selectNumber() {
+		this.currentNumber.update((number) => number + 1);
+		this.onSelectNumber.emit(this.currentNumber())
+	}
 }
 

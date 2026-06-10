@@ -15,100 +15,100 @@ import { PlatformService } from '../../../../services/platform.service';
 import { UserService } from '../../services/user.service';
 
 @Component({
-  selector: 'app-user-management',
-  imports: [
-    TableModule,
-    ToggleSwitchModule,
-    FormsModule,
-    AvatarModule,
-    ButtonModule,
-    IconFieldModule,
-    InputIconModule,
-    InputTextModule,
-    TagModule,
-  ],
-  templateUrl: './user-management.html',
-  styleUrl: './user-management.scss',
+	selector: 'app-user-management',
+	imports: [
+		TableModule,
+		ToggleSwitchModule,
+		FormsModule,
+		AvatarModule,
+		ButtonModule,
+		IconFieldModule,
+		InputIconModule,
+		InputTextModule,
+		TagModule,
+	],
+	templateUrl: './user-management.html',
+	styleUrl: './user-management.scss',
 })
 export class UserManagement {
-  private readonly userService = inject(UserService);
+	private readonly userService = inject(UserService);
 
-  protected platformService = inject(PlatformService);
+	protected platformService = inject(PlatformService);
 
-  private readonly router = inject(Router);
+	private readonly router = inject(Router);
 
-  protected readonly users = signal<UserDetails[]>([]);
-  protected readonly loading = signal<boolean>(true);
-  protected readonly searchTerm = signal<string>('');
+	protected readonly users = signal<UserDetails[]>([]);
+	protected readonly loading = signal<boolean>(true);
+	protected readonly searchTerm = signal<string>('');
 
-  protected readonly filteredUsers = computed<UserDetails[]>(() => {
-    const term = this.searchTerm().trim().toLowerCase();
-    const list = this.users();
-    if (!term) return list;
-    return list.filter((user) => {
-      const fullName = user.profile?.fullName ?? '';
-      const displayName = user.profile?.displayName ?? '';
-      return (
-        user.username.toLowerCase().includes(term) ||
-        fullName.toLowerCase().includes(term) ||
-        displayName.toLowerCase().includes(term)
-      );
-    });
-  });
+	protected readonly filteredUsers = computed<UserDetails[]>(() => {
+		const term = this.searchTerm().trim().toLowerCase();
+		const list = this.users();
+		if (!term) return list;
+		return list.filter((user) => {
+			const fullName = user.profile?.fullName ?? '';
+			const displayName = user.profile?.displayName ?? '';
+			return (
+				user.username.toLowerCase().includes(term) ||
+				fullName.toLowerCase().includes(term) ||
+				displayName.toLowerCase().includes(term)
+			);
+		});
+	});
 
-  protected readonly enabledCount = computed<number>(
-    () => this.users().filter((user) => user.enabled).length
-  );
+	protected readonly enabledCount = computed<number>(
+		() => this.users().filter((user) => user.enabled).length
+	);
 
-  constructor() {
-    this.getAllUsers();
-  }
+	constructor() {
+		this.getAllUsers();
+	}
 
-  private getAllUsers(): void {
-    this.loading.set(true);
-    this.userService.getAllUsers().subscribe({
-      next: (res: UserDetails[]) => {
-        this.users.set(res);
-        this.loading.set(false);
-      },
-      error: () => {
-        this.loading.set(false);
-      },
-    });
-  }
+	private getAllUsers(): void {
+		this.loading.set(true);
+		this.userService.getAllUsers().subscribe({
+			next: (res: UserDetails[]) => {
+				this.users.set(res);
+				this.loading.set(false);
+			},
+			error: () => {
+				this.loading.set(false);
+			},
+		});
+	}
 
-  protected onSearch(value: string): void {
-    this.searchTerm.set(value);
-  }
+	protected onSearch(value: string): void {
+		this.searchTerm.set(value);
+	}
 
-  protected initials(user: UserDetails): string {
-    const source =
-      user.profile?.fullName ||
-      user.profile?.displayName ||
-      user.username ||
-      '';
-    const parts = source.trim().split(/\s+/).filter(Boolean);
-    if (parts.length === 0) return '?';
-    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
-    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
-  }
+	protected initials(user: UserDetails): string {
+		const source =
+			user.profile?.fullName ||
+			user.profile?.displayName ||
+			user.username ||
+			'';
+		const parts = source.trim().split(/\s+/).filter(Boolean);
+		if (parts.length === 0) return '?';
+		if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+		return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+	}
 
-  protected displayName(user: UserDetails): string {
-    return user.profile?.fullName || user.profile?.displayName || user.username;
-  }
+	protected displayName(user: UserDetails): string {
+		return user.profile?.fullName || user.profile?.displayName || user.username;
+	}
 
-  protected toggleActiveUserAccount(user: UserDetails): void {
-    this.userService.updateUserData(user).subscribe({
-      next: () => {},
-      error: () => {
-        user.enabled = !user.enabled;
-      },
-    });
-  }
+	protected toggleActiveUserAccount(user: UserDetails): void {
+		this.userService.updateUserData(user).subscribe({
+			next: () => { },
+			error: () => {
+				user.enabled = !user.enabled;
+			},
+		});
+	}
 
-  protected navigateToUserDetail(user: UserDetails): void {
-    this.router.navigateByUrl(
-      ROUTE_PATHS.USER.children.DETAIL.fullPath.replace(':id', user.id)
-    );
-  }
+	protected navigateToUserDetail(user: UserDetails): void {
+		this.router.navigateByUrl(
+			ROUTE_PATHS.USER.children.DETAIL.fullPath.replace(':id', user.id)
+		);
+	}
 }
