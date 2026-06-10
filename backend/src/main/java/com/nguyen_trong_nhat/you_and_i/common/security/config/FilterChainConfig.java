@@ -39,7 +39,7 @@ public class FilterChainConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:4201"));
+        config.setAllowedOrigins(List.of("http://localhost:4200", "http://localhost:4201", "https://jar-of-messages-5b9cd.web.app"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
