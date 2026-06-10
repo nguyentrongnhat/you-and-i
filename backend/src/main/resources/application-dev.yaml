@@ -35,3 +35,6 @@ account:
     password: ${SUPER_ADMIN_PASSWORD}
 
 
+api:
+  env:
+    test: ${TEST_ENV:Không có biến môi trường!!!}
