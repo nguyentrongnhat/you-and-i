@@ -37,9 +37,9 @@ public class AuthController {
 
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", loginResponse.getRefreshToken())
                 .httpOnly(true)
-                .sameSite("Lax")
-                .secure(secureCookie) // true if https
-                .path("/api/auth/refresh")
+                .sameSite("None")
+                .secure(true) // true if https
+                .path("/")
                 .maxAge(Duration.ofSeconds(Constants.REFRESH_TOKEN_MAX_AGE))
                 .build();
 
@@ -100,9 +100,9 @@ public class AuthController {
         // Overwrite the refresh_token cookie with maxAge=0 to remove it from the client
         ResponseCookie deleteCookie = ResponseCookie.from("refresh_token", "")
                 .httpOnly(true)
-                .sameSite("Lax")
-                .secure(secureCookie) // set true if using HTTPS
-                .path("/api/auth/refresh")
+                .sameSite("None")
+                .secure(true) // true if https
+                .path("/")
                 .maxAge(0)
                 .build();
 
