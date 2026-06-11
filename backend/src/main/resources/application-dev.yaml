@@ -6,9 +6,9 @@ spring:
     #url: jdbc:postgresql://localhost:5432/you-and-i
     #username: ${DB_USERNAME}
     #password: ${DB_PASSWORD}
-    url: jdbc:postgresql://ep-tiny-thunder-a7uum1o3-pooler.ap-southeast-2.aws.neon.tech/you-and-i?&sslmode=require&channelBinding=require
-    username: ${NEON_DB_USERNAME}
-    password: ${NEON_DB_PASSWORD}
+    url: ${LOCAL_DB_URL:NEON_DB_URL}
+    username: ${LOCAL_DB_USERNAME:NEON_DB_USERNAME}
+    password: ${LOCAL_DB_PASSWORD:NEON_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
