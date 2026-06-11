@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, HostListener, inject, OnInit, signal } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { ROUTE_PATHS } from '../../../../core/constants/route-paths';
 import { AvatarModule } from 'primeng/avatar';
@@ -35,7 +35,7 @@ export class Layout1 implements OnInit {
 
     protected userService = inject(UserService);
 
-    protected navigationItems = signal(
+    protected fullNavigationItems = signal(
         [
             {
                 name: 'Dashboard',
@@ -80,7 +80,13 @@ export class Layout1 implements OnInit {
                 requiredRoles: [ROLE.SUPER_ADMIN]
             },
         ]
-    );
+    )
+
+    protected navigationItems = computed(() =>  {
+        const curreentUserRoles = this.userService.userRoles();
+        return this.fullNavigationItems().filter(item => item.requiredRoles.every(role => curreentUserRoles.includes(role)));
+    })
+    
 
     ngOnInit(): void {
         this.setActiveByUrl(this.router.url);
@@ -109,7 +115,7 @@ export class Layout1 implements OnInit {
     
 
     private setActiveByUrl(url: string) {
-        this.navigationItems.update(items =>
+        this.fullNavigationItems.update(items =>
             items.map(item => ({
                 ...item,
                 active: item.url === (url ? url.slice(1) : '')

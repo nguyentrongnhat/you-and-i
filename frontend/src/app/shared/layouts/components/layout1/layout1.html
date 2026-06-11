@@ -8,16 +8,15 @@
 
         <ul class="navigation-item">
             @for(item of this.navigationItems(); track item) {
-                {{!this.userService.hasRoles(item.requiredRoles)}}
-                @if(!this.userService.hasRoles(item.requiredRoles)) {
-                    <li 
-                        (click)="navigateTo(item.url)" 
-                        tooltipPosition="bottom" pTooltip="{{item.name}}" 
-                        [ngClass]="{'active': item.active}"
-                    >
-                        <i class="pi {{item.icon}}"></i>
-                    </li>
-                }
+                
+                <li 
+                    (click)="navigateTo(item.url)" 
+                    tooltipPosition="bottom" pTooltip="{{item.name}}" 
+                    [ngClass]="{'active': item.active}"
+                >
+                    <i class="pi {{item.icon}}"></i>
+                </li>
+                
             }
             
         </ul>
