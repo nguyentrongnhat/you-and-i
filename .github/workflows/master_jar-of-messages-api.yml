@@ -29,10 +29,10 @@ jobs:
         run: mvn clean install -DskipTests
 
       - name: Upload artifact for deployment job
-  	uses: actions/upload-artifact@v4
-  	with:
-    	  name: java-app
-    	  path: backend/target/*.jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: java-app
+          path: backend/target/*.jar
 
   deploy:
     runs-on: ubuntu-latest
