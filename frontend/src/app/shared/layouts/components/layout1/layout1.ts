@@ -7,6 +7,8 @@ import { CommonModule } from '@angular/common';
 import { PlatformService } from '../../../../services/platform.service';
 import { filter } from 'rxjs';
 import { AuthService } from '../../../../features/auth/services/auth.service';
+import { ROLE } from '../../../../core/enums';
+import { UserService } from '../../../../features/user-management/services/user.service';
 
 @Component({
     selector: 'app-layout1',
@@ -31,43 +33,51 @@ export class Layout1 implements OnInit {
 
     private readonly authService = inject(AuthService);
 
+    protected userService = inject(UserService);
+
     protected navigationItems = signal(
         [
             {
                 name: 'Dashboard',
                 icon: 'pi-home',
                 url: this.ROUTE_PATHS.HOME.fullPath,
-                active: true
+                active: true,
+                requiredRoles: []
             },
             {
                 name: 'Memoria',
                 icon: 'pi-heart-fill',
                 url: '#',
-                active: false
+                active: false,
+                requiredRoles: []
             },
             {
                 name: 'Activities',
                 icon: 'pi-list-check',
                 url: '#',
-                active: false
+                active: false,
+                requiredRoles: []
             },
             {
                 name: 'Messages',
                 icon: 'pi-send',
                 url: '#',
-                active: false
+                active: false,
+                requiredRoles: []
             },
             {
                 name: 'Game',
                 icon: 'pi-discord',
                 url: this.ROUTE_PATHS.GAME.children.FIND_NUMBER_GAME.fullPath,
-                active: false
+                active: false,
+                requiredRoles: []
             },
             {
                 name: 'Users Management',
                 icon: 'pi-users',
                 url: this.ROUTE_PATHS.USER.children.MANAGEMENT.fullPath,
-                active: false
+                active: false,
+                requiredRoles: [ROLE.SUPER_ADMIN]
             },
         ]
     );

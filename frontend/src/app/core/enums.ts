@@ -17,3 +17,9 @@ export enum MESSAGE_TYPE {
   CONTRAST = 'contrast',
   SECONDARY = 'secondary'
 }
+
+export enum ROLE {
+    SUPER_ADMIN = 'ROLE_SUPER_ADMIN',
+    ADMIN = 'ROLE_ADMIN',
+    USER = 'ROLE_USER'
+}

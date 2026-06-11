@@ -2,6 +2,7 @@ import { computed, inject, Injectable, signal } from "@angular/core";
 import { Observable } from "rxjs";
 import { UserDetails } from "../../../core/interfaces/user.dtos";
 import { HttpClientService } from "../../../services/http-client.service";
+import { ROLE } from "../../../core/enums";
 
 @Injectable({
     providedIn: 'root'
@@ -25,5 +26,11 @@ export class UserService {
 
     public updateUserData(userData: any): Observable<UserDetails> {
         return this.httpClientService.put('/user/update', userData);
+    }
+
+    public hasRoles(requiredRoles: ROLE[]): boolean {
+        const currentRoles = this.userRoles();
+        if (!currentRoles) return false;
+        return requiredRoles.every(role => currentRoles.includes(role));
     }
 }
