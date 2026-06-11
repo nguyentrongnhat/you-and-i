@@ -29,8 +29,8 @@ export interface LoginModel {
 }
 
 export const initialData: LoginModel = {
-  username: 'superadmin@admin.com',
-  password: 'superadmin123',
+  username: '',
+  password: '',
   isAcceptedTerm: true
 }
 

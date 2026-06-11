@@ -31,9 +31,9 @@ export interface SignupModel {
 }
 
 export const initialData: SignupModel = {
-  username: 'lordabsolute99@gmail.com',
-  password: '123',
-  confirmPassword: '123',
+  username: '',
+  password: '',
+  confirmPassword: '',
   isAcceptedTerm: true
 }
 
