@@ -83,7 +83,7 @@ public class AuthController {
                 .httpOnly(true)
                 .sameSite("None")
                 .secure(true) // true if https
-                .path("/api/auth/refresh")
+                .path("/")
                 .maxAge(Duration.ofSeconds(Constants.REFRESH_TOKEN_MAX_AGE))
                 .build();
 
