@@ -38,3 +38,7 @@ account:
 api:
   env:
     test: ${TEST_ENV:Không có biến môi trường!!!}
+
+security:
+  jwt:
+    secret-key: ${JWT_SECRET_KEY}

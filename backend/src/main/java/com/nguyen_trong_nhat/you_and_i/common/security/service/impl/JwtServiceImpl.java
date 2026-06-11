@@ -7,6 +7,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,11 @@ import java.util.List;
 @Service
 public class JwtServiceImpl implements JwtService {
 
-    private final SecretKey key = Keys.hmacShaKeyFor("super-secure-key-super-secure-key".getBytes());
+    private final SecretKey key;
+
+    public  JwtServiceImpl(@Value("${security.jwt.secret-key}") String secretKey) {
+        this.key = Keys.hmacShaKeyFor(secretKey.getBytes());
+    }
 
     public String generateAccessToken(UserDetails user) {
         return Jwts.builder()
