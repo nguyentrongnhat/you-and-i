@@ -40,5 +40,7 @@ api:
     test: ${TEST_ENV:Không có biến môi trường!!!}
 
 security:
+  cookie:
+    secure: true
   jwt:
     secret-key: ${JWT_SECRET_KEY}
