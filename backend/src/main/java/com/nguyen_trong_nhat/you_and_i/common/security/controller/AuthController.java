@@ -82,7 +82,7 @@ public class AuthController {
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", loginResponse.getRefreshToken())
                 .httpOnly(true)
                 .sameSite("None")
-                .secure(secureCookie) // true if https
+                .secure(true) // true if https
                 .path("/api/auth/refresh")
                 .maxAge(Duration.ofSeconds(Constants.REFRESH_TOKEN_MAX_AGE))
                 .build();
