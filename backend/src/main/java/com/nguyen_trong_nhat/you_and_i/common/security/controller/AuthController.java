@@ -42,7 +42,7 @@ public class AuthController {
                 .httpOnly(true)
                 .sameSite(sameSiteCookie)
                 .secure(secureCookie) // true if https
-                .path("/")
+                .path("/api/auth/refresh")
                 .maxAge(Duration.ofSeconds(Constants.REFRESH_TOKEN_MAX_AGE))
                 .build();
 
@@ -86,7 +86,7 @@ public class AuthController {
                 .httpOnly(true)
                 .sameSite(sameSiteCookie)
                 .secure(secureCookie) // true if https
-                .path("/")
+                .path("/api/auth/refresh")
                 .maxAge(Duration.ofSeconds(Constants.REFRESH_TOKEN_MAX_AGE))
                 .build();
 
@@ -109,7 +109,7 @@ public class AuthController {
                 .httpOnly(true)
                 .sameSite(sameSiteCookie)
                 .secure(secureCookie) // true if https
-                .path("/")
+                .path("/api/auth/refresh")
                 .maxAge(Duration.ofSeconds(Constants.REFRESH_TOKEN_MAX_AGE))
                 .build();
 
