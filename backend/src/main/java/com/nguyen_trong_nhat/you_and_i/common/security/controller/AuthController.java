@@ -22,11 +22,16 @@ import java.time.Duration;
 public class AuthController {
 
     private final boolean secureCookie;
+    private final String sameSiteCookie;
     private final AuthServiceImpl authService;
 
-    public AuthController(AuthServiceImpl authService, @Value("${security.cookie.secure}") boolean secureCookie) {
+    public AuthController(
+            AuthServiceImpl authService,
+            @Value("${security.cookie.secure}") boolean secureCookie,
+            @Value("${security.cookie.same-site}") String sameSiteCookie) {
         this.authService = authService;
         this.secureCookie = secureCookie;
+        this.sameSiteCookie = sameSiteCookie;
     }
 
 
@@ -37,7 +42,7 @@ public class AuthController {
 
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", loginResponse.getRefreshToken())
                 .httpOnly(true)
-                .sameSite("None")
+                .sameSite(sameSiteCookie)
                 .secure(secureCookie) // true if https
                 .path("/api/auth/refresh")
                 .maxAge(Duration.ofSeconds(Constants.REFRESH_TOKEN_MAX_AGE))
@@ -81,7 +86,7 @@ public class AuthController {
 
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", loginResponse.getRefreshToken())
                 .httpOnly(true)
-                .sameSite("None")
+                .sameSite(sameSiteCookie)
                 .secure(secureCookie) // true if https
                 .path("/api/auth/refresh")
                 .maxAge(Duration.ofSeconds(Constants.REFRESH_TOKEN_MAX_AGE))
@@ -100,7 +105,7 @@ public class AuthController {
         // Overwrite the refresh_token cookie with maxAge=0 to remove it from the client
         ResponseCookie deleteCookie = ResponseCookie.from("refresh_token", "")
                 .httpOnly(true)
-                .sameSite("None")
+                .sameSite(sameSiteCookie)
                 .secure(secureCookie) // true if https
                 .path("/api/auth/refresh")
                 .maxAge(0)

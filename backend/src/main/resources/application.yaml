@@ -42,5 +42,6 @@ api:
 security:
   cookie:
     secure: true
+    same-site: None
   jwt:
     secret-key: ${JWT_SECRET_KEY}

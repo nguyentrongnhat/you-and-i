@@ -42,5 +42,6 @@ api:
 security:
   cookie:
     secure: false
+    same-site: Lax
   jwt:
     secret-key: ${JWT_SECRET_KEY:super-secure-key-super-secure-key}
