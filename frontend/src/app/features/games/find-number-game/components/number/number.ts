@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, Component, effect, ElementRef, inject, input, output, signal, ViewChild } from '@angular/core';
 import { PlatformService } from '../../../../../services/platform.service';
 import { NumberData } from '../../find-number-game';
+import { UserService } from '../../../../user-management/services/user.service';
+import { ROLE } from '../../../../../core/enums';
 
 @Component({
   selector: 'app-number',
@@ -25,6 +27,8 @@ export class Number implements AfterViewInit {
   protected isIndicate = signal<boolean>(false);
 
   protected isSelected = signal<boolean>(false);
+
+  private readonly userService = inject(UserService);
 
   private readonly platformService = inject(PlatformService);
 
@@ -75,6 +79,7 @@ export class Number implements AfterViewInit {
 
 
   protected upDateIndicate(currentNumber: number) {
+    if (!this.userService.hasRoles([ROLE.SUPER_ADMIN])) return;
     const numberData: number = this.data()?.value ?? -1
     this.isIndicate.set(currentNumber + 1 === numberData);
   }
