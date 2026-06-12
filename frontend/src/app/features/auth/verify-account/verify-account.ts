@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { email, form, FormField, minLength, required, schema } from '@angular/forms/signals';
 import { Router } from '@angular/router';
@@ -18,6 +18,9 @@ import { ToastService } from '../../../services/toast.service';
 import { VerifyAccountService } from '../services/verify-account.service';
 import { ROUTE_PATHS } from '../../../core/constants/route-paths';
 import { MESSAGE_TYPE } from '../../../core/enums';
+import { LoaderService } from '../../../services/loader.service';
+import { finalize } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export interface EmailVerificationModel {
   email: string,
@@ -92,6 +95,10 @@ export class VerifyAccount implements OnInit, OnDestroy {
 
   private countDownInterval!: ReturnType<typeof setInterval>;
 
+  private readonly destroyRef = inject(DestroyRef);
+
+  private readonly loaderService = inject(LoaderService);
+
   constructor() {
     effect(() => {
       const isRequestedCode = this.isRequestedCode()
@@ -126,7 +133,7 @@ export class VerifyAccount implements OnInit, OnDestroy {
   }
 
 
-  availableResendCodeCountdown() {
+  protected availableResendCodeCountdown() {
     clearInterval(this.countDownInterval);
     this.countDownInterval = setInterval(() => {
       if(this.timeRemainingToGetCodeAgain() > 0) {
@@ -141,7 +148,13 @@ export class VerifyAccount implements OnInit, OnDestroy {
   protected onSubmitRequestCode() {
     if(this.getVerificationCodeForm().invalid()) return;
 
-    this.verifyAccountService.requestVerificationCode(this.emailVerificationFormData().email).subscribe({
+    this.loaderService.show();
+    this.verifyAccountService.requestVerificationCode(this.emailVerificationFormData().email)
+    .pipe(
+      finalize(() => this.loaderService.hide()),
+      takeUntilDestroyed(this.destroyRef)
+    )
+    .subscribe({
       next: (res) => {
         this.isRequestedCode.set(true);
         this.availableResendCodeCountdown();
@@ -162,8 +175,15 @@ export class VerifyAccount implements OnInit, OnDestroy {
    */
   protected onSubmitVerificationCode() {
     if(this.emailVerificationForm().invalid()) return;
+
+    this.loaderService.show();
     const {email, verificationCode} = this.emailVerificationFormData();
-    this.verifyAccountService.verifyEmail(email, verificationCode).subscribe({
+    this.verifyAccountService.verifyEmail(email, verificationCode)
+    .pipe(
+      finalize(() => this.loaderService.hide()),
+      takeUntilDestroyed(this.destroyRef)
+    )
+    .subscribe({
       next: (res) => {
         this.router.navigateByUrl(ROUTE_PATHS.AUTH.children.LOGIN.fullPath);
       },

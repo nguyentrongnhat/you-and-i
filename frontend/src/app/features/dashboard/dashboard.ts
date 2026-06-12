@@ -1,4 +1,4 @@
-import { Component, inject, model, OnInit, signal } from '@angular/core';
+import { AfterViewInit, Component, inject, model, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { AnimateOnScrollModule } from 'primeng/animateonscroll';
 import { AvatarModule } from 'primeng/avatar';
@@ -9,6 +9,7 @@ import { PanelModule } from 'primeng/panel';
 import { TableModule } from 'primeng/table';
 import { PhotoService } from '../../services/photo.service';
 import { UserService } from '../user-management/services/user.service';
+import { LoaderService } from '../../services/loader.service';
 
 @Component({
 	selector: 'app-dashboard',
@@ -16,13 +17,15 @@ import { UserService } from '../user-management/services/user.service';
 	templateUrl: './dashboard.html',
 	styleUrl: './dashboard.scss',
 })
-export class Dashboard implements OnInit {
+export class Dashboard implements OnInit, AfterViewInit {
 
 	private readonly photoService = inject(PhotoService);
 
 	protected readonly userService = inject(UserService);
 
 	private readonly router = inject(Router);
+
+	private readonly loaderService = inject(LoaderService);
 
 	protected images: any = model([]);
 
@@ -41,7 +44,7 @@ export class Dashboard implements OnInit {
 			subTitle: 'Lên kế hoạch nào',
 			description: 'Tìm các số lần lượt từ 1 đến 100 trong điều kiện thách thức về mặt thời gian',
 			icon: 'pi pi-list-check',
-			url: 'game/find-number-game'
+			url: 'go-go-go'
 		}
 	]);
 
@@ -50,6 +53,11 @@ export class Dashboard implements OnInit {
 		this.photoService.getImages().then((images) => {
 			this.images.set(images)
 		});
+	}
+
+
+	ngAfterViewInit(): void {
+		this.loaderService.hide();
 	}
 
 

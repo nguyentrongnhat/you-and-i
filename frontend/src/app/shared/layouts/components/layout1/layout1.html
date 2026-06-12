@@ -22,7 +22,12 @@
         </ul>
 
         <div class="account-and-setting">
-            <p-avatar (click)="signOut()" image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" class="mr-2" shape="circle" />
+            <p-avatar (click)="op.toggle($event)" image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" class="mr-2" shape="circle" />
+            <p-popover #op>
+                <ng-template #content>
+                    <p-menu [model]="accountMenu" />
+                </ng-template>
+            </p-popover>
         </div>
     </nav>
 

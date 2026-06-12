@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { AfterViewInit, Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { email, form, FormField, required, schema } from '@angular/forms/signals';
 import { Router } from '@angular/router';
@@ -21,6 +21,9 @@ import { SessionStorageService } from '../../../services/session-storage.service
 import { ToastService } from '../../../services/toast.service';
 import { AuthService } from '../services/auth.service';
 import { UserService } from '../../user-management/services/user.service';
+import { LoaderService } from '../../../services/loader.service';
+import { finalize } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export interface LoginModel {
   username: string,
@@ -69,7 +72,8 @@ export const loginSchema = schema<LoginModel>((root) => {
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
-export class Login {
+export class Login implements AfterViewInit {
+  
   protected platformService = inject(PlatformService);
 
   private readonly authService = inject(AuthService);
@@ -90,6 +94,14 @@ export class Login {
 
   private readonly userService = inject(UserService);
 
+  private readonly loaderService = inject(LoaderService);
+
+  private readonly destroyRef = inject(DestroyRef);
+
+  ngAfterViewInit(): void {
+    this.loaderService.hide();
+  }
+
   protected submitButtonSeverity = computed(() =>
     this.loginForm().invalid() || !this.loginFormData().password || !this.loginFormData().username ? 'secondary' : 'info'
   );
@@ -104,7 +116,12 @@ export class Login {
   }
 
   private login(username: string, password: string) {
-    this.authService.login(username, password).subscribe({
+    this.loaderService.show();
+    this.authService.login(username, password)
+    .pipe(
+      finalize(() => this.loaderService.hide()),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe({
       next: (res: UsernamePasswordLoginResponse) => {
         this.userService.currentUser.set(res.userInfo);
         const redirectUrl = this.sessionStorageService.getItem(STORAGE_KEY.REDIRECT_URL);

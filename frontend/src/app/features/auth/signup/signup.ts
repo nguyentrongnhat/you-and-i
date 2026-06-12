@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal, WritableSignal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { email, form, FormField, required, schema, validate } from '@angular/forms/signals';
 import { Router } from '@angular/router';
@@ -22,6 +22,9 @@ import { SessionStorageService } from '../../../services/session-storage.service
 import { ToastService } from '../../../services/toast.service';
 import { AuthService } from '../services/auth.service';
 import { VerifyAccountService } from '../services/verify-account.service';
+import { LoaderService } from '../../../services/loader.service';
+import { finalize } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export interface SignupModel {
   username: string,
@@ -119,6 +122,10 @@ export class Signup {
 
   private readonly toggleConfirmPasswordTimeout?: ReturnType<typeof setTimeout>;
 
+  private readonly destroyRef = inject(DestroyRef);
+
+  private readonly loaderService = inject(LoaderService);
+
   protected submitButtonSeverity = computed(() =>
     this.signupForm().invalid() || !this.signupFormData().confirmPassword || !this.signupFormData().password || !this.signupFormData().username ? 'secondary' : 'success'
   );
@@ -131,7 +138,13 @@ export class Signup {
 
 
   private signup(signupData: SignupModel) {
-    this.authService.signup(signupData).subscribe({
+    this.loaderService.show();
+    this.authService.signup(signupData)
+    .pipe(
+      finalize(() => this.loaderService.hide()),
+      takeUntilDestroyed(this.destroyRef)
+    )
+    .subscribe({
       next: (res: UsernamePasswordLoginResponse) => {
         const toastSummary = 'Registration successful!';
         const toastDetail = 'We\'ve sent a verification code to your email. Please enter the code to confirm your email address.';
@@ -144,7 +157,7 @@ export class Signup {
       error: err => {
         const toastSummary = 'Sign up failed';
         const toastDetail = err.error.message;
-        console.log('Login error: ', err);
+        console.log('Sign up error: ', err);
         
         this.toastService.showToast(
           MESSAGE_TYPE.WARN, toastSummary, 

@@ -143,11 +143,23 @@
   }
 
   &__actions {
+    width: 100%;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    justify-content: space-between;
     gap: 0.75rem;
     margin-top: 0.5rem;
+
+    .start-button {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }
+
+    .history-button {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+    }
   }
 
   /* ===== Playing ===== */

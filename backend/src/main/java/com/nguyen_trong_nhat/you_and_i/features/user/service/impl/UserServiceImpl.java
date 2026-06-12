@@ -2,7 +2,9 @@ package com.nguyen_trong_nhat.you_and_i.features.user.service.impl;
 
 import com.nguyen_trong_nhat.you_and_i.common.config.Constants;
 import com.nguyen_trong_nhat.you_and_i.common.exception.BadRequestException;
+import com.nguyen_trong_nhat.you_and_i.common.exception.ForbidenException;
 import com.nguyen_trong_nhat.you_and_i.common.exception.NotFoundException;
+import com.nguyen_trong_nhat.you_and_i.common.security.util.SecurityUtils;
 import com.nguyen_trong_nhat.you_and_i.common.util.OtpGenerator;
 import com.nguyen_trong_nhat.you_and_i.features.user.dto.UserDetailDTO;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
@@ -20,10 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
@@ -143,6 +142,13 @@ public class UserServiceImpl implements UserService {
     public UserDetailDTO getUserDetailsById(String id) {
         UUID userId = UUID.fromString(id);
         MyUserDetail user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
+
+        if(!Objects.equals(SecurityUtils.getLoggedInUsername(), user.getUsername())
+                && !SecurityUtils.hasAuthorities(Constants.ROLE_SUPER_ADMIN)
+                && !SecurityUtils.hasAuthorities(Constants.ROLE_ADMIN)
+        ) {
+            throw new ForbidenException("You have no permission to access this data");
+        }
         return userDataMapper.toUserDetailDTO(user);
     }
 }

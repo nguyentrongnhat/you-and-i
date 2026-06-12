@@ -47,12 +47,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
                 return throwError(() => err);
             }
 
-            if (err.status !== 401 && err.status !== 403) {
+            if (err.status !== 401) {
                 return throwError(() => err);
             }
 
             //===== REFRESH TOKEN FLOW =====
-            if (!isRefreshingToken) { 
+            if (!isRefreshingToken && err.status === 401) { 
                 isRefreshingToken = true;
                 refreshTokenSubject.next(null);
                 return authService.refreshToken().pipe(

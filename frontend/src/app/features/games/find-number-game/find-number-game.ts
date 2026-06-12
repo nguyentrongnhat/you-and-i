@@ -8,6 +8,8 @@ import { GameHistories } from './components/game-histories/game-histories';
 import { GameTable } from './components/game-table/game-table';
 import { FindNumberGameService } from './services/findnumber.service';
 import { PlatformService } from '../../../services/platform.service';
+import { LoaderService } from '../../../services/loader.service';
+import { finalize } from 'rxjs';
 
 export type NumberData = {
 	value: number;
@@ -42,6 +44,8 @@ export class FindNumberGame implements OnInit {
 	protected visible = signal<boolean>(false);
 
 	private readonly findNumberGameService = inject(FindNumberGameService);
+
+	private readonly loaderService = inject(LoaderService);
 
 	private readonly destroyRef = inject(DestroyRef);
 
@@ -107,8 +111,10 @@ export class FindNumberGame implements OnInit {
 
 
 	protected startGame() {
+		this.loaderService.show();
 		this.findNumberGameService.startGame()
 			.pipe(takeUntilDestroyed(this.destroyRef))
+			.pipe(finalize(() => this.loaderService.hide()))
 			.subscribe({
 				next: (res: any) => {
 					this.currentGameId = res.gameId
@@ -145,10 +151,14 @@ export class FindNumberGame implements OnInit {
 
 	protected finishGame(): void {
 		this.stopTimer();
+		this.loaderService.show();
 		this.lastFinishTime.set(this.timer);
 		this.gameCurrentStatus.set(FIND_NUMBER_GAME_STATUSES.FINISHED)
 		this.findNumberGameService.finishGame(this.currentGameId, this.timer)
-			.pipe(takeUntilDestroyed(this.destroyRef))
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => this.loaderService.hide())
+			)
 			.subscribe({
 				next: (res: any) => {
 					this.getHistories()
@@ -158,7 +168,11 @@ export class FindNumberGame implements OnInit {
 
 
 	protected getHistories() {
+		this.loaderService.show();
 		this.findNumberGameService.getGameHistories()
-			.pipe(takeUntilDestroyed(this.destroyRef)).subscribe()
+			.pipe(
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => this.loaderService.hide())
+			).subscribe()
 	}
 }

@@ -13,6 +13,8 @@ import { ROUTE_PATHS } from '../../../../core/constants/route-paths';
 import { UserDetails } from '../../../../core/interfaces/user.dtos';
 import { PlatformService } from '../../../../services/platform.service';
 import { UserService } from '../../services/user.service';
+import { LoaderService } from '../../../../services/loader.service';
+import { finalize } from 'rxjs';
 
 @Component({
 	selector: 'app-user-management',
@@ -38,7 +40,9 @@ export class UserManagement {
 	private readonly router = inject(Router);
 
 	protected readonly users = signal<UserDetails[]>([]);
-	protected readonly loading = signal<boolean>(true);
+	
+	protected loaderService = inject(LoaderService);
+	
 	protected readonly searchTerm = signal<string>('');
 
 	protected readonly filteredUsers = computed<UserDetails[]>(() => {
@@ -65,14 +69,15 @@ export class UserManagement {
 	}
 
 	private getAllUsers(): void {
-		this.loading.set(true);
-		this.userService.getAllUsers().subscribe({
+		this.loaderService.show();
+		this.userService.getAllUsers()
+		.pipe(finalize(() => this.loaderService.hide()))
+		.subscribe({
 			next: (res: UserDetails[]) => {
 				this.users.set(res);
-				this.loading.set(false);
 			},
-			error: () => {
-				this.loading.set(false);
+			error: (err) => {
+				console.log('Error fetching users:', err);
 			},
 		});
 	}

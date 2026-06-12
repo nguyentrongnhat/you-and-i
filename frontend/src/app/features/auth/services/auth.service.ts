@@ -1,12 +1,13 @@
 import { computed, inject, Injectable, signal } from "@angular/core";
 import { Router } from "@angular/router";
-import { catchError, map, of, tap } from "rxjs";
+import { catchError, finalize, map, of, tap } from "rxjs";
 import { API_ENDPOINTS } from "../../../core/constants/api-endpoints";
 import { ROUTE_PATHS } from "../../../core/constants/route-paths";
 import { UsernamePasswordLoginResponse } from "../../../core/interfaces/user.dtos";
 import { HttpClientService } from "../../../services/http-client.service";
 import { SignupModel } from "../signup/signup";
 import { UserService } from "../../user-management/services/user.service";
+import { LoaderService } from "../../../services/loader.service";
 
 @Injectable({
     providedIn: 'root'
@@ -21,6 +22,8 @@ export class AuthService {
     private readonly router = inject(Router);
 
     private readonly userService = inject(UserService);
+
+    private readonly loaderService = inject(LoaderService);
 
 
     public readonly accessTokenPayload = computed(() => {
@@ -40,10 +43,10 @@ export class AuthService {
 
     public isAuthenticated() {
         if(this.isAccessTokenValid()) return of(true);
-        
+        this.loaderService.show();
         return this.refreshToken().pipe(
             map(() => true),
-            catchError(() => of(false))
+            catchError(() => of(false)),
         );
     }
 

@@ -108,19 +108,22 @@
     </div>
 
     <div class="find-number__actions">
-      <p-button
-        label="Bắt đầu"
-        icon="pi pi-play"
-        size="large"
-        severity="contrast"
-        (onClick)="startGame()"
-      />
-      <p-button
-        label="Lịch sử"
-        icon="pi pi-history"
-        [text]="true"
-        (onClick)="showGameHistoriesDialog()"
-      />
+      <div class="start-button">
+        <p-button
+          label="Bắt đầu"
+          icon="pi pi-play"
+          severity="contrast"
+          (onClick)="startGame()"
+        />
+      </div>
+      <div class="history-button">
+        <p-button
+          label="Lịch sử"
+          icon="pi pi-history"
+          [text]="true"
+          (onClick)="showGameHistoriesDialog()"
+        />
+      </div>
     </div>
   </div>
   }

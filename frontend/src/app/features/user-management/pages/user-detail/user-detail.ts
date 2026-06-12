@@ -1,4 +1,4 @@
-import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, input, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
 	form,
@@ -21,6 +21,9 @@ import { UserDetails } from '../../../../core/interfaces/user.dtos';
 import { ToastService } from '../../../../services/toast.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { UserService } from '../../services/user.service';
+import { finalize } from 'rxjs';
+import { LoaderService } from '../../../../services/loader.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 export interface UserProfileFormModel {
 	fullName: string;
@@ -78,7 +81,8 @@ export class UserDetail implements OnInit {
 	private readonly authService = inject(AuthService);
 
 	protected readonly user = signal<UserDetails | undefined>(undefined);
-	protected readonly loading = signal<boolean>(true);
+	protected loaderService = inject(LoaderService);
+	private readonly destroyRef = inject(DestroyRef);
 	protected readonly notFound = signal<boolean>(false);
 	protected readonly saving = signal<boolean>(false);
 
@@ -119,22 +123,22 @@ export class UserDetail implements OnInit {
 	}
 
 	private getUserDetailsById(id: string): void {
-		this.loading.set(true);
+		this.loaderService.show();
 		this.notFound.set(false);
 
-		this.userService.getUserDetailsById(id).subscribe({
+		this.userService.getUserDetailsById(id)
+		.pipe(finalize(() => this.loaderService.hide()))
+		.subscribe({
 			next: (userDetails) => {
 				this.user.set(userDetails);
 				this.patchForm(userDetails);
-				this.loading.set(false);
 			},
-			error: () => {
-				this.loading.set(false);
+			error: (err) => {
 				this.notFound.set(true);
 				this.toastService.showToast(
 					MESSAGE_TYPE.ERROR,
-					'Lỗi',
-					'Không thể tải thông tin người dùng.'
+					'Error',
+					err.error.message || 'Unable to load user information.'
 				);
 			},
 		});
@@ -206,8 +210,12 @@ export class UserDetail implements OnInit {
 			},
 		};
 
+		this.loaderService.show();
 		this.saving.set(true);
-		this.userService.updateUserData(payload).subscribe({
+		this.userService.updateUserData(payload).pipe(
+			finalize(() => this.loaderService.hide()),
+			takeUntilDestroyed(this.destroyRef)
+		).subscribe({
 			next: () => {
 				this.user.set(payload);
 				this.patchForm(payload);

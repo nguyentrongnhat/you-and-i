@@ -1,6 +1,6 @@
 <div class="user-detail">
   <!-- Loading skeleton -->
-  @if (loading()) {
+  @if (loaderService.isLoading()) {
   <div class="user-detail__profile">
     <p-skeleton shape="circle" size="6rem" />
     <p-skeleton width="12rem" height="1.5rem" styleClass="mt-3" />

@@ -1,6 +1,8 @@
 package com.nguyen_trong_nhat.you_and_i.features.user.controller;
 
 import com.nguyen_trong_nhat.you_and_i.common.config.Constants;
+import com.nguyen_trong_nhat.you_and_i.common.exception.BadRequestException;
+import com.nguyen_trong_nhat.you_and_i.common.exception.ForbidenException;
 import com.nguyen_trong_nhat.you_and_i.common.exception.UnauthorizedException;
 import com.nguyen_trong_nhat.you_and_i.common.security.util.SecurityUtils;
 import com.nguyen_trong_nhat.you_and_i.features.user.dto.UserDetailDTO;
@@ -25,6 +27,9 @@ public class UserController {
 
     @GetMapping("/all")
     public List<UserDetailDTO> getAllUsers() {
+        if (!SecurityUtils.hasAuthorities(Constants.ROLE_SUPER_ADMIN)) {
+            throw new ForbidenException("You have no permission to access this data");
+        }
         return userService.getAllUser();
     }
 
@@ -36,7 +41,7 @@ public class UserController {
                 && !SecurityUtils.hasAuthorities(Constants.ROLE_SUPER_ADMIN)
                 && !SecurityUtils.hasAuthorities(Constants.ROLE_ADMIN)
         ) {
-            throw new RuntimeException("Unauthorized to update this user's data");
+            throw new ForbidenException("You have no permission to update this user's data");
         }
 
         return userService.updateUserData(userDetailDTO);

@@ -31,7 +31,7 @@
       [value]="filteredUsers()"
       [paginator]="true"
       [rows]="10"
-      [loading]="loading()"
+      [loading]="loaderService.isLoading()"
       [rowsPerPageOptions]="[10, 20, 50]"
       [tableStyle]="{ 'min-width': '20rem' }"
       styleClass="user-management__table p-datatable-sm"

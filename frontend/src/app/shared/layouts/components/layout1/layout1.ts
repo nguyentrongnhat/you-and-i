@@ -9,10 +9,13 @@ import { filter } from 'rxjs';
 import { AuthService } from '../../../../features/auth/services/auth.service';
 import { ROLE } from '../../../../core/enums';
 import { UserService } from '../../../../features/user-management/services/user.service';
+import { PopoverModule } from 'primeng/popover';
+import { MenuModule } from 'primeng/menu';
+import { MenuItem } from 'primeng/api';
 
 @Component({
     selector: 'app-layout1',
-    imports: [AvatarModule, TooltipModule, CommonModule],
+    imports: [AvatarModule, TooltipModule, CommonModule, PopoverModule, MenuModule],
     templateUrl: './layout1.html',
     styleUrl: './layout1.scss',
 })
@@ -82,6 +85,23 @@ export class Layout1 implements OnInit {
         ]
     )
 
+    protected accountMenu: MenuItem[] = [
+        {
+            label: 'Your Profile',
+            icon: 'pi pi-user',
+            command: () => {
+                this.navigateToProfilePage();
+            }
+        },
+        {
+            label: 'Sign out',
+            icon: 'pi pi-sign-out',
+            command: () => {
+                this.signOut();
+            }
+        }
+    ];
+
     protected navigationItems = computed(() =>  {
         const curreentUserRoles = this.userService.userRoles();
         return this.fullNavigationItems().filter(item => item.requiredRoles.every(role => curreentUserRoles.includes(role)));
@@ -147,5 +167,10 @@ export class Layout1 implements OnInit {
 
     protected signOut(): void {
         this.authService.logout();
+    }
+
+
+    private navigateToProfilePage(): void {
+        this.router.navigateByUrl(ROUTE_PATHS.USER.children.DETAIL.fullPath.replace(':id', this.userService.currentUser()?.id || ''));
     }
 }
