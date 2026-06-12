@@ -144,13 +144,13 @@ export class FindNumberGame implements OnInit {
 
 
 	protected finishGame(): void {
+		this.stopTimer();
 		this.lastFinishTime.set(this.timer);
 		this.gameCurrentStatus.set(FIND_NUMBER_GAME_STATUSES.FINISHED)
 		this.findNumberGameService.finishGame(this.currentGameId, this.timer)
 			.pipe(takeUntilDestroyed(this.destroyRef))
 			.subscribe({
 				next: (res: any) => {
-					this.stopTimer();
 					this.getHistories()
 				}
 			})
