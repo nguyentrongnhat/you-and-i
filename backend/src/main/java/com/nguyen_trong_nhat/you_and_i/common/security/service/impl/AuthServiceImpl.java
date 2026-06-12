@@ -86,6 +86,7 @@ public class AuthServiceImpl implements AuthService {
 
         MyUserDetail newUser = userService.createUserWithUsernameAndPassword(signupData.getUsername(), signupData.getPassword());
         newUser = userRepository.save(newUser);
+        userProfileRepository.save(userService.createUserProfile(newUser));
         this.createAndSendVerificationCodeForAccount(newUser.getUsername());
     }
 
@@ -117,7 +118,6 @@ public class AuthServiceImpl implements AuthService {
         userVerificationRepository.save(userVerification);
         userNeedToVerify.setEmailVerified(true);
         userRepository.save(userNeedToVerify);
-        userProfileRepository.save(userService.createUserProfile(userNeedToVerify));
     }
 
 
