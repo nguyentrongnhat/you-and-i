@@ -51,7 +51,7 @@ export class FindNumberGame implements OnInit {
 
 	protected timer: number = 0;
 
-	protected timeToDisplay = signal<string>('00 : 00 : 00')
+	protected timeToDisplay = signal<string>('00:00:00')
 
 	protected timeInterval!: ReturnType<typeof setInterval>;
 

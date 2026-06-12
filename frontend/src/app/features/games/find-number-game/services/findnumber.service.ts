@@ -40,6 +40,6 @@ export class FindNumberGameService {
         const hh = Math.floor(seconds / 3600)
         const mm = Math.floor((seconds % 3600) / 60)
         const ss = Math.floor(((seconds % 3600) % 60) % 60)
-        return `${hh.toString().padStart(2, '0')} : ${mm.toString().padStart(2, '0')} : ${ss.toString().padStart(2, '0')}`
+        return `${hh.toString().padStart(2, '0')}:${mm.toString().padStart(2, '0')}:${ss.toString().padStart(2, '0')}`
     }
 }   
