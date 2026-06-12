@@ -6,7 +6,8 @@ export const LAYOUT = {
 };
 
 export enum STORAGE_KEY {
-    REDIRECT_URL = 'redirect_url'
+    REDIRECT_URL = 'redirect_url',
+    REFRESH_TOKEN = 'refresh_token_jom_781423554475',
 }
 
 export enum MESSAGE_TYPE {

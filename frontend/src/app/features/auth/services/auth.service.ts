@@ -8,6 +8,9 @@ import { HttpClientService } from "../../../services/http-client.service";
 import { SignupModel } from "../signup/signup";
 import { UserService } from "../../user-management/services/user.service";
 import { LoaderService } from "../../../services/loader.service";
+import { PlatformService } from "../../../services/platform.service";
+import { SessionStorageService } from "../../../services/session-storage.service";
+import { STORAGE_KEY } from "../../../core/enums";
 
 @Injectable({
     providedIn: 'root'
@@ -24,6 +27,10 @@ export class AuthService {
     private readonly userService = inject(UserService);
 
     private readonly loaderService = inject(LoaderService);
+
+    private readonly platformService = inject(PlatformService);
+
+    private readonly sessionStorageService = inject(SessionStorageService);
 
 
     public readonly accessTokenPayload = computed(() => {
@@ -67,6 +74,9 @@ export class AuthService {
                 tap(res => {
                     this.setAccessToken(res.accessToken);
                     this.userService.currentUser.set(res.userInfo);
+                    if(this.platformService.isMobile()) {
+                        this.sessionStorageService.setItem(STORAGE_KEY.REFRESH_TOKEN, res.refreshToken);
+                    }
                 })
             );
     }
@@ -74,6 +84,7 @@ export class AuthService {
 
     public logout() {
         this.clearAccessToken();
+        this.sessionStorageService.removeItem(STORAGE_KEY.REFRESH_TOKEN);
         this.httpService.post(API_ENDPOINTS.AUTH.SIGNOUT, {}).subscribe({
             next: () => {
                 console.log('Logged out successfully');
@@ -85,11 +96,16 @@ export class AuthService {
 
 
     public refreshToken() {
-        return this.httpService.post<UsernamePasswordLoginResponse>(API_ENDPOINTS.AUTH.REFRESH_TOKEN, {})
+        const refreshToken = this.sessionStorageService.getItem(STORAGE_KEY.REFRESH_TOKEN);
+        const REFRESH_TOKEN_ENDPOINT = this.platformService.isMobile() ? API_ENDPOINTS.AUTH.REFRESH_TOKEN_MOBILE : API_ENDPOINTS.AUTH.REFRESH_TOKEN;
+        return this.httpService.post<UsernamePasswordLoginResponse>(REFRESH_TOKEN_ENDPOINT, { refreshToken })
             .pipe(
                 tap(res => {
                     this.setAccessToken(res.accessToken);
                     this.userService.currentUser.set(res.userInfo);
+                    if(this.platformService.isMobile()) {
+                        this.sessionStorageService.setItem(STORAGE_KEY.REFRESH_TOKEN, res.refreshToken);
+                    }
                 }),
             );
     }

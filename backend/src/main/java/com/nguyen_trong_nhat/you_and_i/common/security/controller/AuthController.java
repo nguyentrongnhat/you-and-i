@@ -2,11 +2,9 @@ package com.nguyen_trong_nhat.you_and_i.common.security.controller;
 
 import com.nguyen_trong_nhat.you_and_i.common.config.Constants;
 import com.nguyen_trong_nhat.you_and_i.common.dto.*;
-import com.nguyen_trong_nhat.you_and_i.common.security.service.AuthService;
 import com.nguyen_trong_nhat.you_and_i.common.security.service.impl.AuthServiceImpl;
 import jakarta.validation.Valid;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -96,6 +94,30 @@ public class AuthController {
                 .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
                 .body(loginResponse);
     }
+
+
+    @PostMapping("/refresh-mobile")
+    public ResponseEntity<@NonNull LoginResponse> refreshTokenForMobile(@RequestBody RefreshTokenRequest refreshTokenRequest) {
+
+        if (refreshTokenRequest.getRefreshToken() == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        LoginResponse loginResponse = authService.refreshTokenAuthenticate(refreshTokenRequest.getRefreshToken());
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", loginResponse.getRefreshToken())
+                .httpOnly(true)
+                .sameSite(sameSiteCookie)
+                .secure(secureCookie) // true if https
+                .path("/")
+                .maxAge(Duration.ofSeconds(Constants.REFRESH_TOKEN_MAX_AGE))
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                .body(loginResponse);
+    }
+
 
     @PostMapping("/signout")
     public ResponseEntity<Void> signout(@CookieValue(name = "refresh_token", required = false) String refreshToken) {
