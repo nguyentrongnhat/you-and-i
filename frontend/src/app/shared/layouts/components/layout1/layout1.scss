@@ -6,7 +6,7 @@
         justify-content: space-between;
 
         color: white;
-        background-color: #2b2b2b;
+        background-color: #1a1a1a;;
         border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 
         padding: 0 18px;
@@ -190,7 +190,7 @@
                 gap: 0;
                 width: 64px;
                 padding: 14px 0;
-                background-color: #2b2b2b;
+                background-color: #1a1a1a;;
                 border-right: 1px solid rgba(255, 255, 255, 0.06);
 
                 .navigation-item {
@@ -287,16 +287,16 @@
         .bottom-nav {
             display: block;
             position: fixed;
-            left: 12px;
-            right: 12px;
-            bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+            left: 7px;
+            right: 7px;
+            bottom: calc(3px + env(safe-area-inset-bottom, 0px));
             z-index: 1100;
 
-            padding: 7px 9px;
+            padding: 3px;
 
             background-color: #1a1a1a;
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 22px;
+            border-radius: 28px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 
             transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
@@ -325,8 +325,8 @@
                 align-items: center;
                 justify-content: center;
                 flex: 1 1 0;
-                height: 46px;
-                border-radius: 15px;
+                height: 42px;
+                border-radius: 20px;
                 color: #fff;
                 cursor: pointer;
                 transition: background-color 0.2s ease, transform 0.15s ease;
@@ -343,7 +343,7 @@
                     background-color: rgba(255, 255, 255, 0.16);
 
                     i {
-                        font-weight: 600;
+                        font-weight: 500;
                     }
                 }
             }
@@ -358,7 +358,7 @@
     .wrapper {
         .bottom-nav {
             &__item {
-                height: 42px;
+                height: 36px;
 
                 i {
                     font-size: 1.15rem;
