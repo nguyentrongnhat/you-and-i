@@ -162,6 +162,9 @@ export class FindNumberGame implements OnInit {
 			.subscribe({
 				next: (res: any) => {
 					this.getHistories()
+				},
+				error: (err) => {
+					console.log(err)
 				}
 			})
 	}
