@@ -66,7 +66,7 @@
             label="Sign up" 
             [style]="{'width': '100%'}"
             [severity]="submitButtonSeverity()"
-            [disabled]="signupForm().invalid()"/>
+            [disabled]="this.signupForm().invalid() || !this.signupFormData().confirmPassword || !this.signupFormData().password || !this.signupFormData().username"/>
     </form>
     
     <div class="divider-with-text">
@@ -96,6 +96,5 @@
         (click)="navigateToVerifyAccountPage()"
         label="Verify your registered account" 
         severity="contrast"
-        [style]="{'width': '100%', 'margin-top': '10px'}"
-        [disabled]="signupForm().invalid()"/>
+        [style]="{'width': '100%', 'margin-top': '10px'}"/>
 </div>

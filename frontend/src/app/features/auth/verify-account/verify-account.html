@@ -23,7 +23,7 @@
                 label="Get verify code" 
                 [style]="{'width': '100%'}"
                 [severity]="submitGetVerificationCodeButtonSeverity()"
-                [disabled]="getVerificationCodeForm().invalid()"/>
+                [disabled]="getVerificationCodeForm().invalid() || !this.emailVerificationFormData().email"/>
         </form>
     }
     @else {
@@ -37,14 +37,14 @@
                     label="Verify" 
                     [style]="{'width': '100%'}"
                     [severity]="submitEmailVerificationButtonSeverity()"
-                    [disabled]="emailVerificationForm().invalid()"/>
+                    [disabled]="emailVerificationForm().invalid() || this.emailVerificationFormData().verificationCode.toString().length < 6"/>
 
                 <p-button 
                     label="Get Code Again {{this.timeRemainingToGetCodeAgain() > 0 ? `(${this.timeRemainingToGetCodeAgain()}s)`: ''}}" 
                     [style]="{'width': '100%'}"
                     (click)="getCodeAgain()"
                     severity="success"
-                    [disabled]="emailVerificationForm().invalid() && this.timeRemainingToGetCodeAgain() > 0"/>
+                    [disabled]="this.timeRemainingToGetCodeAgain() > 0"/>
             </div>
         </form>
     }

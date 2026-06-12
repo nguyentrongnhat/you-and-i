@@ -35,9 +35,17 @@ export const initialData: LoginModel = {
 }
 
 export const loginSchema = schema<LoginModel>((root) => {
-  required(root.username, { message: 'user name is required'});
-  email(root.username, { message: 'Please enter the valid email address'})
-  required(root.password, { message: 'password is required'})
+  required(root.username, { 
+    message: 'user name is required',
+    when: context => context.stateOf(root.username).touched()
+  });
+  email(root.username, { 
+    message: 'Please enter the valid email address'
+  });
+  required(root.password, { 
+    message: 'password is required',
+    when: context => context.stateOf(root.password).touched()
+  })
   required(root.isAcceptedTerm, { message: 'Accept term is required'})
 })
 
@@ -83,10 +91,11 @@ export class Login {
   private readonly userService = inject(UserService);
 
   protected submitButtonSeverity = computed(() =>
-    this.loginForm().invalid() ? 'secondary' : 'info'
+    this.loginForm().invalid() || !this.loginFormData().password || !this.loginFormData().username ? 'secondary' : 'info'
   );
 
   protected onSubmit() {
+    console.log('is username touched: ', this.loginForm.username().touched())
     if (this.loginForm().invalid()) return;
 
     const payload = this.loginFormData();

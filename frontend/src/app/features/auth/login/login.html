@@ -46,7 +46,7 @@
             label="Sign in" 
             [style]="{'width': '100%'}"
             [severity]="submitButtonSeverity()"
-            [disabled]="loginForm().invalid()"/>
+            [disabled]="loginForm().invalid() || !loginFormData().password || !loginFormData().username"/>
     </form>
 
     <div class="divider-with-text">

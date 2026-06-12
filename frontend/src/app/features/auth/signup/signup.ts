@@ -43,11 +43,12 @@ export enum PASSWORD_FIELD_TYPE {
 }
 
 export const signupSchema = schema<SignupModel>((root) => {
-  required(root.username, { message: 'user name is required'});
+  required(root.username, {message: 'user name is required', when: context => context.stateOf(root.username).touched()});
   email(root.username, { message: 'Please enter the valid email address'});
-  required(root.password, { message: 'password is required'});
-  required(root.confirmPassword, { message: 'confirm password is required'});
-  required(root.isAcceptedTerm, { message: 'Accept term is required'});
+  email(root.username, { message: 'Please enter the valid email address'});
+  required(root.password, { message: 'password is required', when: context => context.stateOf(root.password).touched() });
+  required(root.confirmPassword, { message: 'confirm password is required', when: context => context.stateOf(root.confirmPassword).touched() });
+  required(root.isAcceptedTerm, { message: 'Accept term is required', when: context => context.stateOf(root.isAcceptedTerm).touched() });
   validate(root.password, (ctx) => {
     const password = ctx.value();
     const confirmPassword = ctx.valueOf(root.confirmPassword);
@@ -119,7 +120,7 @@ export class Signup {
   private readonly toggleConfirmPasswordTimeout?: ReturnType<typeof setTimeout>;
 
   protected submitButtonSeverity = computed(() =>
-    this.signupForm().invalid() ? 'secondary' : 'success'
+    this.signupForm().invalid() || !this.signupFormData().confirmPassword || !this.signupFormData().password || !this.signupFormData().username ? 'secondary' : 'success'
   );
 
 

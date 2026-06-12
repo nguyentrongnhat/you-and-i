@@ -25,20 +25,20 @@ export interface EmailVerificationModel {
 }
 
 export const initialData: EmailVerificationModel = {
-  email: 'lordabsolute99@gmail.com',
+  email: '',
   verificationCode: ''
 }
 
 export const getVerificationCodeSchema = schema<EmailVerificationModel>((root) => {
-  required(root.email, { message: 'Email is required'});
+  required(root.email, { message: 'Email is required', when: context => context.stateOf(root.email).touched() });
   email(root.email, { message: 'Please enter the valid email address'});
 })
 
 export const emailVerificationSchema = schema<EmailVerificationModel>((root) => {
-  required(root.email, { message: 'Email is required'});
-  required(root.verificationCode, { message: 'Verification code is required'});
-  email(root.email, { message: 'Please enter the valid email address'});
-  minLength(root.verificationCode, 6, { message: 'min length 6'});
+  required(root.email, { message: 'Email is required', when: context => context.stateOf(root.email).touched() });
+  required(root.verificationCode, { message: 'Verification code is required', when: context => context.stateOf(root.verificationCode).touched() });
+  email(root.email, { message: 'Please enter the valid email address' });
+  minLength(root.verificationCode, 6, { message: 'min length 6' });
 })
 
 @Component({
@@ -78,14 +78,14 @@ export class VerifyAccount implements OnInit, OnDestroy {
 
   protected emailVerificationForm = form(this.emailVerificationFormData, emailVerificationSchema);
 
-  protected timeRemainingToGetCodeAgain = signal<number>(10);
+  protected timeRemainingToGetCodeAgain = signal<number>(30);
 
   protected submitGetVerificationCodeButtonSeverity = computed(() =>
-    this.getVerificationCodeForm().invalid() ? 'secondary' : 'contrast'
+    this.getVerificationCodeForm().invalid() || !this.emailVerificationFormData().email ? 'secondary' : 'contrast'
   );
 
   protected submitEmailVerificationButtonSeverity = computed(() =>
-    this.emailVerificationForm().invalid() ? 'secondary' : 'contrast'
+    this.emailVerificationForm().invalid() || !this.emailVerificationFormData().verificationCode || this.emailVerificationFormData().verificationCode.toString().length < 6 ? 'secondary' : 'contrast'
   );
 
   protected isRequestedCode = signal<boolean>(false);
@@ -182,7 +182,7 @@ export class VerifyAccount implements OnInit, OnDestroy {
    * Resets the countdown and allows requesting the code again.
    */
   protected getCodeAgain() {
-    this.timeRemainingToGetCodeAgain.set(10);
+    this.timeRemainingToGetCodeAgain.set(30);
     this.isRequestedCode.set(false);
   }
 }
