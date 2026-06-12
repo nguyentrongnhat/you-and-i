@@ -15,8 +15,8 @@ export class HttpClientService {
 
     private buildOptions(options?: ApiOptions) {
         return {
-            withCredentials: true,
-            ...options
+            ...options,
+            withCredentials: true
         };
     }
 

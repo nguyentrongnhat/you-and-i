@@ -95,7 +95,6 @@ export class Login {
   );
 
   protected onSubmit() {
-    console.log('is username touched: ', this.loginForm.username().touched())
     if (this.loginForm().invalid()) return;
 
     const payload = this.loginFormData();
