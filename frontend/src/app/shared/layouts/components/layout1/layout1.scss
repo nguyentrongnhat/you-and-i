@@ -114,7 +114,6 @@
         
         .account-and-setting {
             font-size: 14px;
-            cursor: pointer;
             width: 100%;
             flex: 1;
             display: flex;
@@ -122,6 +121,8 @@
 
             ::ng-deep .p-avatar {
                 transition: transform 0.15s ease, box-shadow 0.2s ease;
+
+                cursor: pointer;
 
                 &:hover {
                     box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
@@ -131,6 +132,7 @@
                     transform: scale(0.92);
                 }
             }
+
         }
     }
 
@@ -365,5 +367,21 @@
                 }
             }
         }
+    }
+}
+
+
+.account-menu-item {
+    cursor: pointer;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    padding: 0 12px;
+
+    height: 32px;
+    
+    &:hover {
+        background-color: rgba(112, 99, 99, 0.08);
+        border-radius: 6px;
     }
 }

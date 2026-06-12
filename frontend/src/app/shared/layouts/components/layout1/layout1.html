@@ -22,10 +22,16 @@
         </ul>
 
         <div class="account-and-setting">
-            <p-avatar (click)="op.toggle($event)" image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" class="mr-2" shape="circle" />
+            <p-avatar class="avartar" (click)="op.toggle($event)" image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" class="mr-2" shape="circle" />
             <p-popover #op>
                 <ng-template #content>
-                    <p-menu [model]="accountMenu" />
+                    <!-- <p-menu [model]="accountMenu" #content /> -->
+                    @for (item of accountMenu; track item) {
+                        <div class="account-menu-item" (click)="item?.command({})">
+                            <i class="pi {{item.icon}} mr-2"></i>
+                            {{item.label}}
+                        </div>
+                    }
                 </ng-template>
             </p-popover>
         </div>
