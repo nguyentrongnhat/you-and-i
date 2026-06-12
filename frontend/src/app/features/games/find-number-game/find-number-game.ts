@@ -113,8 +113,10 @@ export class FindNumberGame implements OnInit {
 	protected startGame() {
 		this.loaderService.show();
 		this.findNumberGameService.startGame()
-			.pipe(takeUntilDestroyed(this.destroyRef))
-			.pipe(finalize(() => this.loaderService.hide()))
+			.pipe (
+				takeUntilDestroyed(this.destroyRef),
+				finalize(() => this.loaderService.hide())
+			)
 			.subscribe({
 				next: (res: any) => {
 					this.currentGameId = res.gameId
@@ -136,6 +138,8 @@ export class FindNumberGame implements OnInit {
 			clearInterval(this.timeInterval);
 		}
 
+		this.timer = 0;
+
 		this.timeInterval = setInterval(() => {
 			this.timer++;
 			this.timeToDisplay.set(this.findNumberGameService.convertTimerToTimeDisplay(this.timer));
@@ -145,7 +149,6 @@ export class FindNumberGame implements OnInit {
 
 	private stopTimer() {
 		clearInterval(this.timeInterval);
-		this.timer = 0;
 	}
 
 
