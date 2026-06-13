@@ -1,13 +1,13 @@
-@if(activeLayout() === LAYOUT.LAYOUT_1) {
+@if(layoutService.activeLayout() === LAYOUT.LAYOUT_1) {
   <app-layout1><router-outlet /></app-layout1>
 }
-@else if (activeLayout() === LAYOUT.LAYOUT_2) {
+@else if (layoutService.activeLayout() === LAYOUT.LAYOUT_2) {
   <app-layout2><router-outlet /></app-layout2>
 }
-@else if (activeLayout() === LAYOUT.LAYOUT_3) {
+@else if (layoutService.activeLayout() === LAYOUT.LAYOUT_3) {
   <app-layout3><router-outlet /></app-layout3>
 }
-@else if (activeLayout() === LAYOUT.EMPTY_LAYOUT) {
+@else if (layoutService.activeLayout() === LAYOUT.EMPTY_LAYOUT) {
   <app-empty-layout><router-outlet /></app-empty-layout>
 }
 <p-toast />

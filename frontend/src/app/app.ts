@@ -11,6 +11,7 @@ import { Layout1 } from './shared/layouts/components/layout1/layout1';
 import { Layout2 } from './shared/layouts/components/layout2/layout2';
 import { Layout3 } from './shared/layouts/components/layout3/layout3';
 import { FullScreenLoader } from './shared/loaders/components/full-screen-loader/full-screen-loader';
+import { LayoutService } from './shared/layouts/services/layout.service';
 
 @Component({
   selector: 'app-root',
@@ -30,13 +31,13 @@ export class App implements OnInit {
   
   protected LAYOUT = LAYOUT;
 
-  protected activeLayout = signal<string>('');
-
   public destroyRef = inject(DestroyRef);
 
   private readonly authService = inject(AuthService);
 
   private readonly userService = inject(UserService);
+
+  protected readonly layoutService = inject(LayoutService);
 
   constructor(
     public router: Router,
@@ -75,7 +76,7 @@ export class App implements OnInit {
       child = child.firstChild;
     }
     child.data.subscribe((data) => {
-      this.activeLayout.update(() => data['layout']);
+      this.layoutService.set(data['layout']);
     });
   }
 }

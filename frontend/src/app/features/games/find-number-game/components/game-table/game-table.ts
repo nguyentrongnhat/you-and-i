@@ -1,6 +1,6 @@
-import { AfterViewInit, Component, computed, HostListener, inject, OnDestroy, OnInit, output, PLATFORM_ID, signal } from '@angular/core';
+import { AfterViewInit, Component, computed, effect, HostListener, inject, input, OnInit, output, signal } from '@angular/core';
+import { PlatformService } from '../../../../../services/platform.service';
 import { NumberData } from '../../find-number-game';
-import { isPlatformBrowser } from '@angular/common';
 import { Number } from '../number/number';
 
 @Component({
@@ -9,9 +9,9 @@ import { Number } from '../number/number';
 	templateUrl: './game-table.html',
 	styleUrl: './game-table.scss',
 })
-export class GameTable implements OnInit, OnDestroy, AfterViewInit {
+export class GameTable implements OnInit, AfterViewInit {
 
-	private readonly platformId = inject(PLATFORM_ID);
+	public currentNumber = input<number>(0);
 
 	screenWidth = signal(0);
 
@@ -19,39 +19,40 @@ export class GameTable implements OnInit, OnDestroy, AfterViewInit {
 
 	numbers = signal<NumberData[]>(this.generateItems());
 
-	currentNumber = signal<number>(0);
-
 	onSelectNumber = output<number>();
+
+	platformService = inject(PlatformService);
 
 	ready = false;
 
+	constructor() {
+		effect(() => {	
+			console.log('update selected number:', this.currentNumber());
+		})
+	}
+
 	@HostListener('window:resize')
 	onResize() {
-		if (isPlatformBrowser(this.platformId)) {
+		if (this.platformService.isBrowser()) {
 			this.screenWidth.set(window.innerWidth);
 		}
 	}
 
 	ngOnInit(): void {
-		if (isPlatformBrowser(this.platformId)) {
+		if (this.platformService.isBrowser()) {
 			this.screenWidth.set(window.innerWidth);
 		}
 	}
 
 
 	ngAfterViewInit(): void {
-		if (isPlatformBrowser(this.platformId)) {
+		if (this.platformService.isBrowser()) {
 			this.screenWidth.set(window.innerWidth);
 
 			setTimeout(() => {
 				this.ready = true;
 			});
 		}
-	}
-
-
-	ngOnDestroy(): void {
-		this.currentNumber.set(0);
 	}
 
 
@@ -81,7 +82,6 @@ export class GameTable implements OnInit, OnDestroy, AfterViewInit {
 
 
 	public selectNumber() {
-		this.currentNumber.update((number) => number + 1);
 		this.onSelectNumber.emit(this.currentNumber())
 	}
 }
