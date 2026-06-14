@@ -22,7 +22,7 @@ export const ROUTE_PATHS = {
                 children: {
                     START_SCREEN: { path: '', fullPath: 'game/find-number-game' },
                     PLAY_GAME_SCREEN: { path: 'play/:gameId', fullPath: 'game/find-number-game/play/:gameId' },
-                    SUMMARY_GAME_SCREEN: { path: 'summary', fullPath: 'game/find-number-game/summary' }
+                    SUMMARY_GAME_SCREEN: { path: 'summary/:gameId', fullPath: 'game/find-number-game/summary/:gameId' }
                 }
             }
         }

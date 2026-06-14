@@ -1,1 +1,40 @@
-<p>game-result-screen works!</p>
+<div class="find-number" animate.enter="enter-animation">
+   <div class="find-number__column">
+      <span class="find-number__badge find-number__badge--success">
+         <i class="pi pi-trophy"></i>
+      </span>
+      <h2 class="find-number__title">Hoàn thành!</h2>
+      <p class="find-number__subtitle">Bạn đã tìm hết các số.</p>
+
+      @if (isNewRecord()) {
+      <p-tag icon="pi pi-bolt" value="Kỷ lục mới!" severity="warn" [rounded]="true" />
+      }
+
+      <div class="find-number__result">
+         <span class="find-number__result-time">{{ timeToDisplay() }}</span>
+         <span class="find-number__result-label">Thời gian hoàn thành</span>
+      </div>
+
+      <div class="find-number__stats">
+         <div class="find-number__cell">
+            <span class="find-number__cell-value">{{ bestTimeDisplay() }}</span>
+            <span class="find-number__cell-label">Kỷ lục</span>
+         </div>
+         <div class="find-number__cell">
+            <span class="find-number__cell-value">{{ totalGames() }}</span>
+            <span class="find-number__cell-label">Số ván</span>
+         </div>
+      </div>
+
+      <div class="find-number__actions">
+         <p-button label="Bắt đầu ván mới" icon="pi pi-replay" severity="contrast" (onClick)="startGame()" />
+         <p-button label="Lịch sử" icon="pi pi-history" [text]="true" (onClick)="showGameHistoriesDialog()" />
+      </div>
+   </div>
+
+</div>
+
+<p-dialog header="Lịch sử chơi" [modal]="true" [(visible)]="visible" [style]="{ width: '50rem' }"
+   [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [maximizable]="true">
+   <app-game-histories />
+</p-dialog>

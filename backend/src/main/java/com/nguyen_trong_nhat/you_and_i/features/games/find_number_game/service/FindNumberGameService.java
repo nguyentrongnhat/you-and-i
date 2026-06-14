@@ -70,6 +70,10 @@ public class FindNumberGameService {
         FindNumberGame gameEntity = findNumberGameRepository.findById(gameDTO.getId())
                 .orElseThrow(() -> new NotFoundException("Game not Found!"));
 
+        if(gameEntity.getGameStatus().equals(GameStatus.DONE)){
+            throw new BadRequestException("This game already finished. Can not update the game already finished");
+        }
+
         FindNumberGameDataMapper.updateEntity(gameEntity, gameDTO);
 
         findNumberGameRepository.save(gameEntity);
@@ -95,6 +99,8 @@ public class FindNumberGameService {
         game.setElapsedTime(gameInfo.getCompletionTime());
 
         game.setEndTime(gameInfo.getEndTime());
+
+        game.setGameStatus(GameStatus.DONE);
 
         return findNumberGameRepository.save(game);
     }

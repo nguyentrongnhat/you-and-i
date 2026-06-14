@@ -43,13 +43,13 @@ export class FindNumberGameService {
     }
 
 
-    public finishGame(gameId: string, timeToFinish: number) {
+    public finishGame(gameId: string, completionTime: number): Observable<FindNumberGameDTO> {
         const finishGameInfo = {
             gameId: gameId.toString(),
-            timeToFinish: timeToFinish.toString(),
+            completionTime: completionTime.toString(),
             endTime: new Date()
         }
-        return this.httpClient.post('/game/find-number-game/finish-game', finishGameInfo)
+        return this.httpClient.post<FindNumberGameDTO>('/game/find-number-game/finish-game', finishGameInfo)
     }
 
 

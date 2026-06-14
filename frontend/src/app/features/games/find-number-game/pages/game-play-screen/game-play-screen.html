@@ -15,7 +15,7 @@
                   <i class="pi pi-check-circle"></i> Đã tìm
                </span>
                <span class="find-number__cell-value">
-                  {{ currentSelectedNumber() }}<small>/ {{ TOTAL_NUMBERS }}</small>
+                  {{ currentSelectedNumber() ?? 0}}<small>/ {{ TOTAL_NUMBERS }}</small>
                </span>
             </div>
             <div class="find-number__cell">
@@ -29,7 +29,6 @@
       </div>
 
       @if (gameCurrentStatus() === GAME_STATUSES.PLAYING) {
-         play in game
          <div class="find-number__game-area">
             <app-game-table (onSelectNumber)="onSelectNumber($event)" [currentNumber]="currentSelectedNumber()" />
          </div>
@@ -40,8 +39,12 @@
          </div>
       }
 
-      <p-speeddial [model]="items()" direction="up" mask [transitionDelay]="80"
-         [style]="{ position: 'fixed', right: '20px', bottom: '20px', 'z-index': '105' }">
+      <p-speeddial 
+         [model]="items()" 
+         direction="up" 
+         mask 
+         [transitionDelay]="80"
+         [style]="{ position: 'fixed', right: '20px', bottom: '20px', 'z-index': 105 }">
 
          <ng-template #button let-toggleCallback="toggleCallback">
             <p-button severity="contrast" [rounded]="true" icon="pi pi-ellipsis-v" (click)="toggleCallback($event)"
@@ -50,10 +53,8 @@
          </ng-template>
 
          <ng-template #item let-item let-toggleCallback="toggleCallback">
-
             <p-button [severity]="item.style" [rounded]="true" icon="pi {{item.icon}}"
                [style]="{ 'width': '50px', 'height': '50px' }" (click)="toggleCallback($event, item)" />
-
          </ng-template>
       </p-speeddial>
    </div>
