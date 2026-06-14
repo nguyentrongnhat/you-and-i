@@ -1,0 +1,39 @@
+<div class="find-number" animate.enter="enter-animation">
+      <div class="find-number__column">
+         <span class="find-number__badge">
+            <i class="pi pi-hashtag"></i>
+         </span>
+         <h1 class="find-number__title">Tìm Số</h1>
+         <p class="find-number__subtitle">
+            Tìm và bấm lần lượt các số từ <strong>1</strong> đến
+            <strong>{{ TOTAL_NUMBERS }}</strong> nhanh nhất có thể.
+            Đồng hồ bắt đầu ngay khi bạn vào ván.
+         </p>
+
+         <div class="find-number__stats">
+            <div class="find-number__cell">
+               <span class="find-number__cell-value">{{ bestTimeDisplay() }}</span>
+               <span class="find-number__cell-label">Kỷ lục</span>
+            </div>
+            <div class="find-number__cell">
+               <span class="find-number__cell-value">{{ totalGames() }}</span>
+               <span class="find-number__cell-label">Số ván</span>
+            </div>
+         </div>
+
+         <div class="find-number__actions">
+            <div class="start-button">
+               <p-button label="Bắt đầu" icon="pi pi-play" severity="contrast" (onClick)="startGame()" />
+            </div>
+            <div class="history-button">
+               <p-button label="Lịch sử" icon="pi pi-history" [text]="true" (onClick)="showGameHistoriesDialog()" />
+            </div>
+         </div>
+      </div>
+
+</div>
+
+<p-dialog header="Lịch sử chơi" [modal]="true" [(visible)]="showGameHistories" [style]="{ width: '50rem' }"
+   [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [maximizable]="true">
+   <app-game-histories />
+</p-dialog>

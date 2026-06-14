@@ -49,11 +49,32 @@ export const routes: Routes = [
     children: [
       {
         path: ROUTE_PATHS.GAME.children.FIND_NUMBER_GAME.path,
-        loadComponent: () => import('./features/games/find-number-game/find-number-game').then(c => c.FindNumberGame),
-        data: {
-          animation: 'SignUpPage',
-          layout: LAYOUT.LAYOUT_1
-        }
+        children: [
+          {
+            path: ROUTE_PATHS.GAME.children.FIND_NUMBER_GAME.children.START_SCREEN.path,
+            loadComponent: () => import('./features/games/find-number-game/pages/game-start-screen/game-start-screen').then(c => c.GameStartScreen),
+            data: {
+              animation: 'SignUpPage',
+              layout: LAYOUT.LAYOUT_1
+            }
+          },
+          {
+            path: ROUTE_PATHS.GAME.children.FIND_NUMBER_GAME.children.PLAY_GAME_SCREEN.path,
+            loadComponent: () => import('./features/games/find-number-game/pages/game-play-screen/game-play-screen').then(c => c.GamePlayScreen),
+            data: {
+              animation: 'SignUpPage',
+              layout: LAYOUT.EMPTY_LAYOUT
+            }
+          },
+          {
+            path: ROUTE_PATHS.GAME.children.FIND_NUMBER_GAME.children.SUMMARY_GAME_SCREEN.path,
+            loadComponent: () => import('./features/games/find-number-game/pages/game-result-screen/game-result-screen').then(c => c.GameResultScreen),
+            data: {
+              animation: 'SignUpPage',
+              layout: LAYOUT.LAYOUT_1
+            }
+          }
+        ],
       }
     ]
   },

@@ -82,7 +82,7 @@ export class GameTable implements OnInit, AfterViewInit {
 
 
 	public selectNumber() {
-		this.onSelectNumber.emit(this.currentNumber())
+		this.onSelectNumber.emit(this.currentNumber()+1)
 	}
 }
 

@@ -1,0 +1,61 @@
+<div class="find-number" animate.enter="enter-animation">
+   <div class="find-number__play">
+      <div class="find-number__game-info">
+         <div class="find-number__hud">
+            <div class="find-number__cell">
+               <span class="find-number__cell-label">
+                  <i class="pi pi-clock"></i> Thời gian
+               </span>
+               <span class="find-number__cell-value find-number__cell-value--primary">
+                  {{ timeToDisplay() }}
+               </span>
+            </div>
+            <div class="find-number__cell">
+               <span class="find-number__cell-label">
+                  <i class="pi pi-check-circle"></i> Đã tìm
+               </span>
+               <span class="find-number__cell-value">
+                  {{ currentSelectedNumber() }}<small>/ {{ TOTAL_NUMBERS }}</small>
+               </span>
+            </div>
+            <div class="find-number__cell">
+               <span class="find-number__cell-label">
+                  <i class="pi pi-star-fill"></i> Kỷ lục
+               </span>
+               <span class="find-number__cell-value">{{ bestTimeDisplay() }}</span>
+            </div>
+         </div>
+
+      </div>
+
+      @if (gameCurrentStatus() === GAME_STATUSES.PLAYING) {
+         play in game
+         <div class="find-number__game-area">
+            <app-game-table (onSelectNumber)="onSelectNumber($event)" [currentNumber]="currentSelectedNumber()" />
+         </div>
+      }
+      @else if (gameCurrentStatus() === GAME_STATUSES.PAUSED) {
+         <div class="find-number__game-pause" style="margin-top: 200px;">
+            Đang tạm dừng
+         </div>
+      }
+
+      <p-speeddial [model]="items()" direction="up" mask [transitionDelay]="80"
+         [style]="{ position: 'fixed', right: '20px', bottom: '20px', 'z-index': 105 }">
+
+         <ng-template #button let-toggleCallback="toggleCallback">
+            <p-button severity="contrast" [rounded]="true" icon="pi pi-ellipsis-v" (click)="toggleCallback($event)"
+               [style]="{ 'width': '70px', 'height': '70px' }">
+            </p-button>
+         </ng-template>
+
+         <ng-template #item let-item let-toggleCallback="toggleCallback">
+
+            <p-button [severity]="item.style" [rounded]="true" icon="pi {{item.icon}}"
+               [style]="{ 'width': '50px', 'height': '50px' }" (click)="toggleCallback($event, item)" />
+
+         </ng-template>
+      </p-speeddial>
+   </div>
+
+</div>

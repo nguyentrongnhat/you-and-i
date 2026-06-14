@@ -1,9 +1,14 @@
 package com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity;
 
 import com.nguyen_trong_nhat.you_and_i.common.entity.BaseEntity;
+import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.dto.DifficultyLevel;
+import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.dto.GameStatus;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.Instant;
@@ -25,11 +30,23 @@ public class FindNumberGame extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private MyUserDetail player;
 
+    private Integer totalNumbersToFind;
+
+    @Enumerated(EnumType.STRING)
+    private DifficultyLevel difficultyLevel;
+
     private Instant startTime;
 
     private Instant endTime;
 
-    private String timeToFinish;
+    private String elapsedTime;
 
-    private int bonusTime;
+    private String completionTime;
+
+    @Enumerated(EnumType.STRING)
+    private GameStatus gameStatus;
+
+    private Integer lastSelectedNumber;
+
+    private Integer bonusTime;
 }

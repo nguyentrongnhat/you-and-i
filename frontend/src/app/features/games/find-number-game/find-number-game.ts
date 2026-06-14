@@ -47,7 +47,7 @@ export enum FIND_NUMBER_GAME_STATUSES {
 })
 export class FindNumberGame implements OnInit {
   
-  protected readonly TOTAL_NUMBERS = 100;
+  protected readonly TOTAL_NUMBERS = 3;
 
   protected FIND_NUMBER_GAME_STATUSES = FIND_NUMBER_GAME_STATUSES;
 
@@ -189,9 +189,9 @@ export class FindNumberGame implements OnInit {
 
   protected onSelectNumber(num: number) {
  
-    this.currentSelectedNumber.set(num + 1);
+    this.currentSelectedNumber.set(num);
  
-    if (num === this.TOTAL_NUMBERS) {
+    if (this.currentSelectedNumber() === this.TOTAL_NUMBERS) {
       this.finishGame();
     }
   }
@@ -199,26 +199,7 @@ export class FindNumberGame implements OnInit {
 
   protected startGame() {
     this.loaderService.show();
-    this.findNumberGameService.startGame()
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.loaderService.hide())
-      )
-      .subscribe({
-        next: (res: any) => {
-          this.layoutService.set(LAYOUT.EMPTY_LAYOUT);
-          this.currentGameId = res.gameId
-          this.previousBest.set(this.bestTime());
-          this.lastFinishTime.set(0);
-          this.currentSelectedNumber.set(0);
-          this.gameCurrentStatus.set(FIND_NUMBER_GAME_STATUSES.STARTED);
-          this.timer = 0;
-          this.startTimer()
-        },
-        error: (err) => {
-          console.log(err)
-        }
-      })
+   
   }
 
 
@@ -241,23 +222,11 @@ export class FindNumberGame implements OnInit {
 
   protected finishGame(): void {
     this.stopTimer();
-    this.layoutService.set(LAYOUT.LAYOUT_1);
+    //this.layoutService.set(LAYOUT.LAYOUT_1);
     this.loaderService.show();
     this.lastFinishTime.set(this.timer);
     this.gameCurrentStatus.set(FIND_NUMBER_GAME_STATUSES.FINISHED)
-    this.findNumberGameService.finishGame(this.currentGameId, this.timer)
-      .pipe(
-        takeUntilDestroyed(this.destroyRef),
-        finalize(() => this.loaderService.hide()),
-      )
-      .subscribe({
-        next: (res: any) => {
-          this.getHistories()
-        },
-        error: (err) => {
-          console.log(err)
-        }
-      })
+  
   }
 
 

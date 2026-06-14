@@ -71,7 +71,7 @@ export class Layout1 implements OnInit {
             {
                 name: 'Game',
                 icon: 'pi-discord',
-                url: this.ROUTE_PATHS.GAME.children.FIND_NUMBER_GAME.fullPath,
+                url: this.ROUTE_PATHS.GAME.children.FIND_NUMBER_GAME.children.START_SCREEN.fullPath,
                 active: false,
                 requiredRoles: []
             },

@@ -12,5 +12,6 @@ import java.time.Instant;
 @Getter
 @Setter
 public class CreateNewFindNumberGameRequest {
-    private Instant startTime;
+    private Integer totalNumbersToFind;
+    private DifficultyLevel difficultyLevel;
 }

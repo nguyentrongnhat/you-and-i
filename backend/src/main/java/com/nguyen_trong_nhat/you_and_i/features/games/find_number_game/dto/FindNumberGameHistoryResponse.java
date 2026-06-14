@@ -15,5 +15,5 @@ public class FindNumberGameHistoryResponse {
     Instant startTime;
     Instant endTime;
     String timeToFinish;
-    int bonusTime;
+    Integer bonusTime;
 }

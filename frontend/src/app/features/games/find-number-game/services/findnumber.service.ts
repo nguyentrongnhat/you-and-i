@@ -1,6 +1,8 @@
 import { inject, Injectable, signal } from "@angular/core";
 import { HttpClientService } from "../../../../services/http-client.service";
-import { tap } from "rxjs";
+import { Observable, of, Subject, tap } from "rxjs";
+import { GAME_DIFFICULTY_LEVEL } from "../../../../core/enums";
+import { FindNumberGameDTO } from "../../../../core/interfaces/find-number-game.dto";
 
 @Injectable({
     providedIn: 'root'
@@ -8,16 +10,40 @@ import { tap } from "rxjs";
 export class FindNumberGameService {
     private readonly httpClient = inject(HttpClientService);
 
-
     public gameHistories = signal<any[]>([]);
 
+    public currentGameInfo = signal<FindNumberGameDTO | undefined>(undefined);
 
-    public startGame() {
-        return this.httpClient.post('/game/find-number-game', {startTime: new Date()})
+    public createNewGame(totalNumbersToFind: number, difficultyLevel: GAME_DIFFICULTY_LEVEL): Observable<FindNumberGameDTO> {
+        const body = {
+            totalNumbersToFind,
+            difficultyLevel
+        }
+        return this.httpClient.post<FindNumberGameDTO>('/game/find-number-game', body)
     }
 
 
-    public finishGame(gameId: number, timeToFinish: number) {
+    public getCurrentGameInfoById(gameId: string): Observable<FindNumberGameDTO> {
+        return this.httpClient.get<FindNumberGameDTO>('/game/find-number-game/:gameId'.replace(':gameId', gameId))
+            .pipe(
+                tap((game: FindNumberGameDTO) => {
+                    this.currentGameInfo.set(game);
+                })
+            )
+    }
+
+
+    public updateGameInfo(game: FindNumberGameDTO): Observable<FindNumberGameDTO> {
+        return this.httpClient.put<FindNumberGameDTO>('/game/find-number-game/update', game)
+            .pipe(
+                tap((game: FindNumberGameDTO) => {
+                    this.currentGameInfo.set(game);
+                })
+            )
+    }
+
+
+    public finishGame(gameId: string, timeToFinish: number) {
         const finishGameInfo = {
             gameId: gameId.toString(),
             timeToFinish: timeToFinish.toString(),

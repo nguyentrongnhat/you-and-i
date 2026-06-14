@@ -1,6 +1,6 @@
 import { computed, inject, Injectable, signal } from "@angular/core";
 import { Router } from "@angular/router";
-import { catchError, finalize, map, of, tap } from "rxjs";
+import { catchError, finalize, map, of, tap, throwError } from "rxjs";
 import { API_ENDPOINTS } from "../../../core/constants/api-endpoints";
 import { ROUTE_PATHS } from "../../../core/constants/route-paths";
 import { UsernamePasswordLoginResponse } from "../../../core/interfaces/user.dtos";
@@ -107,6 +107,10 @@ export class AuthService {
                         this.sessionStorageService.setItem(STORAGE_KEY.REFRESH_TOKEN, res.refreshToken);
                     }
                 }),
+                catchError((err) => {
+                    this.sessionStorageService.setItem(STORAGE_KEY.REDIRECT_URL, this.router.url)
+                    return throwError(() => err);
+                })
             );
     }
 

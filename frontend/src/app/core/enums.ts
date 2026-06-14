@@ -35,3 +35,15 @@ export enum BUTTON_STYLE {
 	DANGER = 'danger',
 	CONTRAST = 'contrast'
 }
+
+export enum GAME_DIFFICULTY_LEVEL {
+	NORMAL = 'NORMAL',
+	HARD = 'HARD'
+};
+
+export enum GAME_STATUSES {
+	NEW = 'NEW',
+	PLAYING = 'PLAYING',
+	PAUSED = 'PAUSED',
+	DONE = 'DONE'
+}
