@@ -4,7 +4,7 @@ import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { TagModule } from 'primeng/tag';
-import { debounceTime, finalize, Subject, switchMap } from 'rxjs';
+import { debounceTime, finalize, Subject, switchMap, take } from 'rxjs';
 
 import { MenuModule } from 'primeng/menu';
 import { SpeedDialModule } from 'primeng/speeddial';
@@ -119,7 +119,7 @@ export class GamePlayScreen {
          this.triggerGameLogic();
       }
       else {
-         this.findNumberGameService.getCurrentGameInfoById(gameId).subscribe({
+         this.findNumberGameService.getCurrentGameInfoById(gameId).pipe(take(1)).subscribe({
             next: (game: FindNumberGameDTO) => {
                console.log('Game data: ', game)
                this.loaderService.hide();
