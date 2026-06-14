@@ -41,7 +41,7 @@
       }
 
       <p-speeddial [model]="items()" direction="up" mask [transitionDelay]="80"
-         [style]="{ position: 'fixed', right: '20px', bottom: '20px', 'z-index': 105 }">
+         [style]="{ position: 'fixed', right: '20px', bottom: '20px', 'z-index': '105' }">
 
          <ng-template #button let-toggleCallback="toggleCallback">
             <p-button severity="contrast" [rounded]="true" icon="pi pi-ellipsis-v" (click)="toggleCallback($event)"

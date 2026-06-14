@@ -14,6 +14,7 @@ import { GameTable } from '../../components/game-table/game-table';
 import { FindNumberGameService } from '../../services/findnumber.service';
 import { FindNumberGameDTO } from '../../../../../core/interfaces/find-number-game.dto';
 import { Router } from '@angular/router';
+import { ROUTE_PATHS } from '../../../../../core/constants/route-paths';
 
 @Component({
 	selector: 'app-game-play-screen',
@@ -289,7 +290,7 @@ export class GamePlayScreen {
 
 	private exitGame() {
 		this.stopTimer();
-		this.gameCurrentStatus.set(GAME_STATUSES.NEW);
+		this.router.navigateByUrl(ROUTE_PATHS.GAME.children.FIND_NUMBER_GAME.children.START_SCREEN.fullPath)
 	}
 
 
@@ -309,7 +310,7 @@ export class GamePlayScreen {
 			)
 			.subscribe({
 				next: (res: any) => {
-	
+					this.exitGame()
 				},
 				error: (err) => {
 					console.log(err)
