@@ -74,19 +74,16 @@ export class GameStartScreen {
    private getData() {
       this.loaderService.show();
       forkJoin([this.findNumberGameService.getGameHistories(), this.findNumberGameService.getUnfinishedGame()])
-         .pipe(
-            takeUntilDestroyed(this.destroyRef),
-            finalize(() => this.loaderService.hide())
-         ).subscribe({
-            next: ([histories, unfinishedGames]) => {
-               console.log('histories: ', histories);
-               console.log('unfinishedGames: ', unfinishedGames);
-               if (unfinishedGames.length > 0) {
-                  this.unfinishedGames.set(unfinishedGames[0]);
-               }
+      .pipe(
+         takeUntilDestroyed(this.destroyRef),
+         finalize(() => this.loaderService.hide())
+      ).subscribe({
+         next: ([histories, unfinishedGames]) => {
+            if (unfinishedGames.length > 0) {
+               this.unfinishedGames.set(unfinishedGames[0]);
             }
-               
-         })
+         }
+      })
    }
 
 
@@ -107,45 +104,42 @@ export class GameStartScreen {
    public createNewGame() {
       this.loaderService.show();
       this.findNumberGameService.createNewGame(this.TOTAL_NUMBERS, GAME_DIFFICULTY_LEVEL.NORMAL)
-         .pipe(
-            takeUntilDestroyed(this.destroyRef),
-            finalize(() => this.loaderService.hide())
-         )
-         .subscribe({
-            next: (newGame: FindNumberGameDTO) => {
-               this.findNumberGameService.currentGameInfo.set(newGame);
-               this.navigationToPlayGameScreen(newGame.id);
-            },
-            error: (err) => {
-               console.log('Create new game Failed: ', err)
-            }
-         })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+         next: (newGame: FindNumberGameDTO) => {
+            this.findNumberGameService.currentGameInfo.set(newGame);
+            this.navigationToPlayGameScreen(newGame.id);
+         },
+         error: (err) => {
+            console.log('Create new game Failed: ', err)
+         }
+      })
    }
 
 
    public confirmStartNewGameOrContinueUnfinishedGame(event: Event) {
       this.confirmationService.confirm({
-            target: event.target as EventTarget,
-            message: '<p class="mb-0">Anh thấy em có game chơi chưa xong</p><p class="mb-0">Em muốn chơi tiếp hay bắt đầu ván mới nào?</p>',
-            header: 'Hô Hô',
-            icon: 'pi pi-info-circle',
-            rejectLabel: 'Chơi tiếp',
-            rejectButtonProps: {
-                label: 'Chơi tiếp',
-                severity: 'secondary',
-            },
-            acceptButtonProps: {
-                label: 'Chơi mới',
-                severity: BUTTON_STYLE.CONTRAST
-            },
-        
-            accept: () => {
-               this.createNewGame();
-            },
-            reject: () => {
-               this.loadUnfinishedGame();
-            }
-        });
+         target: event.target as EventTarget,
+         message: '<p class="mb-0">Anh thấy em có game chơi chưa xong</p><p class="mb-0">Em muốn chơi tiếp hay bắt đầu ván mới nào?</p>',
+         header: 'Hô Hô',
+         icon: 'pi pi-info-circle',
+         rejectLabel: 'Chơi tiếp',
+         rejectButtonProps: {
+               label: 'Chơi tiếp',
+               severity: 'secondary',
+         },
+         acceptButtonProps: {
+               label: 'Chơi mới',
+               severity: BUTTON_STYLE.CONTRAST
+         },
+      
+         accept: () => {
+            this.createNewGame();
+         },
+         reject: () => {
+            this.loadUnfinishedGame();
+         }
+      });
    }
 
 

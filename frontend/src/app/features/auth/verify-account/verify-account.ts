@@ -105,7 +105,6 @@ export class VerifyAccount implements OnInit, OnDestroy, AfterViewInit {
   constructor() {
     effect(() => {
       const isRequestedCode = this.isRequestedCode()
-      console.log('chay effect: ', isRequestedCode)
       if(!isRequestedCode) return;
       this.availableResendCodeCountdown();
     })

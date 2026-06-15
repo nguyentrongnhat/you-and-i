@@ -91,7 +91,6 @@ export class AuthService {
             take(1)
         ).subscribe({
             next: () => {
-                console.log('Logged out successfully');
                 this.router.navigateByUrl(ROUTE_PATHS.AUTH.children.LOGIN.fullPath);
             },
             error: (err) => console.log('Error during logout:', err)
