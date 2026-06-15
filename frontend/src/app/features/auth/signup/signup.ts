@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, DestroyRef, inject, signal, WritableSignal } from '@angular/core';
+import { AfterViewInit, Component, computed, DestroyRef, inject, signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { email, form, FormField, required, schema, validate } from '@angular/forms/signals';
 import { Router } from '@angular/router';
@@ -97,7 +97,8 @@ export const signupSchema = schema<SignupModel>((root) => {
   templateUrl: './signup.html',
   styleUrl: './signup.scss',
 })
-export class Signup {
+export class Signup implements AfterViewInit {
+  
   protected platformService = inject(PlatformService);
 
   private readonly authService = inject(AuthService);
@@ -129,6 +130,11 @@ export class Signup {
   protected submitButtonSeverity = computed(() =>
     this.signupForm().invalid() || !this.signupFormData().confirmPassword || !this.signupFormData().password || !this.signupFormData().username ? 'secondary' : 'success'
   );
+
+
+  ngAfterViewInit(): void {
+    this.loaderService.hide();
+  }
 
 
   protected onSubmit() {

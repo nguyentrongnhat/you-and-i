@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AvatarModule } from 'primeng/avatar';
@@ -15,6 +15,7 @@ import { PlatformService } from '../../../../services/platform.service';
 import { UserService } from '../../services/user.service';
 import { LoaderService } from '../../../../services/loader.service';
 import { finalize } from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
 	selector: 'app-user-management',
@@ -45,6 +46,8 @@ export class UserManagement {
 	
 	protected readonly searchTerm = signal<string>('');
 
+	private destroyRef = inject(DestroyRef);
+
 	protected readonly filteredUsers = computed<UserDetails[]>(() => {
 		const term = this.searchTerm().trim().toLowerCase();
 		const list = this.users();
@@ -71,7 +74,7 @@ export class UserManagement {
 	private getAllUsers(): void {
 		this.loaderService.show();
 		this.userService.getAllUsers()
-		.pipe(finalize(() => this.loaderService.hide()))
+		.pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.loaderService.hide()))
 		.subscribe({
 			next: (res: UserDetails[]) => {
 				this.users.set(res);
@@ -103,7 +106,9 @@ export class UserManagement {
 	}
 
 	protected toggleActiveUserAccount(user: UserDetails): void {
-		this.userService.updateUserData(user).subscribe({
+		this.userService.updateUserData(user)
+		.pipe(takeUntilDestroyed(this.destroyRef))
+		.subscribe({
 			next: () => { },
 			error: () => {
 				user.enabled = !user.enabled;

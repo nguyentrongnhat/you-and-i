@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, DestroyRef, effect, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { AfterViewInit, Component, computed, DestroyRef, effect, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { email, form, FormField, minLength, required, schema } from '@angular/forms/signals';
 import { Router } from '@angular/router';
@@ -63,7 +63,7 @@ export const emailVerificationSchema = schema<EmailVerificationModel>((root) => 
   templateUrl: './verify-account.html',
   styleUrl: './verify-account.scss',
 })
-export class VerifyAccount implements OnInit, OnDestroy {
+export class VerifyAccount implements OnInit, OnDestroy, AfterViewInit {
 
   private readonly verifyAccountService = inject(VerifyAccountService);
 
@@ -113,6 +113,10 @@ export class VerifyAccount implements OnInit, OnDestroy {
         clearInterval(this.countDownInterval);
       }
     })
+  }
+  
+  ngAfterViewInit(): void {
+    this.loaderService.hide();
   }
 
 

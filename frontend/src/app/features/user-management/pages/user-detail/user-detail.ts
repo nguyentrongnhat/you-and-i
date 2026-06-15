@@ -79,10 +79,10 @@ export class UserDetail implements OnInit {
 	private readonly userService = inject(UserService);
 	private readonly toastService = inject(ToastService);
 	private readonly authService = inject(AuthService);
+	private readonly destroyRef = inject(DestroyRef);
 
 	protected readonly user = signal<UserDetails | undefined>(undefined);
 	protected loaderService = inject(LoaderService);
-	private readonly destroyRef = inject(DestroyRef);
 	protected readonly notFound = signal<boolean>(false);
 	protected readonly saving = signal<boolean>(false);
 
@@ -127,7 +127,7 @@ export class UserDetail implements OnInit {
 		this.notFound.set(false);
 
 		this.userService.getUserDetailsById(id)
-		.pipe(finalize(() => this.loaderService.hide()))
+		.pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.loaderService.hide()))
 		.subscribe({
 			next: (userDetails) => {
 				this.user.set(userDetails);
