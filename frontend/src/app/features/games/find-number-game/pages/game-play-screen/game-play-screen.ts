@@ -309,6 +309,7 @@ export class GamePlayScreen {
       const gameData = { ...this.currentGameInfo() };
       gameData.lastSelectedNumber = lastSelected
       gameData.elapsedTime = elapsedTime.toString();
+      if(lastSelected > 90) return;
       this.triggerUpdateGameStatus.next(gameData);
    }
 
@@ -318,7 +319,8 @@ export class GamePlayScreen {
          .pipe(
             debounceTime(5000),
             switchMap((game: FindNumberGameDTO) => this.findNumberGameService.updateGameInfo(game)),
-            tap(() => {this.timerStartPoint = new Date();})
+            tap(() => this.timerStartPoint = new Date()),
+            takeUntilDestroyed(this.destroyRef)
          ).subscribe()
    }
 
