@@ -14,6 +14,7 @@ import { FindNumberGameService } from '../../services/findnumber.service';
 import { FindNumberGameDTO } from '../../../../../core/interfaces/find-number-game.dto';
 import { Router } from '@angular/router';
 import { ROUTE_PATHS } from '../../../../../core/constants/route-paths';
+import { subscribe } from 'diagnostics_channel';
 
 @Component({
    selector: 'app-game-play-screen',
@@ -46,7 +47,7 @@ export class GamePlayScreen {
 
    protected lastFinishTime = signal<number>(0);
 
-   protected TOTAL_NUMBERS = 100;
+   protected TOTAL_NUMBERS = 3;
 
    protected currentGameInfo = computed(() => this.findNumberGameService.currentGameInfo() as FindNumberGameDTO);
 
@@ -63,6 +64,8 @@ export class GamePlayScreen {
    private BUTTON_STYLE = BUTTON_STYLE;
 
    private timerStartPoint: Date | null = null;
+
+   private timerStartPointTemp: number | null = null;
 
    protected bestTime = computed<number | null>(() => {
       const histories = this.findNumberGameService.gameHistories();
@@ -187,9 +190,6 @@ export class GamePlayScreen {
       console.log('load game from last update in db: ', new Date(gameData.updateAt))
       
       this.startTimer(new Date(gameData.updateAt));
-
-      gameData.gameStatus = GAME_STATUSES.PLAYING
-      this.findNumberGameService.updateGameInfo(gameData!).subscribe();
    }
 
 
@@ -318,15 +318,20 @@ export class GamePlayScreen {
       this.triggerUpdateGameStatus
          .pipe(
             debounceTime(5000),
-            switchMap((game: FindNumberGameDTO) => this.findNumberGameService.updateGameInfo(game)),
-            tap(() => this.timerStartPoint = new Date()),
-            takeUntilDestroyed(this.destroyRef)
-         ).subscribe()
+            takeUntilDestroyed(this.destroyRef),
+            switchMap(
+               (game: FindNumberGameDTO) => this.findNumberGameService.updateGameInfo(game))
+         ).subscribe({
+            next: () => {
+               this.timerStartPoint = new Date(this.timerStartPointTemp!);
+            }
+         })
    }
 
 
    protected onSelectNumber(num: number) {
       this.currentSelectedNumber.set(num);
+      this.timerStartPointTemp = Number(new Date()) - 300;
       this.updateGameStatusAfterSeclectEachNumber(this.currentSelectedNumber(), this.timer)
       if (this.currentSelectedNumber() === this.TOTAL_NUMBERS) {
          this.finishGame();
@@ -335,6 +340,7 @@ export class GamePlayScreen {
 
 
    private startTimer(startPoint?: Date): void {
+      console.log('start timer with start point: ', startPoint)
       this.timerStartPoint = startPoint || new Date();
 
       if (this.timeInterval) {
@@ -347,7 +353,7 @@ export class GamePlayScreen {
          if (newTimerValue - this.timer > 5) {
             this.findNumberGameService.shuffleNumbers.next(true);
          }
-         this.timer = newTimerValue;
+         this.timer = Math.round(newTimerValue);
          this.timeToDisplay.set(this.findNumberGameService.convertTimerToTimeDisplay(this.timer));
       }, 1000)
    }
