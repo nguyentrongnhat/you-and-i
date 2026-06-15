@@ -1,28 +1,21 @@
-import { AfterViewInit, Component, computed, DestroyRef, effect, inject, input, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, input, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
+import { MenuModule } from 'primeng/menu';
 import { ProgressBarModule } from 'primeng/progressbar';
+import { SpeedDialModule } from 'primeng/speeddial';
 import { TagModule } from 'primeng/tag';
 import { finalize } from 'rxjs';
-import { MenuModule } from 'primeng/menu';
-import { MenuItem } from 'primeng/api';
-import { SpeedDialModule } from 'primeng/speeddial';
-import { FindNumberGameService } from '../../services/findnumber.service';
-import { LoaderService } from '../../../../../services/loader.service';
-import { BUTTON_STYLE } from '../../../../../core/enums';
-import { GameHistories } from '../../components/game-histories/game-histories';
-import { FindNumberGameDTO } from '../../../../../core/interfaces/find-number-game.dto';
-import { Router } from '@angular/router';
 import { ROUTE_PATHS } from '../../../../../core/constants/route-paths';
+import { BUTTON_STYLE } from '../../../../../core/enums';
+import { FindNumberGameDTO } from '../../../../../core/interfaces/find-number-game.dto';
+import { LoaderService } from '../../../../../services/loader.service';
+import { GameHistories } from '../../components/game-histories/game-histories';
+import { FindNumberGameService } from '../../services/findnumber.service';
 
-export type NumberData = {
-  value: number;
-  rotate: number;
-  tx: number;
-  ty: number;
-  fontSize: number;
-};
+
 
 export enum FIND_NUMBER_GAME_STATUSES {
   NONE = 'none',
@@ -149,6 +142,7 @@ export class GameResultScreen {
     }
   
     protected getHistories() {
+      if(this.findNumberGameService.gameHistories().length > 0) return;
       this.loaderService.show();
       this.findNumberGameService.getGameHistories()
         .pipe(

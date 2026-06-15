@@ -1,7 +1,9 @@
-import { AfterViewInit, Component, computed, effect, HostListener, inject, input, OnInit, output, signal } from '@angular/core';
+import { AfterViewInit, Component, computed, DestroyRef, effect, HostListener, inject, input, OnInit, output, signal } from '@angular/core';
 import { PlatformService } from '../../../../../services/platform.service';
-import { NumberData } from '../../find-number-game';
 import { Number } from '../number/number';
+import { NumberData } from '../../../../../core/type';
+import { FindNumberGameService } from '../../services/findnumber.service';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 @Component({
 	selector: 'app-game-table',
@@ -12,6 +14,10 @@ import { Number } from '../number/number';
 export class GameTable implements OnInit, AfterViewInit {
 
 	public currentNumber = input<number>(0);
+
+	private readonly destroyRef = inject(DestroyRef);
+
+	private findNumberGameService = inject(FindNumberGameService);
 
 	screenWidth = signal(0);
 
@@ -42,6 +48,15 @@ export class GameTable implements OnInit, AfterViewInit {
 		if (this.platformService.isBrowser()) {
 			this.screenWidth.set(window.innerWidth);
 		}
+
+		this.onShuttleNumbers();
+	}
+
+
+	onShuttleNumbers() {
+		this.findNumberGameService.shuffleNumbers.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+			this.numbers.set(this.generateItems());
+		})
 	}
 
 

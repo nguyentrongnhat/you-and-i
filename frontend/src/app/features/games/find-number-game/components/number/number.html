@@ -4,7 +4,8 @@
     class="item"
     [ngClass]="{
       'selected': isSelected(),
-      'indicate': isIndicate()
+      'indicate': isIndicate(),
+      'target': isTarget()
     }"
     (click)="onSelect()"
     [ngStyle]="getTransform()"

@@ -25,3 +25,15 @@ body {
   background-repeat: no-repeat;
   background-attachment: fixed;
 }
+
+.p-component.p-speeddial.p-speeddial-direction-up.p-speeddial-linear.p-speeddial-open > .p-speeddial-list {
+  display: flex !important;
+}
+
+.p-component.p-speeddial.p-speeddial-direction-up.p-speeddial-linear > .p-speeddial-list {
+  display: none !important;
+}
+
+.p-overlay-mask.p-speeddial-mask {
+  z-index: 1000 !important;
+}

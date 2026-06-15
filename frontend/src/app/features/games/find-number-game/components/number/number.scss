@@ -16,7 +16,7 @@
     color: var(--p-text-color, #111827);
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease,
-      background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+    background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
 
     canvas {
       pointer-events: none;
@@ -45,9 +45,13 @@
   /* Mục tiêu kế tiếp – nổi bật theo theme */
   .indicate {
     background: var(--p-highlight-background, #eef2ff);
-    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+    box-shadow: 0 0 0 3px rgba(241, 1, 1, 0.801);
     animation: pulse 1.4s infinite;
     z-index: 3;
+  }
+
+  .target {
+    z-index: 2;
   }
 }
 

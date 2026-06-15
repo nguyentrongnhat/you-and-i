@@ -14,6 +14,8 @@ export class FindNumberGameService {
 
     public currentGameInfo = signal<FindNumberGameDTO | undefined>(undefined);
 
+    public shuffleNumbers: Subject<boolean> = new Subject<boolean>();
+
     public createNewGame(totalNumbersToFind: number, difficultyLevel: GAME_DIFFICULTY_LEVEL): Observable<FindNumberGameDTO> {
         const body = {
             totalNumbersToFind,
