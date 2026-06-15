@@ -296,10 +296,10 @@ export class GamePlayScreen {
 
 
    public updateGameStatusAfterSeclectEachNumber(lastSelected: number, elapsedTime: number) {
+      if(lastSelected > 90) return;
       this.currentGameInfo!.lastSelectedNumber = lastSelected
       this.currentGameInfo!.elapsedTime = elapsedTime.toString();
       this.timerStartPoint = new Date();
-      if(lastSelected > 90) return;
       this.triggerUpdateGameStatus.next(this.currentGameInfo!);
    }
 
