@@ -10,6 +10,7 @@ import { TableModule } from 'primeng/table';
 import { PhotoService } from '../../services/photo.service';
 import { UserService } from '../user-management/services/user.service';
 import { LoaderService } from '../../services/loader.service';
+import { PlatformService } from '../../services/platform.service';
 
 @Component({
 	selector: 'app-dashboard',
@@ -26,6 +27,8 @@ export class Dashboard implements OnInit, AfterViewInit {
 	private readonly router = inject(Router);
 
 	private readonly loaderService = inject(LoaderService);
+
+	private readonly platformService = inject(PlatformService);
 
 	protected images: any = model([]);
 
@@ -57,6 +60,7 @@ export class Dashboard implements OnInit, AfterViewInit {
 
 
 	ngAfterViewInit(): void {
+		if(!this.platformService.isBrowser()) return;
 		this.loaderService.hide();
 	}
 

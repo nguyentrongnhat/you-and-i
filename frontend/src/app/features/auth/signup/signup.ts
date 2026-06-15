@@ -133,6 +133,7 @@ export class Signup implements AfterViewInit {
 
 
   ngAfterViewInit(): void {
+    if(!this.platformService.isBrowser()) return;
     this.loaderService.hide();
   }
 

@@ -49,7 +49,7 @@ export class GamePlayScreen {
 
    protected TOTAL_NUMBERS = 100;
 
-   protected currentGameInfo = computed(() => this.findNumberGameService.currentGameInfo() as FindNumberGameDTO);
+   protected currentGameInfo: FindNumberGameDTO | undefined = undefined;
 
    private findNumberGameService = inject(FindNumberGameService);
 
@@ -112,13 +112,14 @@ export class GamePlayScreen {
 
 
    private getCurrentGameInfo(gameId: string) {
-
-      if (this.currentGameInfo()?.id != gameId) {
+      const gameInfoFromService = this.findNumberGameService.currentGameInfo();
+      if (gameInfoFromService?.id != gameId) {
          this.findNumberGameService.currentGameInfo.set(undefined);
       }
 
-      if (this.currentGameInfo()) {
+      if (gameInfoFromService) {
          this.loaderService.hide();
+         this.currentGameInfo = {...this.findNumberGameService.currentGameInfo() as FindNumberGameDTO}
          this.loadGameStates();
          return;
       }
@@ -128,6 +129,7 @@ export class GamePlayScreen {
          finalize(() => this.loaderService.hide())
       ).subscribe({
          next: (game: FindNumberGameDTO) => {
+            this.currentGameInfo = {...this.findNumberGameService.currentGameInfo() as FindNumberGameDTO}
             this.loadGameStates();
          }
       });
@@ -135,7 +137,7 @@ export class GamePlayScreen {
 
 
    private loadGameStates() {
-      const gameStatus = this.currentGameInfo()?.gameStatus;
+      const gameStatus = this.currentGameInfo?.gameStatus;
       switch (gameStatus) {
          case GAME_STATUSES.NEW:
             this.startNewGame();
@@ -154,22 +156,21 @@ export class GamePlayScreen {
 
 
    private startNewGame() {
-      const gameData = this.currentGameInfo();
-      gameData.gameStatus = GAME_STATUSES.PLAYING
-      gameData.startTime = new Date();
-      gameData.totalNumbersToFind = this.TOTAL_NUMBERS;
-      gameData.difficultyLevel = GAME_DIFFICULTY_LEVEL.NORMAL;
+      this.currentGameInfo!.gameStatus = GAME_STATUSES.PLAYING
+      this.currentGameInfo!.startTime = new Date();
+      this.currentGameInfo!.totalNumbersToFind = this.TOTAL_NUMBERS;
+      this.currentGameInfo!.lastSelectedNumber = 0;
+      this.currentGameInfo!.difficultyLevel = GAME_DIFFICULTY_LEVEL.NORMAL;
 
-      this.findNumberGameService.updateGameInfo(gameData!).subscribe();
+      this.findNumberGameService.updateGameInfo(this.currentGameInfo!).subscribe();
       this.gameCurrentStatus.set(GAME_STATUSES.PLAYING);
       this.startTimer();
    }
 
 
    private loadGameFromLastUpdateInDB() {
-      
       this.gameCurrentStatus.set(GAME_STATUSES.PLAYING);
-      this.currentSelectedNumber.set(this.currentGameInfo()?.lastSelectedNumber || 0);
+      this.currentSelectedNumber.set(this.currentGameInfo!.lastSelectedNumber || 0);
       this.items.set([
          {
             label: 'Pause',
@@ -185,17 +186,13 @@ export class GamePlayScreen {
          }
       ]);
 
-      const gameData = this.currentGameInfo();
-
-      console.log('load game from last update in db: ', new Date(gameData.updateAt))
-      
-      this.startTimer(new Date(gameData.updateAt));
+      this.startTimer(new Date(this.currentGameInfo!.updateAt));
    }
 
 
    private resumeFromPause() {
       this.gameCurrentStatus.set(GAME_STATUSES.PLAYING);
-      this.currentSelectedNumber.set(this.currentGameInfo()?.lastSelectedNumber);
+      this.currentSelectedNumber.set(this.currentGameInfo!.lastSelectedNumber);
       this.items.set([
          {
             label: 'Pause',
@@ -211,11 +208,9 @@ export class GamePlayScreen {
          }
       ]);
 
+      this.currentGameInfo!.gameStatus = GAME_STATUSES.PLAYING
       this.startTimer();
-
-      const gameData = this.currentGameInfo();
-      gameData.gameStatus = GAME_STATUSES.PLAYING
-      this.findNumberGameService.updateGameInfo(gameData!).subscribe();
+      this.findNumberGameService.updateGameInfo(this.currentGameInfo!).subscribe();
    }
 
 
@@ -223,9 +218,8 @@ export class GamePlayScreen {
       this.stopTimer();
       this.gameCurrentStatus.set(GAME_STATUSES.PAUSED);
 
-      const gameData = this.currentGameInfo();
-      this.currentSelectedNumber.set(gameData?.lastSelectedNumber ?? 0);
-      this.timeToDisplay.set(this.findNumberGameService.convertTimerToTimeDisplay(Number(gameData?.elapsedTime) ?? 0));
+      this.currentSelectedNumber.set(this.currentGameInfo!.lastSelectedNumber ?? 0);
+      this.timeToDisplay.set(this.findNumberGameService.convertTimerToTimeDisplay(Number(this.currentGameInfo!.elapsedTime) ?? 0));
       
       this.items.set([
          {
@@ -248,10 +242,9 @@ export class GamePlayScreen {
       this.stopTimer();
       this.gameCurrentStatus.set(GAME_STATUSES.PAUSED);
 
-      const gameData = this.currentGameInfo();
-      gameData.gameStatus = GAME_STATUSES.PAUSED;
-      gameData.elapsedTime = this.timer.toString();
-      this.findNumberGameService.updateGameInfo(gameData).subscribe();
+      this.currentGameInfo!.gameStatus = GAME_STATUSES.PAUSED;
+      this.currentGameInfo!.elapsedTime = this.timer.toString();
+      this.findNumberGameService.updateGameInfo(this.currentGameInfo!).subscribe();
       
       this.items.set([
          {
@@ -275,10 +268,7 @@ export class GamePlayScreen {
       this.loaderService.show();
       this.lastFinishTime.set(this.timer);
       this.findNumberGameService.finishGame(this.gameId()!, this.timer)
-         .pipe(
-            takeUntilDestroyed(this.destroyRef),
-            finalize(() => this.loaderService.hide()),
-         )
+         .pipe(takeUntilDestroyed(this.destroyRef))
          .subscribe({
             next: (game: FindNumberGameDTO) => {
                this.findNumberGameService.currentGameInfo.set(game);
@@ -306,11 +296,11 @@ export class GamePlayScreen {
 
 
    public updateGameStatusAfterSeclectEachNumber(lastSelected: number, elapsedTime: number) {
-      const gameData = { ...this.currentGameInfo() };
-      gameData.lastSelectedNumber = lastSelected
-      gameData.elapsedTime = elapsedTime.toString();
+      this.currentGameInfo!.lastSelectedNumber = lastSelected
+      this.currentGameInfo!.elapsedTime = elapsedTime.toString();
+      this.timerStartPoint = new Date();
       if(lastSelected > 90) return;
-      this.triggerUpdateGameStatus.next(gameData);
+      this.triggerUpdateGameStatus.next(this.currentGameInfo!);
    }
 
 
@@ -319,13 +309,8 @@ export class GamePlayScreen {
          .pipe(
             debounceTime(5000),
             takeUntilDestroyed(this.destroyRef),
-            switchMap(
-               (game: FindNumberGameDTO) => this.findNumberGameService.updateGameInfo(game))
-         ).subscribe({
-            next: () => {
-               this.timerStartPoint = new Date(this.timerStartPointTemp!);
-            }
-         })
+            switchMap((game: FindNumberGameDTO) => this.findNumberGameService.updateGameInfo(game))
+         ).subscribe()
    }
 
 
@@ -340,7 +325,6 @@ export class GamePlayScreen {
 
 
    private startTimer(startPoint?: Date): void {
-      console.log('start timer with start point: ', startPoint)
       this.timerStartPoint = startPoint || new Date();
 
       if (this.timeInterval) {
@@ -349,8 +333,8 @@ export class GamePlayScreen {
 
       this.timeInterval = setInterval(() => {
          const diffFromStart = (new Date().getTime() - this.timerStartPoint!.getTime()) / 1000;
-         const newTimerValue = diffFromStart + Number(this.currentGameInfo()?.elapsedTime);
-         if (newTimerValue - this.timer > 5) {
+         const newTimerValue = diffFromStart + Number(this.currentGameInfo!.elapsedTime);
+         if (newTimerValue - this.timer > 10) {
             this.findNumberGameService.shuffleNumbers.next(true);
          }
          this.timer = Math.round(newTimerValue);

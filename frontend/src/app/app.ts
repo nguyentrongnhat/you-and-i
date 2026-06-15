@@ -47,8 +47,8 @@ export class App implements OnInit {
     effect(() => {
       const userinfo = this.authService.accessTokenPayload();
       if (!userinfo) return;
-      console.log('access token payload: ', userinfo);
-      console.log('current user info from user service: ', this.userService.currentUser());
+      //console.log('access token payload: ', userinfo);
+      //console.log('current user info from user service: ', this.userService.currentUser());
     })
   }
 

@@ -99,6 +99,7 @@ export class Login implements AfterViewInit {
   private readonly destroyRef = inject(DestroyRef);
 
   ngAfterViewInit(): void {
+    if(!this.platformService.isBrowser()) return;
     this.loaderService.hide();
   }
 

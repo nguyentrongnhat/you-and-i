@@ -21,6 +21,7 @@ import { MESSAGE_TYPE } from '../../../core/enums';
 import { LoaderService } from '../../../services/loader.service';
 import { finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { PlatformService } from '../../../services/platform.service';
 
 export interface EmailVerificationModel {
   email: string,
@@ -99,6 +100,8 @@ export class VerifyAccount implements OnInit, OnDestroy, AfterViewInit {
 
   private readonly loaderService = inject(LoaderService);
 
+  private readonly platformService = inject(PlatformService);
+
   constructor() {
     effect(() => {
       const isRequestedCode = this.isRequestedCode()
@@ -116,6 +119,7 @@ export class VerifyAccount implements OnInit, OnDestroy, AfterViewInit {
   }
   
   ngAfterViewInit(): void {
+    if(!this.platformService.isBrowser()) return;
     this.loaderService.hide();
   }
 

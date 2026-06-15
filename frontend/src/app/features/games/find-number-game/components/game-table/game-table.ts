@@ -31,11 +31,7 @@ export class GameTable implements OnInit, AfterViewInit {
 
 	ready = false;
 
-	constructor() {
-		effect(() => {	
-			console.log('update selected number:', this.currentNumber());
-		})
-	}
+	constructor() {}
 
 	@HostListener('window:resize')
 	onResize() {
