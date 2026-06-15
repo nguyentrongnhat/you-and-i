@@ -23,7 +23,7 @@
 
          <div class="find-number__actions">
             <div class="start-button">
-               <p-button label="Bắt đầu" icon="pi pi-play" severity="contrast" (onClick)="startGame()" />
+               <p-button label="Bắt đầu" icon="pi pi-play" severity="contrast" (onClick)="startGame($event)" />
             </div>
             <div class="history-button">
                <p-button label="Lịch sử" icon="pi pi-history" [text]="true" (onClick)="showGameHistoriesDialog()" />
@@ -37,3 +37,21 @@
    [breakpoints]="{ '1199px': '75vw', '575px': '90vw' }" [maximizable]="true">
    <app-game-histories />
 </p-dialog>
+
+<p-confirmdialog #cd>
+   <ng-template #headless let-message let-onAccept="onAccept" let-onReject="onReject">
+      @if (message) {
+         <div class="flex flex-col items-center p-8 bg-surface-0 dark:bg-surface-900 rounded">
+               <div class="rounded-full bg-dark text-primary-contrast inline-flex justify-center items-center h-24 w-24 -mt-20">
+                  <i class="pi pi-question !text-5xl"></i>
+               </div>
+               <span class="font-bold text-2xl block mb-2 mt-6">{{ message.header }}</span>
+               <div [innerHTML]="message.message" style="text-align: center;"></div>
+               <div class="flex items-center gap-2 mt-6">
+                  <p-button label="Chơi mới" (onClick)="onAccept()" styleClass="w-32" severity="contrast"></p-button>
+                  <p-button label="Chơi tiếp" [outlined]="true" (onClick)="onReject()" styleClass="w-32" severity="secondary"></p-button>
+               </div>
+         </div>
+      }
+   </ng-template>
+</p-confirmdialog>

@@ -7,13 +7,15 @@ import { MenuModule } from 'primeng/menu';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { SpeedDialModule } from 'primeng/speeddial';
 import { TagModule } from 'primeng/tag';
-import { finalize } from 'rxjs';
+import { finalize, forkJoin } from 'rxjs';
 import { ROUTE_PATHS } from '../../../../../core/constants/route-paths';
+import { BUTTON_STYLE, GAME_DIFFICULTY_LEVEL } from '../../../../../core/enums';
+import { FindNumberGameDTO } from '../../../../../core/interfaces/find-number-game.dto';
 import { LoaderService } from '../../../../../services/loader.service';
 import { GameHistories } from '../../components/game-histories/game-histories';
 import { FindNumberGameService } from '../../services/findnumber.service';
-import { GAME_DIFFICULTY_LEVEL } from '../../../../../core/enums';
-import { FindNumberGameDTO } from '../../../../../core/interfaces/find-number-game.dto';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService, MessageService } from 'primeng/api';
 
 @Component({
    selector: 'app-game-start-screen',
@@ -24,8 +26,10 @@ import { FindNumberGameDTO } from '../../../../../core/interfaces/find-number-ga
       TagModule,
       MenuModule,
       SpeedDialModule,
-      GameHistories
+      GameHistories,
+      ConfirmDialogModule
    ],
+   providers: [ConfirmationService, MessageService],
    templateUrl: './game-start-screen.html',
    styleUrl: './game-start-screen.scss',
 })
@@ -38,6 +42,12 @@ export class GameStartScreen {
    
    private readonly destroyRef = inject(DestroyRef);
    
+   private unfinishedGames = signal<FindNumberGameDTO | undefined>(undefined);
+
+   private confirmationService = inject(ConfirmationService);
+    
+   private messageService = inject(MessageService);
+
    private readonly router = inject(Router);
    
    protected showGameHistories = signal<boolean>(false);
@@ -59,7 +69,26 @@ export class GameStartScreen {
 
 
    ngOnInit(): void {
-      this.getHistories();
+      this.getData();
+   }
+
+
+   private getData() {
+      this.loaderService.show();
+      forkJoin([this.findNumberGameService.getGameHistories(), this.findNumberGameService.getUnfinishedGame()])
+         .pipe(
+            takeUntilDestroyed(this.destroyRef),
+            finalize(() => this.loaderService.hide())
+         ).subscribe({
+            next: ([histories, unfinishedGames]) => {
+               console.log('histories: ', histories);
+               console.log('unfinishedGames: ', unfinishedGames);
+               if (unfinishedGames.length > 0) {
+                  this.unfinishedGames.set(unfinishedGames[0]);
+               }
+            }
+               
+         })
    }
 
 
@@ -68,18 +97,12 @@ export class GameStartScreen {
    }
 
 
-   protected getHistories() {
-      this.loaderService.show();
-      this.findNumberGameService.getGameHistories()
-         .pipe(
-            takeUntilDestroyed(this.destroyRef),
-            finalize(() => this.loaderService.hide())
-         ).subscribe()
-   }
-
-
-   protected startGame(): void {
-      this.createNewGame();
+   protected startGame(event: Event): void {
+      if(!this.unfinishedGames()) {
+         this.createNewGame();
+         return;
+      }
+      this.confirmStartNewGameOrContinueUnfinishedGame(event);
    }
 
 
@@ -99,6 +122,39 @@ export class GameStartScreen {
                console.log('Create new game Failed: ', err)
             }
          })
+   }
+
+
+   public confirmStartNewGameOrContinueUnfinishedGame(event: Event) {
+      this.confirmationService.confirm({
+            target: event.target as EventTarget,
+            message: '<p class="mb-0">Anh thấy em có game chơi chưa xong</p><p class="mb-0">Em muốn chơi tiếp hay bắt đầu ván mới nào?</p>',
+            header: 'Hô Hô',
+            icon: 'pi pi-info-circle',
+            rejectLabel: 'Chơi tiếp',
+            rejectButtonProps: {
+                label: 'Chơi tiếp',
+                severity: 'secondary',
+            },
+            acceptButtonProps: {
+                label: 'Chơi mới',
+                severity: BUTTON_STYLE.CONTRAST
+            },
+        
+            accept: () => {
+               this.createNewGame();
+            },
+            reject: () => {
+               this.loadUnfinishedGame();
+            }
+        });
+   }
+
+
+   public loadUnfinishedGame() {
+      this.loaderService.show();
+      this.findNumberGameService.currentGameInfo.set(this.unfinishedGames() as FindNumberGameDTO);
+      this.navigationToPlayGameScreen((this.unfinishedGames() as FindNumberGameDTO).id);
    }
 
 

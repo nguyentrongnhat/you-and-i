@@ -1,6 +1,6 @@
 import { computed, inject, Injectable, signal } from "@angular/core";
 import { Router } from "@angular/router";
-import { catchError, finalize, map, of, tap, throwError } from "rxjs";
+import { catchError, finalize, map, of, take, tap, throwError } from "rxjs";
 import { API_ENDPOINTS } from "../../../core/constants/api-endpoints";
 import { ROUTE_PATHS } from "../../../core/constants/route-paths";
 import { UsernamePasswordLoginResponse } from "../../../core/interfaces/user.dtos";
@@ -50,7 +50,7 @@ export class AuthService {
 
     public isAuthenticated() {
         if(this.isAccessTokenValid()) return of(true);
-        this.loaderService.show();
+        
         return this.refreshToken().pipe(
             map(() => true),
             catchError(() => of(false)),
@@ -83,9 +83,13 @@ export class AuthService {
 
 
     public logout() {
+        this.loaderService.show();
         this.clearAccessToken();
         this.sessionStorageService.removeItem(STORAGE_KEY.REFRESH_TOKEN);
-        this.httpService.post(API_ENDPOINTS.AUTH.SIGNOUT, {}).subscribe({
+        this.httpService.post(API_ENDPOINTS.AUTH.SIGNOUT, {}).pipe(
+            finalize(() => this.loaderService.hide()),
+            take(1)
+        ).subscribe({
             next: () => {
                 console.log('Logged out successfully');
                 this.router.navigateByUrl(ROUTE_PATHS.AUTH.children.LOGIN.fullPath);

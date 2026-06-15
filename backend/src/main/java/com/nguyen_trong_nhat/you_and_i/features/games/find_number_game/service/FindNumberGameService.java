@@ -3,6 +3,7 @@ package com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.service;
 import com.nguyen_trong_nhat.you_and_i.common.exception.BadRequestException;
 import com.nguyen_trong_nhat.you_and_i.common.exception.NotFoundException;
 import com.nguyen_trong_nhat.you_and_i.common.exception.UnauthorizedException;
+import com.nguyen_trong_nhat.you_and_i.common.security.util.SecurityUtils;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.dto.*;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGame;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.mapper.FindNumberGameDataMapper;
@@ -110,7 +111,7 @@ public class FindNumberGameService {
 
         Optional<MyUserDetail> playerOpt = userRepository.findByUsername(userName);
 
-        if(playerOpt.isEmpty()) throw new BadRequestException("");
+        if(playerOpt.isEmpty()) throw new BadRequestException("User not found!");
 
         MyUserDetail player = playerOpt.get();
 
@@ -124,5 +125,12 @@ public class FindNumberGameService {
                     game.getBonusTime()
             )
         ).toList();
+    }
+
+
+    public List<FindNumberGameDTO> getUnfinishedGamesForCurrentUser() {
+        String username = SecurityUtils.getLoggedInUsername();
+        MyUserDetail user = userRepository.findByUsername(username).orElseThrow(() -> new BadRequestException("User not found!"));
+        return findNumberGameRepository.findByPlayerAndEndTimeIsNull(user).stream().map(FindNumberGameDataMapper::toDTO).toList();
     }
 }

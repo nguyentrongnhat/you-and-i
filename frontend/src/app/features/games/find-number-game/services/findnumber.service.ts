@@ -64,6 +64,11 @@ export class FindNumberGameService {
     }
 
 
+    public getUnfinishedGame(): Observable<FindNumberGameDTO[]> {
+        return this.httpClient.get<FindNumberGameDTO[]>('/game/find-number-game/unfinish-games')
+    }
+
+
     public convertTimerToTimeDisplay(seconds: number) {
         const hh = Math.floor(seconds / 3600)
         const mm = Math.floor((seconds % 3600) / 60)

@@ -129,7 +129,7 @@ public class AuthController {
                 .httpOnly(true)
                 .sameSite(sameSiteCookie)
                 .secure(secureCookie) // true if https
-                .path("/")
+                .path("/api/auth/refresh")
                 .maxAge(0)
                 .build();
 

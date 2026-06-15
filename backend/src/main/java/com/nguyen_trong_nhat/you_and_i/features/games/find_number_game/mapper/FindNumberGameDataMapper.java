@@ -31,6 +31,7 @@ public class FindNumberGameDataMapper {
         dto.setGameStatus(entity.getGameStatus());
         dto.setLastSelectedNumber(entity.getLastSelectedNumber());
         dto.setBonusTime(entity.getBonusTime());
+        dto.setUpdateAt(entity.getUpdatedAt());
 
         return dto;
     }

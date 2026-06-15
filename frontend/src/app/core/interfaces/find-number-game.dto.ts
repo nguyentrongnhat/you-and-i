@@ -22,4 +22,6 @@ export interface FindNumberGameDTO {
 	elapsedTime: string;
 
 	bonusTime: number;
+
+	updateAt: Date;
 }

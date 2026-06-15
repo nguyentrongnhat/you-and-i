@@ -38,4 +38,6 @@ public class FindNumberGameDTO {
     private String  elapsedTime;
 
     private Integer bonusTime;
+
+    private Instant updateAt;
 }

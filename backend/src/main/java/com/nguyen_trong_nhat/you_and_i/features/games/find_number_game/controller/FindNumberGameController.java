@@ -46,10 +46,15 @@ public class FindNumberGameController {
         return ResponseEntity.ok().body(FindNumberGameDataMapper.toDTO(game));
     }
 
+    @GetMapping("/unfinish-games")
+    public ResponseEntity<List<FindNumberGameDTO>> getUnfinishedGames() {
+        return ResponseEntity.ok().body(findNumberGameService.getUnfinishedGamesForCurrentUser());
+    }
+
     @PostMapping("/finish-game")
     public ResponseEntity<FindNumberGameDTO> finishGame(@RequestBody FinishFindNumberGameRequest gameInfo) {
         String userName = SecurityUtils.getLoggedInUsername();
-        var gameFinished = this.findNumberGameService.finishGame(userName, gameInfo);
+        var gameFinished = findNumberGameService.finishGame(userName, gameInfo);
         return ResponseEntity.ok().body(FindNumberGameDataMapper.toDTO(gameFinished));
     }
 

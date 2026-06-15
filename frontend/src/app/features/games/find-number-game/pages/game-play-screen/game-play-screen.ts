@@ -138,7 +138,7 @@ export class GamePlayScreen {
             this.startNewGame();
             break;
          case GAME_STATUSES.PLAYING:
-            this.continueGame();
+            this.loadGameFromLastUpdateInDB();
             break;
          case GAME_STATUSES.PAUSED:
             this.loadPausedGame();
@@ -163,7 +163,37 @@ export class GamePlayScreen {
    }
 
 
-   private continueGame() {
+   private loadGameFromLastUpdateInDB() {
+      
+      this.gameCurrentStatus.set(GAME_STATUSES.PLAYING);
+      this.currentSelectedNumber.set(this.currentGameInfo()?.lastSelectedNumber || 0);
+      this.items.set([
+         {
+            label: 'Pause',
+            icon: 'pi pi-pause',
+            command: () => this.pauseGame(),
+            style: this.BUTTON_STYLE.WARN
+         },
+         {
+            label: 'Exit',
+            icon: 'pi pi-sign-out',
+            command: () => this.exitGame(),
+            style: this.BUTTON_STYLE.DANGER
+         }
+      ]);
+
+      const gameData = this.currentGameInfo();
+
+      console.log('load game from last update in db: ', new Date(gameData.updateAt))
+      
+      this.startTimer(new Date(gameData.updateAt));
+
+      gameData.gameStatus = GAME_STATUSES.PLAYING
+      this.findNumberGameService.updateGameInfo(gameData!).subscribe();
+   }
+
+
+   private resumeFromPause() {
       this.gameCurrentStatus.set(GAME_STATUSES.PLAYING);
       this.currentSelectedNumber.set(this.currentGameInfo()?.lastSelectedNumber);
       this.items.set([
@@ -180,6 +210,7 @@ export class GamePlayScreen {
             style: this.BUTTON_STYLE.DANGER
          }
       ]);
+
       this.startTimer();
 
       const gameData = this.currentGameInfo();
@@ -200,7 +231,7 @@ export class GamePlayScreen {
          {
             label: 'Resume',
             icon: 'pi pi-play-circle',
-            command: () => this.continueGame(),
+            command: () => this.resumeFromPause(),
             style: this.BUTTON_STYLE.PRIMARY
          },
          {
@@ -226,7 +257,7 @@ export class GamePlayScreen {
          {
             label: 'Resume',
             icon: 'pi pi-play-circle',
-            command: () => this.continueGame(),
+            command: () => this.resumeFromPause(),
             style: this.BUTTON_STYLE.PRIMARY
          },
          {
@@ -301,8 +332,8 @@ export class GamePlayScreen {
    }
 
 
-   private startTimer(): void {
-      this.timerStartPoint = new Date();
+   private startTimer(startPoint?: Date): void {
+      this.timerStartPoint = startPoint || new Date();
 
       if (this.timeInterval) {
          clearInterval(this.timeInterval);

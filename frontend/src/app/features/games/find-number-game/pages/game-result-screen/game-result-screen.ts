@@ -15,8 +15,6 @@ import { LoaderService } from '../../../../../services/loader.service';
 import { GameHistories } from '../../components/game-histories/game-histories';
 import { FindNumberGameService } from '../../services/findnumber.service';
 
-
-
 export enum FIND_NUMBER_GAME_STATUSES {
   NONE = 'none',
   STARTED = 'started',
@@ -33,7 +31,7 @@ export enum FIND_NUMBER_GAME_STATUSES {
     TagModule,
     GameHistories,
     MenuModule,
-    SpeedDialModule
+    SpeedDialModule,
   ],
   templateUrl: './game-result-screen.html',
   styleUrl: './game-result-screen.scss',

@@ -12,4 +12,5 @@ import java.util.UUID;
 public interface FindNumberGameRepository extends JpaRepository<FindNumberGame, UUID> {
     List<FindNumberGame> findByEndTimeIsNull();
     List<FindNumberGame> findByPlayerAndEndTimeIsNotNull(MyUserDetail player);
+    List<FindNumberGame> findByPlayerAndEndTimeIsNull(MyUserDetail player);
 }
