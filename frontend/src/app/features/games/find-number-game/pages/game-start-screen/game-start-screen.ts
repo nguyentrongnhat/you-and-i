@@ -1,7 +1,9 @@
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
+import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DialogModule } from 'primeng/dialog';
 import { MenuModule } from 'primeng/menu';
 import { ProgressBarModule } from 'primeng/progressbar';
@@ -14,8 +16,6 @@ import { FindNumberGameDTO } from '../../../../../core/interfaces/find-number-ga
 import { LoaderService } from '../../../../../services/loader.service';
 import { GameHistories } from '../../components/game-histories/game-histories';
 import { FindNumberGameService } from '../../services/findnumber.service';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService, MessageService } from 'primeng/api';
 
 @Component({
    selector: 'app-game-start-screen',
@@ -29,7 +29,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
       GameHistories,
       ConfirmDialogModule
    ],
-   providers: [ConfirmationService, MessageService],
+   providers: [ConfirmationService],
    templateUrl: './game-start-screen.html',
    styleUrl: './game-start-screen.scss',
 })
@@ -45,8 +45,6 @@ export class GameStartScreen {
    private unfinishedGames = signal<FindNumberGameDTO | undefined>(undefined);
 
    private confirmationService = inject(ConfirmationService);
-    
-   private messageService = inject(MessageService);
 
    private readonly router = inject(Router);
    
