@@ -7,7 +7,7 @@ import { TagModule } from 'primeng/tag';
 import { debounceTime, finalize, Subject, switchMap, take, tap } from 'rxjs';
 import { MenuModule } from 'primeng/menu';
 import { SpeedDialModule } from 'primeng/speeddial';
-import { BUTTON_STYLE, GAME_DIFFICULTY_LEVEL, GAME_STATUSES } from '../../../../../core/enums';
+import { BUTTON_STYLE, GAME_DIFFICULTY_LEVEL, GAME_STATUSES, MESSAGE_TYPE } from '../../../../../core/enums';
 import { LoaderService } from '../../../../../services/loader.service';
 import { GameTable } from '../../components/game-table/game-table';
 import { FindNumberGameService } from '../../services/findnumber.service';
@@ -15,6 +15,8 @@ import { FindNumberGameDTO } from '../../../../../core/interfaces/find-number-ga
 import { Router } from '@angular/router';
 import { ROUTE_PATHS } from '../../../../../core/constants/route-paths';
 import { subscribe } from 'diagnostics_channel';
+import { ToastService } from '../../../../../services/toast.service';
+import { AuthService } from '../../../../auth/services/auth.service';
 
 @Component({
    selector: 'app-game-play-screen',
@@ -65,7 +67,9 @@ export class GamePlayScreen {
 
    private timerStartPoint: Date | null = null;
 
-   private timerStartPointTemp: number | null = null;
+   private toastService = inject(ToastService);
+
+   private authService = inject(AuthService);
 
    protected bestTime = computed<number | null>(() => {
       const histories = this.findNumberGameService.gameHistories();
@@ -131,6 +135,12 @@ export class GamePlayScreen {
          next: (game: FindNumberGameDTO) => {
             this.currentGameInfo = {...this.findNumberGameService.currentGameInfo() as FindNumberGameDTO}
             this.loadGameStates();
+         },
+         error: err => {
+            const toastSummary = 'Can not load game';
+            const toastDetail = err.error.message;
+            this.toastService.showToast(MESSAGE_TYPE.ERROR, toastSummary, toastDetail);
+            this.exitGame();
          }
       });
    }
@@ -169,6 +179,11 @@ export class GamePlayScreen {
 
 
    private loadGameFromLastUpdateInDB() {
+      if (this.currentGameInfo!.lastSelectedNumber === this.TOTAL_NUMBERS) {
+         this.timer = Number(this.currentGameInfo!.completionTime);
+         this.finishGame();
+         return;
+      }
       this.gameCurrentStatus.set(GAME_STATUSES.PLAYING);
       this.currentSelectedNumber.set(this.currentGameInfo!.lastSelectedNumber || 0);
       this.items.set([
@@ -276,6 +291,11 @@ export class GamePlayScreen {
             },
             error: (err) => {
                console.log(err)
+               this.currentGameInfo!.gameStatus = GAME_STATUSES.PLAYING;
+               this.currentGameInfo!.lastSelectedNumber = this.TOTAL_NUMBERS;
+               this.currentGameInfo!.completionTime = this.timer.toString();
+               this.findNumberGameService.currentGameInfo.set(this.currentGameInfo);
+               this.authService.refreshToken();
             }
          })
    }
@@ -296,10 +316,12 @@ export class GamePlayScreen {
 
 
    public updateGameStatusAfterSeclectEachNumber(lastSelected: number, elapsedTime: number) {
-      if(lastSelected > 90) return;
       this.currentGameInfo!.lastSelectedNumber = lastSelected
       this.currentGameInfo!.elapsedTime = elapsedTime.toString();
       this.timerStartPoint = new Date();
+      
+      if(lastSelected > 90) return;
+      
       this.triggerUpdateGameStatus.next(this.currentGameInfo!);
    }
 
@@ -316,7 +338,6 @@ export class GamePlayScreen {
 
    protected onSelectNumber(num: number) {
       this.currentSelectedNumber.set(num);
-      this.timerStartPointTemp = Number(new Date()) - 300;
       this.updateGameStatusAfterSeclectEachNumber(this.currentSelectedNumber(), this.timer)
       if (this.currentSelectedNumber() === this.TOTAL_NUMBERS) {
          this.finishGame();

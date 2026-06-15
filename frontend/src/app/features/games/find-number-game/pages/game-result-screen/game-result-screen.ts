@@ -9,9 +9,9 @@ import { SpeedDialModule } from 'primeng/speeddial';
 import { TagModule } from 'primeng/tag';
 import { finalize } from 'rxjs';
 import { ROUTE_PATHS } from '../../../../../core/constants/route-paths';
-import { BUTTON_STYLE } from '../../../../../core/enums';
 import { FindNumberGameDTO } from '../../../../../core/interfaces/find-number-game.dto';
 import { LoaderService } from '../../../../../services/loader.service';
+import { PlatformService } from '../../../../../services/platform.service';
 import { GameHistories } from '../../components/game-histories/game-histories';
 import { FindNumberGameService } from '../../services/findnumber.service';
 
@@ -57,7 +57,7 @@ export class GameResultScreen {
 
    protected currentGameId: number = 0;
 
-   private readonly BUTTON_STYLE = BUTTON_STYLE;
+   private platformService = inject(PlatformService);
 
    private router = inject(Router);
 
@@ -99,7 +99,6 @@ export class GameResultScreen {
       })
    }
 
-
    ngOnInit(): void {
       this.getHistories();
    }
@@ -137,7 +136,6 @@ export class GameResultScreen {
    }
 
    protected getHistories() {
-      if (this.findNumberGameService.gameHistories().length > 0) return;
       this.loaderService.show();
       this.findNumberGameService.getGameHistories()
          .pipe(
