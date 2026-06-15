@@ -31,7 +31,7 @@ public class FindNumberGameService {
 
         MyUserDetail player = playerOpt.get();
 
-        var gamesAreNotFinish = findNumberGameRepository.findByEndTimeIsNull();
+        var gamesAreNotFinish = findNumberGameRepository.findByPlayerAndEndTimeIsNull(player);
 
         findNumberGameRepository.deleteAll(gamesAreNotFinish);
 
