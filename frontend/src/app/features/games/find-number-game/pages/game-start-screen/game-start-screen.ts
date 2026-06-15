@@ -34,7 +34,7 @@ import { FindNumberGameService } from '../../services/findnumber.service';
    styleUrl: './game-start-screen.scss',
 })
 export class GameStartScreen {
-   protected readonly TOTAL_NUMBERS = 3;
+   protected readonly TOTAL_NUMBERS = 100;
 
    private readonly findNumberGameService = inject(FindNumberGameService);
    
