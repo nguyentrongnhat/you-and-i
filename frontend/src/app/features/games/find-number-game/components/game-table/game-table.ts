@@ -79,8 +79,8 @@ export class GameTable implements OnInit, AfterViewInit {
 			return {
 				value: num,
 				rotate: this.random(-180, 175),
-				tx: this.random(0, 120),
-				ty: this.random(0, 180),
+				tx: this.random(0, 110),
+				ty: this.random(0, 110),
 				fontSize: this.random(13, 20)
 			};
 		});
