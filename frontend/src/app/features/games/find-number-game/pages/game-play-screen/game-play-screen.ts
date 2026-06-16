@@ -84,20 +84,42 @@ export class GamePlayScreen {
 
    protected totalGames = computed(() => this.findNumberGameService.gameHistories().length);
 
-   protected items = signal<any[]>([
-      {
+   protected actionItems = computed<any[]>(() => {
+      const paused = {
          label: 'Pause',
          icon: 'pi pi-pause',
          command: () => this.pauseGame(),
          style: this.BUTTON_STYLE.WARN
-      },
-      {
+      }
+      
+      const resume = {
+         label: 'Resume',
+         icon: 'pi pi-play-circle',
+         command: () => this.resumeFromPause(),
+         style: this.BUTTON_STYLE.PRIMARY
+      }
+      
+      const shuffle = {
+         label: 'Shuffle',
+         icon: 'pi pi-refresh',
+         command: () => this.findNumberGameService.shuffleNumbers.next(true),
+         style: this.BUTTON_STYLE.SUCCESS
+      }
+
+      const exit = {
          label: 'Exit',
          icon: 'pi pi-sign-out',
          command: () => this.exitGame(),
          style: this.BUTTON_STYLE.DANGER
       }
-   ]);
+      
+      const gameStatus = this.gameCurrentStatus();
+
+      if (gameStatus === GAME_STATUSES.PAUSED) {
+         return [resume, shuffle, exit];
+      }
+      return [paused, shuffle, exit];
+   });
 
 
    constructor() {
@@ -186,20 +208,6 @@ export class GamePlayScreen {
       }
       this.gameCurrentStatus.set(GAME_STATUSES.PLAYING);
       this.currentSelectedNumber.set(this.currentGameInfo!.lastSelectedNumber || 0);
-      this.items.set([
-         {
-            label: 'Pause',
-            icon: 'pi pi-pause',
-            command: () => this.pauseGame(),
-            style: this.BUTTON_STYLE.WARN
-         },
-         {
-            label: 'Exit',
-            icon: 'pi pi-sign-out',
-            command: () => this.exitGame(),
-            style: this.BUTTON_STYLE.DANGER
-         }
-      ]);
 
       this.startTimer(new Date(this.currentGameInfo!.updateAt));
    }
@@ -208,21 +216,6 @@ export class GamePlayScreen {
    private resumeFromPause() {
       this.gameCurrentStatus.set(GAME_STATUSES.PLAYING);
       this.currentSelectedNumber.set(this.currentGameInfo!.lastSelectedNumber);
-      this.items.set([
-         {
-            label: 'Pause',
-            icon: 'pi pi-pause',
-            command: () => this.pauseGame(),
-            style: this.BUTTON_STYLE.WARN
-         },
-         {
-            label: 'Exit',
-            icon: 'pi pi-sign-out',
-            command: () => this.exitGame(),
-            style: this.BUTTON_STYLE.DANGER
-         }
-      ]);
-
       this.currentGameInfo!.gameStatus = GAME_STATUSES.PLAYING
       this.startTimer();
       this.findNumberGameService.updateGameInfo(this.currentGameInfo!).subscribe();
@@ -235,21 +228,6 @@ export class GamePlayScreen {
 
       this.currentSelectedNumber.set(this.currentGameInfo!.lastSelectedNumber ?? 0);
       this.timeToDisplay.set(this.findNumberGameService.convertTimerToTimeDisplay(Number(this.currentGameInfo!.elapsedTime) ?? 0));
-      
-      this.items.set([
-         {
-            label: 'Resume',
-            icon: 'pi pi-play-circle',
-            command: () => this.resumeFromPause(),
-            style: this.BUTTON_STYLE.PRIMARY
-         },
-         {
-            label: 'Exit',
-            icon: 'pi pi-sign-out',
-            command: () => this.exitGame(),
-            style: this.BUTTON_STYLE.DANGER
-         }
-      ]);
    }
 
 
@@ -260,21 +238,6 @@ export class GamePlayScreen {
       this.currentGameInfo!.gameStatus = GAME_STATUSES.PAUSED;
       this.currentGameInfo!.elapsedTime = this.timer.toString();
       this.findNumberGameService.updateGameInfo(this.currentGameInfo!).subscribe();
-      
-      this.items.set([
-         {
-            label: 'Resume',
-            icon: 'pi pi-play-circle',
-            command: () => this.resumeFromPause(),
-            style: this.BUTTON_STYLE.PRIMARY
-         },
-         {
-            label: 'Exit',
-            icon: 'pi pi-sign-out',
-            command: () => this.exitGame(),
-            style: this.BUTTON_STYLE.DANGER
-         }
-      ]);
    }
 
 
