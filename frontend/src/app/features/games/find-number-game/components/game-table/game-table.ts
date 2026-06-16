@@ -45,11 +45,11 @@ export class GameTable implements OnInit, AfterViewInit {
 			this.screenWidth.set(window.innerWidth);
 		}
 
-		this.onShuttleNumbers();
+		this.onShuffleNumbers();
 	}
 
 
-	onShuttleNumbers() {
+	onShuffleNumbers() {
 		this.findNumberGameService.shuffleNumbers.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
 			this.numbers.set(this.generateItems());
 		})
@@ -78,9 +78,9 @@ export class GameTable implements OnInit, AfterViewInit {
 		return arr.map(num => {
 			return {
 				value: num,
-				rotate: this.random(-180, 170),
-				tx: this.random(0, 100),
-				ty: this.random(0, 100),
+				rotate: this.random(-180, 175),
+				tx: this.random(0, 120),
+				ty: this.random(0, 180),
 				fontSize: this.random(13, 20)
 			};
 		});

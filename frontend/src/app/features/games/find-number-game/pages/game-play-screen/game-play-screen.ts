@@ -101,7 +101,7 @@ export class GamePlayScreen {
       
       const shuffle = {
          label: 'Shuffle',
-         icon: 'pi pi-refresh',
+         icon: 'pi pi-sync',
          command: () => this.findNumberGameService.shuffleNumbers.next(true),
          style: this.BUTTON_STYLE.SUCCESS
       }
