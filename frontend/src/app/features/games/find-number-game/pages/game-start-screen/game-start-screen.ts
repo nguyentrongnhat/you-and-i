@@ -16,6 +16,7 @@ import { FindNumberGameDTO } from '../../../../../core/interfaces/find-number-ga
 import { LoaderService } from '../../../../../services/loader.service';
 import { GameHistories } from '../../components/game-histories/game-histories';
 import { FindNumberGameService } from '../../services/findnumber.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
    selector: 'app-game-start-screen',
@@ -27,7 +28,8 @@ import { FindNumberGameService } from '../../services/findnumber.service';
       MenuModule,
       SpeedDialModule,
       GameHistories,
-      ConfirmDialogModule
+      ConfirmDialogModule,
+      FormsModule
    ],
    providers: [ConfirmationService],
    templateUrl: './game-start-screen.html',
@@ -44,13 +46,15 @@ export class GameStartScreen {
    
    private unfinishedGames = signal<FindNumberGameDTO | undefined>(undefined);
 
-   private confirmationService = inject(ConfirmationService);
-
    private readonly router = inject(Router);
    
    protected showGameHistories = signal<boolean>(false);
 
+   protected continueOrNewGameDialogVisible = signal<boolean>(false);
+
    protected totalGames = computed(() => this.findNumberGameService.gameHistories().length);
+
+   protected BUTTON_STYLE = BUTTON_STYLE;
 
 
    protected bestTime = computed<number | null>(() => {
@@ -97,7 +101,8 @@ export class GameStartScreen {
          this.createNewGame();
          return;
       }
-      this.confirmStartNewGameOrContinueUnfinishedGame(event);
+
+      this.continueOrNewGameDialogVisible.set(true);
    }
 
 
@@ -114,32 +119,6 @@ export class GameStartScreen {
             console.log('Create new game Failed: ', err)
          }
       })
-   }
-
-
-   public confirmStartNewGameOrContinueUnfinishedGame(event: Event) {
-      this.confirmationService.confirm({
-         target: event.target as EventTarget,
-         message: '<p class="mb-0">Anh thấy em có game chơi chưa xong</p><p class="mb-0">Em muốn chơi tiếp hay bắt đầu ván mới nào?</p>',
-         header: 'Hô Hô',
-         icon: 'pi pi-info-circle',
-         rejectLabel: 'Chơi tiếp',
-         rejectButtonProps: {
-               label: 'Chơi tiếp',
-               severity: 'secondary',
-         },
-         acceptButtonProps: {
-               label: 'Chơi mới',
-               severity: BUTTON_STYLE.CONTRAST
-         },
-      
-         accept: () => {
-            this.createNewGame();
-         },
-         reject: () => {
-            this.loadUnfinishedGame();
-         }
-      });
    }
 
 
