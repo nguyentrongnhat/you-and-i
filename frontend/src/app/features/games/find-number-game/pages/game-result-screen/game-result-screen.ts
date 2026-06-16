@@ -112,6 +112,7 @@ export class GameResultScreen {
       }
 
       if (currentGameInfo) {
+         this.loaderService.hide();
          this.extractDataToDisplayResult();
       }
       else {
@@ -136,7 +137,6 @@ export class GameResultScreen {
    }
 
    protected getHistories() {
-      this.loaderService.show();
       this.findNumberGameService.getGameHistories()
          .pipe(
             takeUntilDestroyed(this.destroyRef),
