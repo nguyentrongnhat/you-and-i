@@ -49,7 +49,7 @@ export class GamePlayScreen {
 
    protected lastFinishTime = signal<number>(0);
 
-   protected TOTAL_NUMBERS = 3;
+   protected TOTAL_NUMBERS = 100;
 
    protected currentGameInfo: FindNumberGameDTO | undefined = undefined;
 
