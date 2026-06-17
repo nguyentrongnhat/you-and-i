@@ -29,13 +29,13 @@ public class FindNumberGameDTO {
 
     private Instant endTime;
 
-    private String completionTime;
+    private Integer completionTime;
 
     private GameStatus gameStatus;
 
     private Integer lastSelectedNumber;
 
-    private String  elapsedTime;
+    private Integer  elapsedTime;
 
     private Integer bonusTime;
 

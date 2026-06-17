@@ -14,6 +14,6 @@ import java.time.Instant;
 public class FindNumberGameHistoryResponse {
     Instant startTime;
     Instant endTime;
-    String timeToFinish;
+    Integer completionTime;
     Integer bonusTime;
 }

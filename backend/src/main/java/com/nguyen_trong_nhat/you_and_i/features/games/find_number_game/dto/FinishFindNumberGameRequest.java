@@ -14,6 +14,6 @@ import java.util.UUID;
 @Setter
 public class FinishFindNumberGameRequest {
     UUID gameId;
-    String completionTime;
+    Integer completionTime;
     Instant endTime;
 }

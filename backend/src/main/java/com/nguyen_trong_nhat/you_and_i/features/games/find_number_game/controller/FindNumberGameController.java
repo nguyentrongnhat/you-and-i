@@ -32,7 +32,7 @@ public class FindNumberGameController {
     public ResponseEntity<FindNumberGameDTO> getGameById(@PathVariable String gameId) {
 
         if(gameId == null) {
-            throw new BadRequestException("Gameid is required");
+            throw new BadRequestException("Game id is required");
         }
 
         FindNumberGame game = findNumberGameService.getGameById(gameId);
