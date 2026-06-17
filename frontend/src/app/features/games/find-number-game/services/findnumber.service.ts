@@ -1,8 +1,9 @@
 import { computed, inject, Injectable, signal } from "@angular/core";
 import { HttpClientService } from "../../../../services/http-client.service";
-import { Observable, of, Subject, tap } from "rxjs";
-import { GAME_DIFFICULTY_LEVEL } from "../../../../core/enums";
+import { catchError, Observable, of, Subject, tap, throwError } from "rxjs";
+import { GAME_DIFFICULTY_LEVEL, MESSAGE_TYPE } from "../../../../core/enums";
 import { FindNumberGameDTO } from "../../../../core/interfaces/find-number-game.dto";
+import { ToastService } from "../../../../services/toast.service";
 
 @Injectable({
     providedIn: 'root'
@@ -19,6 +20,8 @@ export class FindNumberGameService {
     public currentGameInfo = signal<FindNumberGameDTO | undefined>(undefined);
 
     public shuffleNumbers: Subject<boolean> = new Subject<boolean>();
+
+    private readonly toastService = inject(ToastService);
 
     public createNewGame(totalNumbersToFind: number, difficultyLevel: GAME_DIFFICULTY_LEVEL): Observable<FindNumberGameDTO> {
         const body = {
@@ -44,6 +47,20 @@ export class FindNumberGameService {
             .pipe(
                 tap((game: FindNumberGameDTO) => {
                     this.currentGameInfo.set(game);
+                }),
+                catchError((err) => {
+                    if(err.error.status === 404) {
+                        const toastSummary = 'The game is not exist anymore';
+                        const toastDetail = 'The game is not exist anymore. Please start a new game.';
+                        this.toastService.showToast(MESSAGE_TYPE.ERROR, toastSummary, toastDetail);
+                    }
+                    else {
+                        const toastSummary = 'Can not update game';
+                        const toastDetail = err.error.message;
+                        this.toastService.showToast(MESSAGE_TYPE.ERROR, toastSummary, toastDetail);
+                    }
+
+                    return throwError(() => err);
                 })
             )
     }

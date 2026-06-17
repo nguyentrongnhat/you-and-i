@@ -20,7 +20,7 @@ export class GameHistories {
 	protected bestTime = computed<number | null>(() => {
 		const histories = this.gameHistories();
 		if (!histories.length) return null;
-		return Math.min(...histories.map((h) => h.timeToFinish));
+		return Math.min(...histories.map((h) => h.completionTime));
 	});
 
 }

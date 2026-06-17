@@ -23,9 +23,9 @@
           <td>{{ history.startTime | date:'dd/MM/yyyy - HH:mm' }}</td>
           <td>
             <span class="histories__time">
-              {{ findNumberGameService.convertTimerToTimeDisplay(history.timeToFinish) }}
+              {{ findNumberGameService.convertTimerToTimeDisplay(history.completionTime) }}
             </span>
-            @if (history.timeToFinish === bestTime()) {
+            @if (history.completionTime === bestTime()) {
             <p-tag
               icon="pi pi-star-fill"
               value="Kỷ lục"

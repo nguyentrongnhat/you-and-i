@@ -60,7 +60,7 @@ export class GameStartScreen {
    protected bestTime = computed<number | null>(() => {
       const histories = this.findNumberGameService.gameHistories();
       if (!histories.length) return null;
-      return Math.min(...histories.map((h) => h.timeToFinish));
+      return Math.min(...histories.map((h) => h.completionTime));
    });
 
 
@@ -98,7 +98,7 @@ export class GameStartScreen {
 
    protected startGame(event: Event): void {
       this.findNumberGameService.currentSeclectedNumber.set(0);
-      
+
       if(!this.unfinishedGames()) {
          this.createNewGame();
          return;

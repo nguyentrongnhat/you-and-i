@@ -14,6 +14,8 @@ import { LoaderService } from '../../../../../services/loader.service';
 import { PlatformService } from '../../../../../services/platform.service';
 import { GameHistories } from '../../components/game-histories/game-histories';
 import { FindNumberGameService } from '../../services/findnumber.service';
+import { MESSAGE_TYPE } from '../../../../../core/enums';
+import { ToastService } from '../../../../../services/toast.service';
 
 export enum FIND_NUMBER_GAME_STATUSES {
    NONE = 'none',
@@ -57,7 +59,7 @@ export class GameResultScreen {
 
    protected currentGameId: number = 0;
 
-   private platformService = inject(PlatformService);
+   private readonly toastService = inject(ToastService);
 
    private router = inject(Router);
 
@@ -73,7 +75,7 @@ export class GameResultScreen {
    protected bestTime = computed<number | null>(() => {
       const histories = this.findNumberGameService.gameHistories();
       if (!histories.length) return null;
-      return Math.min(...histories.map((h) => h.timeToFinish));
+      return Math.min(...histories.map((h) => h.completionTime));
    });
 
 
@@ -120,9 +122,20 @@ export class GameResultScreen {
             next: (game: FindNumberGameDTO) => {
                this.loaderService.hide();
                this.extractDataToDisplayResult();
+            },
+            error: (err) => {
+               const toastSummary = 'Can not load game';
+               const toastDetail = err.error.message;
+               this.toastService.showToast(MESSAGE_TYPE.ERROR, toastSummary, toastDetail);
+               this.goToGameStartScreen();
             }
          })
       }
+   }
+
+
+   private goToGameStartScreen() {
+      this.router.navigateByUrl(ROUTE_PATHS.GAME.children.FIND_NUMBER_GAME.children.START_SCREEN.fullPath);
    }
 
 

@@ -49,7 +49,7 @@ export class GamePlayScreen {
 
    protected lastFinishTime = signal<number>(0);
 
-   protected TOTAL_NUMBERS = 100;
+   protected TOTAL_NUMBERS = 3;
 
    protected currentGameInfo: FindNumberGameDTO | undefined = undefined;
 
@@ -74,7 +74,7 @@ export class GamePlayScreen {
    protected bestTime = computed<number | null>(() => {
       const histories = this.findNumberGameService.gameHistories();
       if (!histories.length) return null;
-      return Math.min(...histories.map((h) => h.timeToFinish));
+      return Math.min(...histories.map((h) => h.completionTime));
    });
 
    protected bestTimeDisplay = computed(() => {
@@ -214,7 +214,7 @@ export class GamePlayScreen {
 
    private loadGameFromLastUpdateInDB() {
       if (this.currentGameInfo!.lastSelectedNumber === this.TOTAL_NUMBERS) {
-         this.timer = Number(this.currentGameInfo!.completionTime);
+         this.timer = Number(this.currentGameInfo!.elapsedTime || 0);
          this.finishGame();
          return;
       }
@@ -247,7 +247,7 @@ export class GamePlayScreen {
       this.stopTimer();
       this.gameCurrentStatus.set(GAME_STATUSES.PAUSED);
       this.currentGameInfo!.gameStatus = GAME_STATUSES.PAUSED;
-      this.currentGameInfo!.elapsedTime = this.timer.toString();
+      this.currentGameInfo!.elapsedTime = this.timer;
       this.findNumberGameService.updateGameInfo(this.currentGameInfo!).subscribe();
    }
 
@@ -264,12 +264,23 @@ export class GamePlayScreen {
                this.goToResultScreen();
             },
             error: (err) => {
-               console.log(err)
-               this.currentGameInfo!.gameStatus = GAME_STATUSES.PLAYING;
-               this.currentGameInfo!.lastSelectedNumber = this.TOTAL_NUMBERS;
-               this.currentGameInfo!.completionTime = this.timer.toString();
-               this.findNumberGameService.currentGameInfo.set(this.currentGameInfo);
-               this.authService.refreshToken();
+               if(err.error.status === 404) {
+                  const toastSummary = 'The game is not exist anymore';
+                  const toastDetail = 'Please start a new game.';
+                  this.toastService.showToast(MESSAGE_TYPE.ERROR, toastSummary, toastDetail);
+                  this.exitGame();
+                  return;
+               }
+               else if(err.error.status === 401 || err.error.status === 403) {
+                  this.currentGameInfo!.gameStatus = GAME_STATUSES.PLAYING;
+                  this.currentGameInfo!.lastSelectedNumber = this.TOTAL_NUMBERS;
+                  this.currentGameInfo!.completionTime = this.timer;
+                  this.findNumberGameService.currentGameInfo.set(this.currentGameInfo);
+                  this.authService.refreshToken();
+               }
+               else {
+                  this.goToResultScreen();
+               }
             }
          })
    }
@@ -291,7 +302,7 @@ export class GamePlayScreen {
 
    public updateGameStatusAfterSeclectEachNumber(lastSelected: number, elapsedTime: number) {
       this.currentGameInfo!.lastSelectedNumber = lastSelected
-      this.currentGameInfo!.elapsedTime = elapsedTime.toString();
+      this.currentGameInfo!.elapsedTime = elapsedTime;
       this.timerStartPoint = new Date();
       
       if(lastSelected > 90) return;
@@ -306,7 +317,11 @@ export class GamePlayScreen {
             debounceTime(5000),
             takeUntilDestroyed(this.destroyRef),
             switchMap((game: FindNumberGameDTO) => this.findNumberGameService.updateGameInfo(game))
-         ).subscribe()
+         ).subscribe({
+            error: (err) => {
+               this.exitGame();
+            }
+         })
    }
 
    private startTimer(startPoint?: Date): void {

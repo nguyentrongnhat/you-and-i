@@ -11,15 +11,15 @@ export interface FindNumberGameDTO {
 
 	startTime: Date;
 
-	endTime: string;
+	endTime: Date;
 
-	completionTime: string;
+	completionTime: number;
 
 	gameStatus: GAME_STATUSES;
 
 	lastSelectedNumber: number;
 
-	elapsedTime: string;
+	elapsedTime: number;
 
 	bonusTime: number;
 
