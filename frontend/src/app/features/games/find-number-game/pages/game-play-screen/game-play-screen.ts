@@ -230,7 +230,14 @@ export class GamePlayScreen {
       this.findNumberGameService.currentSeclectedNumber.set(this.currentGameInfo!.lastSelectedNumber);
       this.currentGameInfo!.gameStatus = GAME_STATUSES.PLAYING
       this.startTimer();
-      this.findNumberGameService.updateGameInfo(this.currentGameInfo!).subscribe();
+      this.findNumberGameService.updateGameInfo(this.currentGameInfo!).subscribe({
+         error: err => {
+            const toastSummary = 'An error occurred!!';
+            const toastDetail = err.error.message;
+            this.toastService.showToast(MESSAGE_TYPE.ERROR, toastSummary, toastDetail);
+            this.exitGame();
+         }
+      });
    }
 
 
@@ -248,7 +255,14 @@ export class GamePlayScreen {
       this.gameCurrentStatus.set(GAME_STATUSES.PAUSED);
       this.currentGameInfo!.gameStatus = GAME_STATUSES.PAUSED;
       this.currentGameInfo!.elapsedTime = this.timer;
-      this.findNumberGameService.updateGameInfo(this.currentGameInfo!).subscribe();
+      this.findNumberGameService.updateGameInfo(this.currentGameInfo!).subscribe({
+         error: err => {
+            const toastSummary = 'An error occurred!!';
+            const toastDetail = err.error.message;
+            this.toastService.showToast(MESSAGE_TYPE.ERROR, toastSummary, toastDetail);
+            this.exitGame();
+         }
+      });
    }
 
 
