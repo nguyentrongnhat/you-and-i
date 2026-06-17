@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, Component, effect, ElementRef, inject, input, output, signal, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, input, output, signal, ViewChild } from '@angular/core';
 import { PlatformService } from '../../../../../services/platform.service';
 import { UserService } from '../../../../user-management/services/user.service';
 import { ROLE } from '../../../../../core/enums';
 import { NumberData } from '../../../../../core/type';
+import { FindNumberGameService } from '../../services/findnumber.service';
+import { SoundService } from '../../services/sound.service';
 
 @Component({
   selector: 'app-number',
@@ -22,7 +24,9 @@ export class Number implements AfterViewInit {
 
   public onSelected = output<number>();
 
-  public currentNumber = input<number>(0);
+  private currentSelectedNumber = computed(() => this.findNumberGameService.currentSeclectedNumber());
+
+  private targetNumber = computed(() => this.findNumberGameService.curentTargetNumber());
 
   protected isIndicate = signal<boolean>(false);
 
@@ -34,14 +38,17 @@ export class Number implements AfterViewInit {
 
   private readonly platformService = inject(PlatformService);
 
+  private readonly findNumberGameService = inject(FindNumberGameService);
+
+  private readonly soundService = inject(SoundService);
+
   constructor() {
     effect(() => {
       const numberData = this.data() as NumberData;
       if (this.platformService.isBrowser()) {
         this.drawNumber(numberData);
-        const currentNumber = this.currentNumber();
-        this.updateForSelectedNumber(currentNumber);
-        this.upDateIndicate(currentNumber);
+        this.updateForSelectedNumber(this.currentSelectedNumber());
+        this.upDateIndicate(this.currentSelectedNumber());
       }
     });
   }
@@ -64,16 +71,17 @@ export class Number implements AfterViewInit {
 
 
   protected onSelect() {
-    const numberData: number = this.data()?.value ?? -1
-    if(this.currentNumber() + 1 === numberData) {
-      this.updateForSelectedNumber(this.currentNumber());
-      this.onSelected.emit(numberData)
+    const numberData: number = this.data()!.value
+    if(this.targetNumber() === numberData) {
+      this.findNumberGameService.currentSeclectedNumber.set(numberData);
+      this.updateForSelectedNumber(this.currentSelectedNumber());
+      this.soundService.playSound('correct');
     }
   }
 
 
   protected updateForSelectedNumber(currentNumber: number) {
-    const numberData: number = this.data()?.value ?? -1
+    const numberData: number = this.data()!.value
     if(numberData <= currentNumber) {
       this.isSelected.set(true);
     }
@@ -81,7 +89,7 @@ export class Number implements AfterViewInit {
 
 
   protected upDateIndicate(currentNumber: number) {
-    const numberData: number = this.data()?.value ?? -1
+    const numberData: number = this.data()!.value
     this.isTarget.set(currentNumber + 1 === numberData);
     if (!this.userService.hasRoles([ROLE.SUPER_ADMIN])) return;
     this.isIndicate.set(currentNumber + 1 === numberData);
@@ -107,7 +115,7 @@ export class Number implements AfterViewInit {
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
-      const value = drawData?.value ?? -1;
+      const value = drawData?.value;
 
       ctx.fillText(
         value.toString(),

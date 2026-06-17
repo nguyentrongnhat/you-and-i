@@ -30,7 +30,7 @@
 
       @if (gameCurrentStatus() === GAME_STATUSES.PLAYING) {
          <div class="find-number__game-area">
-            <app-game-table (onSelectNumber)="onSelectNumber($event)" [currentNumber]="currentSelectedNumber()" />
+            <app-game-table/>
          </div>
       }
       @else if (gameCurrentStatus() === GAME_STATUSES.PAUSED) {

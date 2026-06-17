@@ -1,4 +1,4 @@
-import { inject, Injectable, signal } from "@angular/core";
+import { computed, inject, Injectable, signal } from "@angular/core";
 import { HttpClientService } from "../../../../services/http-client.service";
 import { Observable, of, Subject, tap } from "rxjs";
 import { GAME_DIFFICULTY_LEVEL } from "../../../../core/enums";
@@ -9,6 +9,10 @@ import { FindNumberGameDTO } from "../../../../core/interfaces/find-number-game.
 })
 export class FindNumberGameService {
     private readonly httpClient = inject(HttpClientService);
+
+    public currentSeclectedNumber = signal<number>(0);
+
+    public curentTargetNumber = computed(() => this.currentSeclectedNumber() + 1);
 
     public gameHistories = signal<any[]>([]);
 

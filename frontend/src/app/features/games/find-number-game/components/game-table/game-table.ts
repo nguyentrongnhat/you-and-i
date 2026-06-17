@@ -13,23 +13,21 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 })
 export class GameTable implements OnInit, AfterViewInit {
 
-	public currentNumber = input<number>(0);
-
 	private readonly destroyRef = inject(DestroyRef);
 
 	private findNumberGameService = inject(FindNumberGameService);
 
-	screenWidth = signal(0);
+	protected screenWidth = signal(0);
 
-	columns = computed(() => this.screenWidth() < 768 ? 5 : 10);
+	protected columns = computed(() => this.screenWidth() < 768 ? 5 : 10);
 
-	numbers = signal<NumberData[]>(this.generateItems());
+	protected numbers = signal<NumberData[]>(this.generateItems());
 
-	onSelectNumber = output<number>();
+	protected onSelectNumber = output<number>();
 
-	platformService = inject(PlatformService);
+	protected platformService = inject(PlatformService);
 
-	ready = false;
+	protected ready = false;
 
 	constructor() {}
 
@@ -89,11 +87,6 @@ export class GameTable implements OnInit, AfterViewInit {
 
 	private random(min: number, max: number) {
 		return Math.random() * (max - min) + min;
-	}
-
-
-	public selectNumber() {
-		this.onSelectNumber.emit(this.currentNumber()+1)
 	}
 }
 

@@ -39,7 +39,7 @@ export class GamePlayScreen {
 
    protected timer: number = 0;
 
-   protected currentSelectedNumber = signal<number>(0);
+   protected currentSelectedNumber = computed(() => this.findNumberGameService.currentSeclectedNumber());
 
    protected timeToDisplay = signal<string>('00:00:00')
 
@@ -116,7 +116,7 @@ export class GamePlayScreen {
       const gameStatus = this.gameCurrentStatus();
 
       if (gameStatus === GAME_STATUSES.PAUSED) {
-         return [resume, shuffle, exit];
+         return [resume, exit];
       }
       return [paused, shuffle, exit];
    });
@@ -127,6 +127,18 @@ export class GamePlayScreen {
          const currentGameId = this.gameId();
          if (!currentGameId) return;
          untracked(() => this.getCurrentGameInfo(currentGameId));
+      }),
+
+
+      effect(() => {
+         const currentSelectedNumber = this.currentSelectedNumber();
+
+         if (currentSelectedNumber === (this.currentGameInfo?.lastSelectedNumber || 0)) return;
+         
+         this.updateGameStatusAfterSeclectEachNumber(currentSelectedNumber, this.timer)
+         if (this.findNumberGameService.currentSeclectedNumber() === this.TOTAL_NUMBERS) {
+            this.finishGame();
+         }
       })
    }
 
@@ -207,7 +219,7 @@ export class GamePlayScreen {
          return;
       }
       this.gameCurrentStatus.set(GAME_STATUSES.PLAYING);
-      this.currentSelectedNumber.set(this.currentGameInfo!.lastSelectedNumber || 0);
+      this.findNumberGameService.currentSeclectedNumber.set(this.currentGameInfo!.lastSelectedNumber || 0);
 
       this.startTimer(new Date(this.currentGameInfo!.updateAt));
    }
@@ -215,7 +227,7 @@ export class GamePlayScreen {
 
    private resumeFromPause() {
       this.gameCurrentStatus.set(GAME_STATUSES.PLAYING);
-      this.currentSelectedNumber.set(this.currentGameInfo!.lastSelectedNumber);
+      this.findNumberGameService.currentSeclectedNumber.set(this.currentGameInfo!.lastSelectedNumber);
       this.currentGameInfo!.gameStatus = GAME_STATUSES.PLAYING
       this.startTimer();
       this.findNumberGameService.updateGameInfo(this.currentGameInfo!).subscribe();
@@ -226,7 +238,7 @@ export class GamePlayScreen {
       this.stopTimer();
       this.gameCurrentStatus.set(GAME_STATUSES.PAUSED);
 
-      this.currentSelectedNumber.set(this.currentGameInfo!.lastSelectedNumber ?? 0);
+      this.findNumberGameService.currentSeclectedNumber.set(this.currentGameInfo!.lastSelectedNumber ?? 0);
       this.timeToDisplay.set(this.findNumberGameService.convertTimerToTimeDisplay(Number(this.currentGameInfo!.elapsedTime) ?? 0));
    }
 
@@ -234,7 +246,6 @@ export class GamePlayScreen {
    private pauseGame() {
       this.stopTimer();
       this.gameCurrentStatus.set(GAME_STATUSES.PAUSED);
-
       this.currentGameInfo!.gameStatus = GAME_STATUSES.PAUSED;
       this.currentGameInfo!.elapsedTime = this.timer.toString();
       this.findNumberGameService.updateGameInfo(this.currentGameInfo!).subscribe();
@@ -297,16 +308,6 @@ export class GamePlayScreen {
             switchMap((game: FindNumberGameDTO) => this.findNumberGameService.updateGameInfo(game))
          ).subscribe()
    }
-
-
-   protected onSelectNumber(num: number) {
-      this.currentSelectedNumber.set(num);
-      this.updateGameStatusAfterSeclectEachNumber(this.currentSelectedNumber(), this.timer)
-      if (this.currentSelectedNumber() === this.TOTAL_NUMBERS) {
-         this.finishGame();
-      }
-   }
-
 
    private startTimer(startPoint?: Date): void {
       this.timerStartPoint = startPoint || new Date();

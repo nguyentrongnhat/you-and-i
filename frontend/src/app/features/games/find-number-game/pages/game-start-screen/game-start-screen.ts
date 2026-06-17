@@ -97,6 +97,8 @@ export class GameStartScreen {
 
 
    protected startGame(event: Event): void {
+      this.findNumberGameService.currentSeclectedNumber.set(0);
+      
       if(!this.unfinishedGames()) {
          this.createNewGame();
          return;
