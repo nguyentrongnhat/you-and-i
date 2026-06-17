@@ -24,16 +24,6 @@ export class Number implements AfterViewInit {
 
   public onSelected = output<number>();
 
-  private currentSelectedNumber = computed(() => this.findNumberGameService.currentSeclectedNumber());
-
-  private targetNumber = computed(() => this.findNumberGameService.curentTargetNumber());
-
-  protected isIndicate = signal<boolean>(false);
-
-  protected isTarget = signal<boolean>(false);
-
-  protected isSelected = signal<boolean>(false);
-
   private readonly userService = inject(UserService);
 
   private readonly platformService = inject(PlatformService);
@@ -42,13 +32,28 @@ export class Number implements AfterViewInit {
 
   private readonly soundService = inject(SoundService);
 
+  private currentSelectedNumber = computed(() => this.findNumberGameService.currentSeclectedNumber());
+
+  private targetNumber = computed(() => this.findNumberGameService.curentTargetNumber());
+
+  protected isTargetNumber = computed<boolean>(() => this.targetNumber() === this.data()?.value);
+
+  protected isSelected = computed<boolean>(() => {
+    const numberData: number = this.data()?.value || 0;
+    return numberData <= this.currentSelectedNumber();
+  });
+
+  protected isIndicate = computed<boolean>(() => {
+    const numberData: number = this.data()?.value || 0;
+    if (!this.userService.hasRoles([ROLE.SUPER_ADMIN])) return false;
+    return numberData === this.targetNumber();
+  });
+
   constructor() {
     effect(() => {
       const numberData = this.data() as NumberData;
       if (this.platformService.isBrowser()) {
         this.drawNumber(numberData);
-        this.updateForSelectedNumber(this.currentSelectedNumber());
-        this.upDateIndicate(this.currentSelectedNumber());
       }
     });
   }
@@ -74,25 +79,8 @@ export class Number implements AfterViewInit {
     const numberData: number = this.data()!.value
     if(this.targetNumber() === numberData) {
       this.findNumberGameService.currentSeclectedNumber.set(numberData);
-      this.updateForSelectedNumber(this.currentSelectedNumber());
       this.soundService.playSound('correct');
     }
-  }
-
-
-  protected updateForSelectedNumber(currentNumber: number) {
-    const numberData: number = this.data()!.value
-    if(numberData <= currentNumber) {
-      this.isSelected.set(true);
-    }
-  }
-
-
-  protected upDateIndicate(currentNumber: number) {
-    const numberData: number = this.data()!.value
-    this.isTarget.set(currentNumber + 1 === numberData);
-    if (!this.userService.hasRoles([ROLE.SUPER_ADMIN])) return;
-    this.isIndicate.set(currentNumber + 1 === numberData);
   }
 
 

@@ -47,11 +47,10 @@
     background: var(--p-highlight-background, #eef2ff);
     box-shadow: 0 0 0 3px rgba(241, 1, 1, 0.801);
     animation: pulse 1.4s infinite;
-    z-index: 3;
   }
 
   .target {
-    z-index: 2;
+    z-index: 3;
   }
 }
 
