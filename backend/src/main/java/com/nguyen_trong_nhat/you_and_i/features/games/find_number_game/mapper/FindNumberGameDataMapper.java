@@ -1,6 +1,7 @@
 package com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.mapper;
 
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.dto.CreateNewFindNumberGameResponse;
+import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.dto.DifficultyLevel;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.dto.FindNumberGameBestRecordDTO;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.dto.FindNumberGameDTO;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGame;
