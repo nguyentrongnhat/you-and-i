@@ -2,13 +2,14 @@ package com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.service;
 
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGame;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGameUserBestRecord;
+import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.mapper.FindNumberGameDataMapper;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.repository.FindNumberGameUserBestRecordRepository;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -36,5 +37,9 @@ public class FindNumberGameBestRecordService {
         existingRecord.setBestCompletionTime(game.getCompletionTime());
 
         findNumberGameUserBestRecordRepository.save(existingRecord);
+    }
+
+    public List<FindNumberGameUserBestRecord> getBestRecordRanking() {
+        return findNumberGameUserBestRecordRepository.findAll();
     }
 }

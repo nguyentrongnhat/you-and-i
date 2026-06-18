@@ -7,6 +7,7 @@ import com.nguyen_trong_nhat.you_and_i.common.security.util.SecurityUtils;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.dto.*;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGame;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.mapper.FindNumberGameDataMapper;
+import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.service.FindNumberGameBestRecordService;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.service.FindNumberGameService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,8 @@ import java.util.List;
 @AllArgsConstructor
 public class FindNumberGameController {
     private final FindNumberGameService findNumberGameService;
+
+    private final FindNumberGameBestRecordService findNumberGameBestRecordService;
 
     @PostMapping("")
     public ResponseEntity<FindNumberGameDTO> createNewGame(@RequestBody CreateNewFindNumberGameRequest gameInfo) {
@@ -69,5 +72,16 @@ public class FindNumberGameController {
         String userName = SecurityUtils.getLoggedInUsername();
         var history = this.findNumberGameService.getGameHistory(userName);
         return ResponseEntity.ok().body(history);
+    }
+
+    @GetMapping("/best-records-ranking")
+    public ResponseEntity<List<FindNumberGameBestRecordDTO>> getBestRecordsRanking() {
+
+        List<FindNumberGameBestRecordDTO> bestRecordsDTO
+                = findNumberGameBestRecordService.getBestRecordRanking()
+                    .stream()
+                        .map(FindNumberGameDataMapper::toBestRecordDTO).toList();
+
+        return ResponseEntity.ok().body(bestRecordsDTO);
     }
 }

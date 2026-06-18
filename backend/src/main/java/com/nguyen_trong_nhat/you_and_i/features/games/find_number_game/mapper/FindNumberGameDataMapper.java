@@ -1,8 +1,11 @@
 package com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.mapper;
 
-import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.dto.DifficultyLevel;
+import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.dto.CreateNewFindNumberGameResponse;
+import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.dto.FindNumberGameBestRecordDTO;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.dto.FindNumberGameDTO;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGame;
+import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGameUserBestRecord;
+import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
@@ -80,5 +83,22 @@ public class FindNumberGameDataMapper {
         entity.setGameStatus(dto.getGameStatus());
         entity.setLastSelectedNumber(dto.getLastSelectedNumber());
         entity.setBonusTime(dto.getBonusTime());
+    }
+
+    public static FindNumberGameBestRecordDTO toBestRecordDTO(FindNumberGameUserBestRecord entity) {
+        if (entity == null) {
+            return null;
+        }
+
+        MyUserDetail user = entity.getPlayer();
+
+        return new FindNumberGameBestRecordDTO(
+                entity.getId(),
+                user != null ? user.getProfile().getFullName() : null,
+                entity.getPlayer() != null ? user.getProfile().getDisplayName() : null,
+                entity.getPlayer() != null ? user.getUsername() : null,
+                entity.getUpdatedAt(),
+                entity.getBestCompletionTime()
+        );
     }
 }

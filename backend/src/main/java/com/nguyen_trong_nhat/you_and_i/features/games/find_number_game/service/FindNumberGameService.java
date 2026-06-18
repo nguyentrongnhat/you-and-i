@@ -39,17 +39,6 @@ public class FindNumberGameService {
 
         findNumberGameRepository.deleteAll(gamesAreNotFinish);
 
-        List<FindNumberGameUserBestRecord> bestRecords = findNumberGameRepository.findBestGamesForRanking()
-                .stream().map(game -> {
-                    var bestRecord = new FindNumberGameUserBestRecord();
-                    bestRecord.setBestGame(game);
-                    bestRecord.setPlayer(game.getPlayer());
-                    bestRecord.setBestCompletionTime(game.getCompletionTime());
-                    return bestRecord;
-                }).toList();
-
-
-
         var newGame = new FindNumberGame();
 
         newGame.setBonusTime(0);
