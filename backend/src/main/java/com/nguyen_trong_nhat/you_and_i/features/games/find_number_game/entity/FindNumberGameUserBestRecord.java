@@ -32,6 +32,6 @@ public class FindNumberGameUserBestRecord extends BaseEntity {
     @JoinColumn(name = "best_game_id", nullable = false)
     private FindNumberGame bestGame;
 
-    @Column(nullable = false)
+    @Column(name="completion_time", nullable = false)
     private Integer bestCompletionTime;
 }

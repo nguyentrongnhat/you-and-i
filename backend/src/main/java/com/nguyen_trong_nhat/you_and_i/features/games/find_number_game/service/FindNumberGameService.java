@@ -6,10 +6,13 @@ import com.nguyen_trong_nhat.you_and_i.common.exception.UnauthorizedException;
 import com.nguyen_trong_nhat.you_and_i.common.security.util.SecurityUtils;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.dto.*;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGame;
+import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGameUserBestRecord;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.mapper.FindNumberGameDataMapper;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.repository.FindNumberGameRepository;
+import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.repository.FindNumberGameUserBestRecordRepository;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
 import com.nguyen_trong_nhat.you_and_i.features.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +24,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class FindNumberGameService {
     private final FindNumberGameRepository findNumberGameRepository;
+    private final FindNumberGameBestRecordService findNumberGameBestRecordService;
     private final UserRepository userRepository;
 
     public FindNumberGame createNewGame(String userName, CreateNewFindNumberGameRequest gameInfo) {
@@ -34,6 +38,17 @@ public class FindNumberGameService {
         var gamesAreNotFinish = findNumberGameRepository.findByPlayerAndEndTimeIsNull(player);
 
         findNumberGameRepository.deleteAll(gamesAreNotFinish);
+
+        List<FindNumberGameUserBestRecord> bestRecords = findNumberGameRepository.findBestGamesForRanking()
+                .stream().map(game -> {
+                    var bestRecord = new FindNumberGameUserBestRecord();
+                    bestRecord.setBestGame(game);
+                    bestRecord.setPlayer(game.getPlayer());
+                    bestRecord.setBestCompletionTime(game.getCompletionTime());
+                    return bestRecord;
+                }).toList();
+
+
 
         var newGame = new FindNumberGame();
 
@@ -83,6 +98,7 @@ public class FindNumberGameService {
     }
 
 
+    @Transactional
     public FindNumberGame finishGame(String userName, FinishFindNumberGameRequest gameInfo) {
 
         Optional<FindNumberGame> gameOpt = findNumberGameRepository.findById(gameInfo.getGameId());
@@ -102,6 +118,10 @@ public class FindNumberGameService {
         game.setEndTime(gameInfo.getEndTime());
 
         game.setGameStatus(GameStatus.DONE);
+
+        game = findNumberGameRepository.save(game);
+
+        findNumberGameBestRecordService.updateBestRecordForUser(game.getPlayer(), game);
 
         return findNumberGameRepository.save(game);
     }

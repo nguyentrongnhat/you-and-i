@@ -3,6 +3,8 @@ package com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.reposito
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGame;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -11,5 +13,20 @@ import java.util.UUID;
 @Repository
 public interface FindNumberGameRepository extends JpaRepository<FindNumberGame, UUID> {
     List<FindNumberGame> findByPlayerAndEndTimeIsNotNull(MyUserDetail player);
+
     List<FindNumberGame> findByPlayerAndEndTimeIsNull(MyUserDetail player);
+
+    @Query(value = """
+        SELECT g.*
+        FROM (
+            SELECT f.*,
+                   ROW_NUMBER() OVER (
+                       PARTITION BY f.user_id
+                       ORDER BY f.completion_time ASC, f.id ASC
+                   ) rn
+            FROM find_number_games f
+        ) g
+        WHERE g.rn = 1
+        """, nativeQuery = true)
+    List<FindNumberGame> findBestGamesForRanking();
 }
