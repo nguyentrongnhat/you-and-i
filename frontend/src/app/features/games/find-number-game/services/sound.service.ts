@@ -10,7 +10,12 @@ export class SoundService {
   public playSound(type: 'correct' | 'wrong' | 'victory') {
     try {
       const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
-      if (!AudioContext) return;
+      if (!AudioContext) {
+        setTimeout(()=> {
+          this.playSound(type);
+        }, 1000)
+        return;
+      };
 
       const ctx = new AudioContext();
       const osc = ctx.createOscillator();
