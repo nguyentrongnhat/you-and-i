@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.List;
 
 @RestController
@@ -80,7 +81,9 @@ public class FindNumberGameController {
         List<FindNumberGameBestRecordDTO> bestRecordsDTO
                 = findNumberGameBestRecordService.getBestRecordRanking()
                     .stream()
-                        .map(FindNumberGameDataMapper::toBestRecordDTO).toList();
+                        .map(FindNumberGameDataMapper::toBestRecordDTO)
+                        .sorted(Comparator.comparing(FindNumberGameBestRecordDTO::getCompletionTime))
+                        .toList();
 
         return ResponseEntity.ok().body(bestRecordsDTO);
     }

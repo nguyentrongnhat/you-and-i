@@ -15,4 +15,18 @@ public interface FindNumberGameRepository extends JpaRepository<FindNumberGame, 
     List<FindNumberGame> findByPlayerAndEndTimeIsNotNull(MyUserDetail player);
 
     List<FindNumberGame> findByPlayerAndEndTimeIsNull(MyUserDetail player);
+
+    @Query(value = """
+        SELECT g.*
+        FROM (
+            SELECT f.*,
+                   ROW_NUMBER() OVER (
+                       PARTITION BY f.user_id
+                       ORDER BY f.completion_time ASC, f.id ASC
+                   ) rn
+            FROM find_number_games f
+        ) g
+        WHERE g.rn = 1
+        """, nativeQuery = true)
+    List<FindNumberGame> findBestGamesForRanking();
 }

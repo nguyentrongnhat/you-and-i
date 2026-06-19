@@ -3,6 +3,7 @@ package com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.service;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGame;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGameUserBestRecord;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.mapper.FindNumberGameDataMapper;
+import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.repository.FindNumberGameRepository;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.repository.FindNumberGameUserBestRecordRepository;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
 import jakarta.transaction.Transactional;
@@ -17,8 +18,17 @@ import java.util.Optional;
 public class FindNumberGameBestRecordService {
     private final FindNumberGameUserBestRecordRepository findNumberGameUserBestRecordRepository;
 
+    private final FindNumberGameRepository findNumberGameRepository;
+
+    private void migrateFindNumberGameBestRecord() {
+        List<FindNumberGame> bestRecords = findNumberGameRepository.findBestGamesForRanking();
+        bestRecords.forEach(game
+                -> this.updateBestRecordForUser(game.getPlayer(), game));
+    }
+
     @Transactional
     public void updateBestRecordForUser(MyUserDetail user, FindNumberGame game) {
+
         Optional<FindNumberGameUserBestRecord> recordOpt = findNumberGameUserBestRecordRepository.findByPlayer(user);
 
         if(recordOpt.isEmpty()) {
@@ -31,7 +41,7 @@ public class FindNumberGameBestRecordService {
         }
 
         FindNumberGameUserBestRecord existingRecord = recordOpt.get();
-        if (existingRecord.getBestCompletionTime() >= game.getCompletionTime()) return;
+        if (existingRecord.getBestCompletionTime() <= game.getCompletionTime()) return;
 
         existingRecord.setBestGame(game);
         existingRecord.setBestCompletionTime(game.getCompletionTime());
@@ -40,6 +50,7 @@ public class FindNumberGameBestRecordService {
     }
 
     public List<FindNumberGameUserBestRecord> getBestRecordRanking() {
+        this.migrateFindNumberGameBestRecord();
         return findNumberGameUserBestRecordRepository.findAll();
     }
 }
