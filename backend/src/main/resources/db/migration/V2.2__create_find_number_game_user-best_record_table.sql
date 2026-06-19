@@ -20,8 +20,8 @@ CREATE TABLE IF NOT EXISTS find_number_game_user_best_record (
     ON DELETE CASCADE
 );
 
-CREATE UNIQUE INDEX uk_best_record_user
+CREATE UNIQUE INDEX IF NOT EXISTS uk_best_record_user
 ON find_number_game_user_best_record(user_id);
 
-CREATE INDEX idx_best_record_completion_time
+CREATE INDEX IF NOT EXISTS idx_best_record_completion_time
 ON find_number_game_user_best_record(completion_time);
