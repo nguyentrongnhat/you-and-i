@@ -11,12 +11,14 @@ import { SpeedDialModule } from 'primeng/speeddial';
 import { TagModule } from 'primeng/tag';
 import { finalize, forkJoin } from 'rxjs';
 import { ROUTE_PATHS } from '../../../../../core/constants/route-paths';
-import { BUTTON_STYLE, GAME_DIFFICULTY_LEVEL } from '../../../../../core/enums';
+import { BUTTON_STYLE, GAME_DIFFICULTY_LEVEL, ROLE } from '../../../../../core/enums';
 import { FindNumberGameDTO } from '../../../../../core/interfaces/find-number-game.dto';
 import { LoaderService } from '../../../../../services/loader.service';
 import { GameHistories } from '../../components/game-histories/game-histories';
 import { FindNumberGameService } from '../../services/findnumber.service';
 import { FormsModule } from '@angular/forms';
+import { GameRanking } from '../../components/game-ranking/game-ranking';
+import { UserService } from '../../../../user-management/services/user.service';
 
 @Component({
    selector: 'app-game-start-screen',
@@ -29,7 +31,8 @@ import { FormsModule } from '@angular/forms';
       SpeedDialModule,
       GameHistories,
       ConfirmDialogModule,
-      FormsModule
+      FormsModule,
+      GameRanking
    ],
    providers: [ConfirmationService],
    templateUrl: './game-start-screen.html',
@@ -56,6 +59,10 @@ export class GameStartScreen {
 
    protected BUTTON_STYLE = BUTTON_STYLE;
 
+   protected userService = inject(UserService);
+
+   protected ROLE = ROLE;
+
 
    protected bestTime = computed<number | null>(() => {
       const histories = this.findNumberGameService.gameHistories();
@@ -77,15 +84,21 @@ export class GameStartScreen {
 
    private getData() {
       this.loaderService.show();
-      forkJoin([this.findNumberGameService.getGameHistories(), this.findNumberGameService.getUnfinishedGame()])
+      forkJoin([
+         this.findNumberGameService.getGameHistories(), 
+         this.findNumberGameService.getUnfinishedGame(),
+         this.findNumberGameService.getBestRecordsRanking()
+      ])
       .pipe(
          takeUntilDestroyed(this.destroyRef),
          finalize(() => this.loaderService.hide())
       ).subscribe({
-         next: ([histories, unfinishedGames]) => {
+         next: ([histories, unfinishedGames, bestRecords]) => {
             if (unfinishedGames.length > 0) {
                this.unfinishedGames.set(unfinishedGames[0]);
             }
+
+            console.log('bestRecords: ', bestRecords);
          }
       })
    }

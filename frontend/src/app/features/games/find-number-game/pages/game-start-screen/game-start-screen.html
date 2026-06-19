@@ -31,6 +31,12 @@
          </div>
       </div>
 
+      @if(this.userService.hasRoles([this.ROLE.ADMIN, this.ROLE.SUPER_ADMIN], 'OR')) {
+         <div class="find-number__best-records-ranking">
+            <app-game-ranking></app-game-ranking>
+         </div>
+      }
+
 </div>
 
 <p-dialog header="Lịch sử chơi" [modal]="true" [(visible)]="showGameHistories" [style]="{ width: '50rem' }"

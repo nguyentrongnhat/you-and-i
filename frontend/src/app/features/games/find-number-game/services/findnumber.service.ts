@@ -17,6 +17,8 @@ export class FindNumberGameService {
 
     public gameHistories = signal<any[]>([]);
 
+    public bestRecordsRanking = signal<any[]>([]);
+
     public currentGameInfo = signal<FindNumberGameDTO | undefined>(undefined);
 
     public shuffleNumbers: Subject<boolean> = new Subject<boolean>();
@@ -95,5 +97,14 @@ export class FindNumberGameService {
         const mm = Math.floor((seconds % 3600) / 60)
         const ss = Math.floor(((seconds % 3600) % 60) % 60)
         return `${hh.toString().padStart(2, '0')}:${mm.toString().padStart(2, '0')}:${ss.toString().padStart(2, '0')}`
+    }
+
+
+    public getBestRecordsRanking() {
+        return this.httpClient.get('/game/find-number-game/best-records-ranking').pipe(
+            tap((bestRecords: any) => {
+                this.bestRecordsRanking.set(bestRecords);
+            })
+        )
     }
 }   

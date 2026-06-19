@@ -28,9 +28,14 @@ export class UserService {
         return this.httpClientService.put('/user/update', userData);
     }
 
-    public hasRoles(requiredRoles: ROLE[]): boolean {
+    public hasRoles(requiredRoles: ROLE[], combination: 'AND' | 'OR' = 'AND'): boolean {
         const currentRoles = this.userRoles();
         if (!currentRoles) return false;
-        return requiredRoles.every(role => currentRoles.includes(role));
+
+        if (combination === 'AND') {
+            return requiredRoles.every(role => currentRoles.includes(role));
+        } else {
+            return requiredRoles.some(role => currentRoles.includes(role));
+        }
     }
 }

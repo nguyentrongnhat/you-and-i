@@ -1,5 +1,6 @@
 .find-number {
 	display: flex;
+	flex-direction: column;
 	justify-content: center;
 	align-items: center;
 	padding: 2rem 1.5rem;
@@ -49,7 +50,12 @@
 		line-height: 1.7;
 	}
 
-	
+	&__best-records-ranking {
+		width: 100%;
+		max-width: 640px;
+		margin-top: 5rem;
+	}
+
 	/* ===== Cell rows (divided, centered, symmetric) ===== */
 	&__hud,
 	&__stats {
