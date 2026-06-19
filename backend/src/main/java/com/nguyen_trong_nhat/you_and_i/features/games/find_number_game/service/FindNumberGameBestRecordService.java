@@ -50,7 +50,6 @@ public class FindNumberGameBestRecordService {
     }
 
     public List<FindNumberGameUserBestRecord> getBestRecordRanking() {
-        this.migrateFindNumberGameBestRecord();
         return findNumberGameUserBestRecordRepository.findAll();
     }
 }
