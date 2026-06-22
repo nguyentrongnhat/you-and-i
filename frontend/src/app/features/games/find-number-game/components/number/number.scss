@@ -23,7 +23,7 @@
     }
 
     &:hover {
-      box-shadow: 0 8px 18px rgba(99, 102, 241, 0.25);
+      box-shadow: 0 8px 18px rgba(173, 184, 21, 0.25);
       transform: scale(1.12) translate(-50%, -50%);
       z-index: 2;
     }
@@ -56,12 +56,12 @@
 
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.45);
+    box-shadow: 0 0 0 0 rgba(217, 241, 77, 0.45);
   }
   70% {
-    box-shadow: 0 0 0 12px rgba(99, 102, 241, 0);
+    box-shadow: 0 0 0 12px rgba(234, 100, 5, 0.93);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+    box-shadow: 0 0 0 0 rgb(238, 3, 3);
   }
 }

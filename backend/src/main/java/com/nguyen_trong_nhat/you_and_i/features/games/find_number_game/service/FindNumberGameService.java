@@ -6,10 +6,8 @@ import com.nguyen_trong_nhat.you_and_i.common.exception.UnauthorizedException;
 import com.nguyen_trong_nhat.you_and_i.common.security.util.SecurityUtils;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.dto.*;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGame;
-import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGameUserBestRecord;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.mapper.FindNumberGameDataMapper;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.repository.FindNumberGameRepository;
-import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.repository.FindNumberGameUserBestRecordRepository;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
 import com.nguyen_trong_nhat.you_and_i.features.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -112,11 +110,11 @@ public class FindNumberGameService {
 
         findNumberGameBestRecordService.updateBestRecordForUser(game.getPlayer(), game);
 
-        return findNumberGameRepository.save(game);
+        return game;
     }
 
 
-    public List<FindNumberGameHistoryResponse> getGameHistory(String userName) {
+    public List<FindNumberGameHistoryItem> getGameHistory(String userName) {
 
         Optional<MyUserDetail> playerOpt = userRepository.findByUsername(userName);
 
@@ -127,7 +125,7 @@ public class FindNumberGameService {
         List<FindNumberGame> gameFinished = findNumberGameRepository.findByPlayerAndEndTimeIsNotNull(player);
 
         return gameFinished.stream().map(game ->
-            new FindNumberGameHistoryResponse(
+            new FindNumberGameHistoryItem(
                     game.getStartTime(),
                     game.getEndTime(),
                     game.getCompletionTime(),

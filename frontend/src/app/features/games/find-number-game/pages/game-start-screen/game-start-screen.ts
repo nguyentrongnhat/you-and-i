@@ -55,7 +55,7 @@ export class GameStartScreen {
 
    protected continueOrNewGameDialogVisible = signal<boolean>(false);
 
-   protected totalGames = computed(() => this.findNumberGameService.gameHistories().length);
+   protected totalGames = computed(() => this.findNumberGameService.gameHistories().history.length);
 
    protected BUTTON_STYLE = BUTTON_STYLE;
 
@@ -66,8 +66,8 @@ export class GameStartScreen {
 
    protected bestTime = computed<number | null>(() => {
       const histories = this.findNumberGameService.gameHistories();
-      if (!histories.length) return null;
-      return Math.min(...histories.map((h) => h.completionTime));
+      if (!histories.history.length) return null;
+      return Math.min(...histories.history.map((h) => h.completionTime));
    });
 
 

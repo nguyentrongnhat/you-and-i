@@ -69,13 +69,12 @@ export class GameResultScreen {
    /** Kỷ lục tốt nhất trước khi vào ván hiện tại */
    private previousBest = signal<number | null>(null);
    /** Tổng số ván đã chơi */
-   protected totalGames = computed(() => this.findNumberGameService.gameHistories().length);
+   protected totalGames = computed(() => this.findNumberGameService.gameHistories().history.length);
 
    /** Thời gian tốt nhất (giây) từ lịch sử */
    protected bestTime = computed<number | null>(() => {
       const histories = this.findNumberGameService.gameHistories();
-      if (!histories.length) return null;
-      return Math.min(...histories.map((h) => h.completionTime));
+      return histories.bestRecord.completionTime || null;
    });
 
 

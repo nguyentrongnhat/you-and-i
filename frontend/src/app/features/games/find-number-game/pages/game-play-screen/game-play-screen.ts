@@ -73,8 +73,8 @@ export class GamePlayScreen {
 
    protected bestTime = computed<number | null>(() => {
       const histories = this.findNumberGameService.gameHistories();
-      if (!histories.length) return null;
-      return Math.min(...histories.map((h) => h.completionTime));
+      if (!histories.history.length) return null;
+      return histories.bestRecord.completionTime || null;
    });
 
    protected bestTimeDisplay = computed(() => {
@@ -82,7 +82,7 @@ export class GamePlayScreen {
       return best === null ? '--' : this.findNumberGameService.convertTimerToTimeDisplay(best);
    });
 
-   protected totalGames = computed(() => this.findNumberGameService.gameHistories().length);
+   protected totalGames = computed(() => this.findNumberGameService.gameHistories().history.length);
 
    protected actionItems = computed<any[]>(() => {
       const paused = {
@@ -363,7 +363,6 @@ export class GamePlayScreen {
 
 
    protected getHistories() {
-      if (this.findNumberGameService.gameHistories().length) return;
       this.findNumberGameService.getGameHistories()
          .pipe(
             takeUntilDestroyed(this.destroyRef),

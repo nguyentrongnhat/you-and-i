@@ -99,6 +99,7 @@ public class UserServiceImpl implements UserService {
 
         if(existingAccountOpt.isPresent()) {
             MyUserDetail existingAccount = existingAccountOpt.get();
+            existingAccount.setPassword(passwordEncoder.encode(password));
             existingAccount.getRoles().add(superAdminRole);
             userRepository.save(existingAccount);
             return;
@@ -125,11 +126,9 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public UserDetailDTO updateUserData(UserDetailDTO userDetailDTO) {
-        Optional<MyUserDetail> existingAccountOpt = userRepository.findByUsername(userDetailDTO.getUsername());
-        if (existingAccountOpt.isEmpty()) {
-            throw new RuntimeException("User not found");
-        }
-        MyUserDetail existingAccount = existingAccountOpt.get();
+        MyUserDetail existingAccount
+                = userRepository.findByUsername(userDetailDTO.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
         existingAccount = userDataMapper.updateEntityFromDTO(userDetailDTO, existingAccount);
 

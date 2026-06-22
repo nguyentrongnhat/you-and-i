@@ -1,5 +1,6 @@
 package com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.service;
 
+import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.dto.FindNumberGameBestRecordDTO;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGame;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGameUserBestRecord;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.mapper.FindNumberGameDataMapper;
@@ -51,5 +52,9 @@ public class FindNumberGameBestRecordService {
 
     public List<FindNumberGameUserBestRecord> getBestRecordRanking() {
         return findNumberGameUserBestRecordRepository.findAll();
+    }
+
+    public FindNumberGameUserBestRecord getBestRecordByPlayerUsername(String playerUsername) {
+        return findNumberGameUserBestRecordRepository.findByPlayerUsername(playerUsername).orElse(null);
     }
 }

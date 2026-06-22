@@ -11,7 +11,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @Setter
 @Getter
-public class FindNumberGameHistoryResponse {
+public class FindNumberGameHistoryItem {
     Instant startTime;
     Instant endTime;
     Integer completionTime;

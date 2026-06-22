@@ -69,10 +69,11 @@ public class FindNumberGameController {
     }
 
     @GetMapping("/history")
-    public ResponseEntity<List<FindNumberGameHistoryResponse>> getGameHistory() {
+    public ResponseEntity<FindNumberGameHistory> getGameHistory() {
         String userName = SecurityUtils.getLoggedInUsername();
-        var history = this.findNumberGameService.getGameHistory(userName);
-        return ResponseEntity.ok().body(history);
+        var history = findNumberGameService.getGameHistory(userName);
+        var bestRecord = FindNumberGameDataMapper.toBestRecordDTO(findNumberGameBestRecordService.getBestRecordByPlayerUsername(userName));
+        return ResponseEntity.ok().body(new FindNumberGameHistory(history, bestRecord));
     }
 
     @GetMapping("/best-records-ranking")
@@ -86,5 +87,18 @@ public class FindNumberGameController {
                         .toList();
 
         return ResponseEntity.ok().body(bestRecordsDTO);
+    }
+
+    @GetMapping("/best-record")
+    public ResponseEntity<FindNumberGameBestRecordDTO> getBestRecordByPlayerUsername() {
+        String playerUsername = SecurityUtils.getLoggedInUsername();
+        return ResponseEntity
+                .ok()
+                .body(
+                        FindNumberGameDataMapper
+                                .toBestRecordDTO(
+                                        findNumberGameBestRecordService
+                                                .getBestRecordByPlayerUsername(playerUsername))
+                );
     }
 }

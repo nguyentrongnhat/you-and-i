@@ -11,4 +11,5 @@ import java.util.UUID;
 @Repository
 public interface FindNumberGameUserBestRecordRepository extends JpaRepository<FindNumberGameUserBestRecord, UUID> {
     Optional<FindNumberGameUserBestRecord> findByPlayer(MyUserDetail user);
+    Optional<FindNumberGameUserBestRecord> findByPlayerUsername(String username);
 }

@@ -3,6 +3,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { FindNumberGameService } from '../../services/findnumber.service';
+import { FindNumberGameHistoryItem } from '../../../../../core/interfaces/find-number-game.dto';
 
 @Component({
 	selector: 'app-game-histories',
@@ -16,11 +17,13 @@ export class GameHistories {
 
 	protected readonly gameHistories = computed(() => this.findNumberGameService.gameHistories());
 
+
+	protected readonly history = computed<FindNumberGameHistoryItem[]>(() => this.gameHistories().history.sort((a, b) => b.endTime.localeCompare(a.endTime)));
+
 	/** Thời gian tốt nhất (giây) để đánh dấu kỷ lục */
 	protected bestTime = computed<number | null>(() => {
 		const histories = this.gameHistories();
-		if (!histories.length) return null;
-		return Math.min(...histories.map((h) => h.completionTime));
+		return histories.bestRecord.completionTime || null;
 	});
 
 }

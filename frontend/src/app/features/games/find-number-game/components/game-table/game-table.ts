@@ -27,8 +27,6 @@ export class GameTable implements OnInit, AfterViewInit {
 
 	protected platformService = inject(PlatformService);
 
-	protected ready = false;
-
 	constructor() {}
 
 	@HostListener('window:resize')
@@ -57,10 +55,6 @@ export class GameTable implements OnInit, AfterViewInit {
 	ngAfterViewInit(): void {
 		if (this.platformService.isBrowser()) {
 			this.screenWidth.set(window.innerWidth);
-
-			setTimeout(() => {
-				this.ready = true;
-			});
 		}
 	}
 

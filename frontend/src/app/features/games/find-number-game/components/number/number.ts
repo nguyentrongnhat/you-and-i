@@ -50,6 +50,10 @@ export class Number implements AfterViewInit {
   });
 
   constructor() {
+    if (this.data()) {
+      this.drawNumber(this.data() as NumberData);
+    }
+    
     effect(() => {
       const numberData = this.data() as NumberData;
       if (this.platformService.isBrowser()) {

@@ -2,7 +2,7 @@ import { computed, inject, Injectable, signal } from "@angular/core";
 import { HttpClientService } from "../../../../services/http-client.service";
 import { catchError, Observable, of, Subject, tap, throwError } from "rxjs";
 import { GAME_DIFFICULTY_LEVEL, MESSAGE_TYPE } from "../../../../core/enums";
-import { FindNumberGameDTO } from "../../../../core/interfaces/find-number-game.dto";
+import { FindNumberGameBestRecordDTO, FindNumberGameDTO, FindNumberGameHistory } from "../../../../core/interfaces/find-number-game.dto";
 import { ToastService } from "../../../../services/toast.service";
 
 @Injectable({
@@ -15,9 +15,9 @@ export class FindNumberGameService {
 
     public curentTargetNumber = computed(() => this.currentSeclectedNumber() + 1);
 
-    public gameHistories = signal<any[]>([]);
+    public gameHistories = signal<FindNumberGameHistory>({ history: [], bestRecord: {} as FindNumberGameBestRecordDTO });
 
-    public bestRecordsRanking = signal<any[]>([]);
+    public bestRecordsRanking = signal<FindNumberGameBestRecordDTO[]>([]);
 
     public currentGameInfo = signal<FindNumberGameDTO | undefined>(undefined);
 
