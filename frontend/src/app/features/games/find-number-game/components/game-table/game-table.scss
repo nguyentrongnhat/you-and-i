@@ -16,7 +16,7 @@
         width: 100%;
         margin: auto;
         display: grid;
-        gap: clamp(16px, 2.2vw, 30px);
+        gap: clamp(5px, 2.2vw, 30px);
 
         grid-template-columns: repeat(10, 1fr);
 
@@ -28,12 +28,12 @@
 
         /* Small phones – tighten so the 5 columns never overflow */
         @media (max-width: 575px) {
-            gap: clamp(8px, 2.4vw, 14px);
+            gap: clamp(5px, 2.4vw, 14px);
         }
 
         /* Very small phones */
         @media (max-width: 360px) {
-            gap: 8px;
+            gap: 5px;
         }
     }
 }

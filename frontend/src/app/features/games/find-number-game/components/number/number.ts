@@ -74,7 +74,7 @@ export class Number implements AfterViewInit {
     return {
       left: this.data()?.tx + '%',
       top: this.data()?.ty + '%',
-      transform: `translate(-50%, -50%) rotate(${this.data()?.rotate}deg)`
+      transform: `translate(-15%, -15%) rotate(${this.data()?.rotate}deg)`
     };
   }
 
