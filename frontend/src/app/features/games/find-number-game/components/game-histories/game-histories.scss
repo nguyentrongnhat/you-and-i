@@ -37,10 +37,18 @@
   }
 
   &__time {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    border-radius: 8px;
+    background: var(--p-content-hover-background, #f3f4f6);
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     font-weight: 600;
     color: var(--p-text-color, #111827);
     margin-right: 0.5rem;
+  }
+
+  ::ng-deep .p-tag {
+    animation: record-glow 2.4s ease-in-out infinite;
   }
 
   /* ---------- Empty ---------- */
@@ -187,4 +195,15 @@
 /* Ensure the rows-per-page overlay shows all options (not clipped/short) */
 :host ::ng-deep .p-select-overlay .p-select-list-container {
   max-height: 16rem;
+}
+
+@keyframes record-glow {
+  0%, 100% { filter: drop-shadow(0 0 0 rgba(245, 158, 11, 0)); }
+  50% { filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.6)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .histories ::ng-deep .p-tag {
+    animation: none;
+  }
 }

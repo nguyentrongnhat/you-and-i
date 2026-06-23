@@ -1,4 +1,12 @@
 <div class="histories">
+  <div class="histories__heading">
+    <span class="histories__heading-icon"><i class="pi pi-trophy"></i></span>
+    <div class="histories__heading-text">
+      <h3 class="histories__heading-title">Bảng xếp hạng</h3>
+      <span class="histories__heading-sub">Những kỷ lục nhanh nhất</span>
+    </div>
+  </div>
+
   <div class="histories__card">
     <p-table
       [value]="bestRecords()"
@@ -19,10 +27,28 @@
         </tr>
       </ng-template>
       <ng-template #body let-history let-i="rowIndex">
-        <tr class="histories__row">
-          <td class="histories__col-center histories__index">{{ i + 1 }}</td>
+        <tr class="histories__row" [class.histories__row--podium]="i < 3">
+          <td class="histories__col-center">
+            <span
+              class="histories__rank"
+              [class.histories__rank--gold]="i === 0"
+              [class.histories__rank--silver]="i === 1"
+              [class.histories__rank--bronze]="i === 2"
+            >
+              @if (i < 3) {
+                <i class="pi pi-crown"></i>
+              } @else {
+                {{ i + 1 }}
+              }
+            </span>
+          </td>
 
-          <td>{{ history.playerDisplayname }}</td>
+          <td>
+            <div class="histories__player">
+              <span class="histories__avatar">{{ history.playerDisplayname | slice:0:1 }}</span>
+              <span class="histories__player-name">{{ history.playerDisplayname }}</span>
+            </div>
+          </td>
           <td>{{ history.archivedTime | date:'dd/MM/yyyy - HH:mm' }}</td>
           <td>
             <span class="histories__time">

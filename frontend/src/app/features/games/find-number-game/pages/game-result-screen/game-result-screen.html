@@ -1,7 +1,14 @@
 <div class="find-number" animate.enter="enter-animation">
+   <div class="find-number__confetti" aria-hidden="true">
+      @for (c of confettiPieces; track c) {
+         <span class="find-number__confetti-piece"></span>
+      }
+   </div>
+
    <div class="find-number__column">
       <span class="find-number__badge find-number__badge--success">
          <i class="pi pi-trophy"></i>
+         <span class="find-number__badge-ring"></span>
       </span>
       <h2 class="find-number__title">Hoàn thành!</h2>
       <p class="find-number__subtitle">Bạn đã tìm hết các số.</p>
@@ -17,10 +24,12 @@
 
       <div class="find-number__stats">
          <div class="find-number__cell">
+            <i class="find-number__cell-icon pi pi-stopwatch"></i>
             <span class="find-number__cell-value">{{ bestTimeDisplay() }}</span>
             <span class="find-number__cell-label">Kỷ lục</span>
          </div>
          <div class="find-number__cell">
+            <i class="find-number__cell-icon pi pi-flag"></i>
             <span class="find-number__cell-value">{{ totalGames() }}</span>
             <span class="find-number__cell-label">Số ván</span>
          </div>

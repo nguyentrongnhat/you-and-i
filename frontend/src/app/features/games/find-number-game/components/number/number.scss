@@ -11,42 +11,52 @@
     place-items: center;
 
     background: var(--p-content-background, #ffffff);
+    border: 1px solid var(--p-content-border-color, #e5e7eb);
     border-radius: 50%;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 2px 6px rgba(16, 24, 40, 0.08);
     color: var(--p-text-color, #111827);
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease,
-    background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+    transition: transform 0.18s cubic-bezier(0.34, 1.56, 0.64, 1),
+      box-shadow 0.2s ease, background-color 0.2s ease,
+      border-color 0.2s ease, opacity 0.25s ease;
+    will-change: transform;
 
     canvas {
       pointer-events: none;
     }
 
     &:hover {
-      box-shadow: 0 8px 18px rgba(173, 184, 21, 0.25);
-      transform: scale(1.12) translate(-50%, -50%);
+      border-color: var(--p-primary-color, #6366f1);
+      box-shadow: 0 10px 22px rgba(99, 102, 241, 0.3);
+      transform: scale(1.16) translate(-43%, -43%);
       z-index: 2;
     }
-  }
 
-  /* Đã tìm thấy – làm mờ, lùi ra sau */
-  .selected {
-    background: var(--p-content-hover-background, #f3f4f6);
-    box-shadow: none;
-    opacity: 0.35;
-    cursor: default;
-
-    &:hover {
-      transform: translate(-50%, -50%);
-      box-shadow: none;
+    &:active {
+      transform: scale(0.96) translate(-52%, -52%);
     }
   }
 
-  /* Mục tiêu kế tiếp – nổi bật theo theme */
+  /* Đã tìm thấy – làm mờ, lùi ra sau, có hiệu ứng pop */
+  .selected {
+    background: var(--p-content-hover-background, #f3f4f6);
+    border-color: transparent;
+    box-shadow: none;
+    opacity: 0.3;
+    cursor: default;
+    animation: found-pop 0.4s ease;
+
+    &:hover {
+      box-shadow: none;
+      border-color: transparent;
+    }
+  }
+
+  /* Mục tiêu kế tiếp – nổi bật theo theme (chỉ super admin) */
   .indicate {
     background: var(--p-highlight-background, #eef2ff);
-    box-shadow: 0 0 0 3px rgba(241, 1, 1, 0.801);
-    animation: pulse 1.4s infinite;
+    border-color: var(--p-primary-color, #6366f1);
+    animation: target-pulse 1.4s ease-in-out infinite;
   }
 
   .target {
@@ -54,14 +64,20 @@
   }
 }
 
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(217, 241, 77, 0.45);
-  }
-  70% {
-    box-shadow: 0 0 0 12px rgba(234, 100, 5, 0.93);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgb(238, 3, 3);
+@keyframes found-pop {
+  0% { opacity: 0.9; box-shadow: 0 0 14px 2px rgba(34, 197, 94, 0.55); }
+  100% { opacity: 0.3; box-shadow: none; }
+}
+
+@keyframes target-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.5); }
+  70% { box-shadow: 0 0 0 12px rgba(99, 102, 241, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grid-item .indicate,
+  .grid-item .selected {
+    animation: none !important;
   }
 }

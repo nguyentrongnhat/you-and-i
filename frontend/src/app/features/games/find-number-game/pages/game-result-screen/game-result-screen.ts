@@ -43,6 +43,9 @@ export class GameResultScreen {
 
    protected readonly TOTAL_NUMBERS = 3;
 
+   /** Decorative confetti pieces for the celebration screen (display only) */
+   protected readonly confettiPieces = Array.from({ length: 24 });
+
    protected visible = signal<boolean>(false);
 
    private readonly findNumberGameService = inject(FindNumberGameService);

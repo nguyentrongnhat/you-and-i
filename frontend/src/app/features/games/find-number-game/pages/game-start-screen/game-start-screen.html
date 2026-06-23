@@ -1,7 +1,14 @@
 <div class="find-number" animate.enter="enter-animation">
+      <div class="find-number__orbs" aria-hidden="true">
+         <span class="find-number__orb find-number__orb--1"></span>
+         <span class="find-number__orb find-number__orb--2"></span>
+         <span class="find-number__orb find-number__orb--3"></span>
+      </div>
+
       <div class="find-number__column">
          <span class="find-number__badge">
             <i class="pi pi-search"></i>
+            <span class="find-number__badge-ring"></span>
          </span>
          <h1 class="find-number__title">Tìm Số</h1>
          <p class="find-number__subtitle">
@@ -12,10 +19,12 @@
 
          <div class="find-number__stats">
             <div class="find-number__cell">
+               <i class="find-number__cell-icon pi pi-stopwatch"></i>
                <span class="find-number__cell-value">{{ bestTimeDisplay() }}</span>
                <span class="find-number__cell-label">Kỷ lục</span>
             </div>
             <div class="find-number__cell">
+               <i class="find-number__cell-icon pi pi-flag"></i>
                <span class="find-number__cell-value">{{ totalGames() }}</span>
                <span class="find-number__cell-label">Số ván</span>
             </div>
