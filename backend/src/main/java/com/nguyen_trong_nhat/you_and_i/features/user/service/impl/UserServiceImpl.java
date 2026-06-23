@@ -18,6 +18,8 @@ import com.nguyen_trong_nhat.you_and_i.features.user.repository.UserRepository;
 import com.nguyen_trong_nhat.you_and_i.features.user.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +37,7 @@ public class UserServiceImpl implements UserService {
     private final UserDataMapper userDataMapper;
 
     @Override
+    @CacheEvict(value = "userDetails", key = "#username.toLowerCase()")
     public MyUserDetail createUserWithUsernameAndPassword(String username, String password) {
         Optional<Role> defaultRoleOpt = roleRepository.findByName(Constants.ROLE_USER);
 
@@ -43,7 +46,7 @@ public class UserServiceImpl implements UserService {
         }
 
         MyUserDetail user = new MyUserDetail();
-        user.setUsername(username);
+        user.setUsername(username.toLowerCase());
         user.setPassword(passwordEncoder.encode(password));
         user.setRoles(Set.of(defaultRoleOpt.get()));
         user.setEnabled(false);
@@ -125,6 +128,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
+    @CacheEvict(value = "userDetails", key = "#userDetailDTO.username")
     public UserDetailDTO updateUserData(UserDetailDTO userDetailDTO) {
         MyUserDetail existingAccount
                 = userRepository.findByUsername(userDetailDTO.getUsername())
