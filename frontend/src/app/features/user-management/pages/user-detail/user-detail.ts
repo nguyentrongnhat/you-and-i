@@ -24,6 +24,7 @@ import { UserService } from '../../services/user.service';
 import { finalize } from 'rxjs';
 import { LoaderService } from '../../../../services/loader.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { RoleService } from '../../services/role.service';
 
 export interface UserProfileFormModel {
 	fullName: string;
@@ -77,6 +78,7 @@ export class UserDetail implements OnInit {
 	id = input.required<string>();
 
 	private readonly userService = inject(UserService);
+	private readonly roleService = inject(RoleService);
 	private readonly toastService = inject(ToastService);
 	private readonly authService = inject(AuthService);
 	private readonly destroyRef = inject(DestroyRef);
@@ -120,6 +122,11 @@ export class UserDetail implements OnInit {
 
 	ngOnInit(): void {
 		this.getUserDetailsById(this.id());
+		this.roleService.getAllRoles().pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.loaderService.hide())).subscribe({
+			next: (roles) => {
+				console.log('Roles fetched:', roles); // Roles are fetched and cached in the service, no further action needed here
+			}
+		});
 	}
 
 	private getUserDetailsById(id: string): void {
