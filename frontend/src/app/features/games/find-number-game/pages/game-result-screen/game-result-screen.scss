@@ -66,16 +66,20 @@
 		color: #fff;
 		font-size: 2.1rem;
 		box-shadow: 0 14px 34px rgba(99, 102, 241, 0.4);
-		animation: trophy-pop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both,
-			badge-bob 4s ease-in-out 0.7s infinite;
+		animation: badge-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both,
+			badge-bob 4s ease-in-out 0.6s infinite;
 
 		i {
-			animation: trophy-shine 2.6s ease-in-out infinite;
+			animation: badge-icon 3s ease-in-out infinite;
 		}
 
 		&--success {
 			background: linear-gradient(135deg, #f59e0b, #f97316);
 			box-shadow: 0 14px 34px rgba(245, 158, 11, 0.4);
+
+			.find-number__badge-ring {
+				border-color: rgba(245, 158, 11, 0.55);
+			}
 		}
 	}
 
@@ -83,7 +87,7 @@
 		position: absolute;
 		inset: -6px;
 		border-radius: inherit;
-		border: 2px solid rgba(245, 158, 11, 0.55);
+		border: 2px solid rgba(129, 140, 248, 0.5);
 		animation: ring-pulse 2.4s ease-out infinite;
 	}
 
@@ -92,8 +96,12 @@
 		font-size: 2.1rem;
 		font-weight: 800;
 		letter-spacing: -0.01em;
-		color: var(--p-text-color, #111827);
-		animation: rise-in 0.5s ease 0.15s both;
+		background: linear-gradient(120deg, #6366f1, #a855f7, #ec4899);
+		background-size: 200% auto;
+		-webkit-background-clip: text;
+		background-clip: text;
+		-webkit-text-fill-color: transparent;
+		animation: rise-in 0.5s ease 0.15s both, gradient-shift 6s linear infinite;
 	}
 
 	&__subtitle {
@@ -205,9 +213,15 @@
 		margin-top: 0.75rem;
 		animation: rise-in 0.5s ease 0.4s both;
 
+		p-button {
+			flex: 1;
+		}
+
 		::ng-deep .p-button {
+			width: 100%;
 			border-radius: 12px;
-			transition: transform 0.18s ease, box-shadow 0.25s ease;
+			transition: transform 0.18s ease, box-shadow 0.25s ease,
+				background-color 0.2s ease;
 
 			&:hover {
 				transform: translateY(-2px);
@@ -215,6 +229,15 @@
 
 			&:active {
 				transform: translateY(0) scale(0.97);
+			}
+		}
+
+		::ng-deep .p-button:not(.p-button-text) {
+			font-weight: 700;
+			box-shadow: 0 8px 20px rgba(17, 24, 39, 0.18);
+
+			&:hover {
+				box-shadow: 0 12px 26px rgba(17, 24, 39, 0.28);
 			}
 		}
 	}
@@ -231,12 +254,12 @@
 	100% { opacity: 0; transform: translateY(105vh) rotate(720deg); }
 }
 
-@keyframes trophy-pop {
-	0% { opacity: 0; transform: scale(0.3) rotate(-18deg); }
+@keyframes badge-pop {
+	0% { opacity: 0; transform: scale(0.4) rotate(-12deg); }
 	100% { opacity: 1; transform: scale(1) rotate(0); }
 }
 
-@keyframes trophy-shine {
+@keyframes badge-icon {
 	0%, 100% { transform: scale(1) rotate(0); }
 	50% { transform: scale(1.12) rotate(6deg); }
 }

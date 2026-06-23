@@ -82,12 +82,16 @@
 			badge-bob 4s ease-in-out 0.6s infinite;
 
 		i {
-			animation: icon-wiggle 5s ease-in-out infinite;
+			animation: badge-icon 3s ease-in-out infinite;
 		}
 
 		&--success {
 			background: linear-gradient(135deg, #f59e0b, #f97316);
 			box-shadow: 0 14px 34px rgba(245, 158, 11, 0.4);
+
+			.find-number__badge-ring {
+				border-color: rgba(245, 158, 11, 0.55);
+			}
 		}
 	}
 
@@ -109,7 +113,7 @@
 		-webkit-background-clip: text;
 		background-clip: text;
 		-webkit-text-fill-color: transparent;
-		animation: gradient-shift 6s linear infinite;
+		animation: rise-in 0.5s ease 0.15s both, gradient-shift 6s linear infinite;
 	}
 
 	&__subtitle {
@@ -117,6 +121,7 @@
 		max-width: 30rem;
 		color: var(--p-text-muted-color, #6b7280);
 		line-height: 1.7;
+		animation: rise-in 0.5s ease 0.2s both;
 	}
 
 	&__best-records-ranking {
@@ -136,6 +141,7 @@
 		justify-content: center;
 		align-items: stretch;
 		gap: 1rem;
+		animation: rise-in 0.5s ease 0.34s both;
 	}
 
 	&__cell {
@@ -203,24 +209,20 @@
 		justify-content: space-between;
 		gap: 0.75rem;
 		margin-top: 0.75rem;
+		animation: rise-in 0.5s ease 0.4s both;
 
-		.start-button,
-		.history-button {
+		p-button {
 			flex: 1;
-			display: flex;
-			justify-content: center;
 		}
 
-		.start-button ::ng-deep .p-button {
+		::ng-deep .p-button {
 			width: 100%;
 			border-radius: 12px;
-			font-weight: 700;
-			transition: transform 0.18s ease, box-shadow 0.25s ease;
-			box-shadow: 0 8px 20px rgba(17, 24, 39, 0.18);
+			transition: transform 0.18s ease, box-shadow 0.25s ease,
+				background-color 0.2s ease;
 
 			&:hover {
 				transform: translateY(-2px);
-				box-shadow: 0 12px 26px rgba(17, 24, 39, 0.28);
 			}
 
 			&:active {
@@ -228,13 +230,12 @@
 			}
 		}
 
-		.history-button ::ng-deep .p-button {
-			width: 100%;
-			border-radius: 12px;
-			transition: transform 0.18s ease, background-color 0.2s ease;
+		::ng-deep .p-button:not(.p-button-text) {
+			font-weight: 700;
+			box-shadow: 0 8px 20px rgba(17, 24, 39, 0.18);
 
 			&:hover {
-				transform: translateY(-2px);
+				box-shadow: 0 12px 26px rgba(17, 24, 39, 0.28);
 			}
 		}
 	}
@@ -256,11 +257,9 @@
 	50% { transform: translateY(-8px); }
 }
 
-@keyframes icon-wiggle {
-	0%, 92%, 100% { transform: rotate(0); }
-	94% { transform: rotate(-14deg); }
-	96% { transform: rotate(12deg); }
-	98% { transform: rotate(-6deg); }
+@keyframes badge-icon {
+	0%, 100% { transform: scale(1) rotate(0); }
+	50% { transform: scale(1.12) rotate(6deg); }
 }
 
 @keyframes ring-pulse {
@@ -273,7 +272,7 @@
 }
 
 @keyframes rise-in {
-	from { opacity: 0; transform: translateY(24px); }
+	from { opacity: 0; transform: translateY(18px); }
 	to { opacity: 1; transform: translateY(0); }
 }
 

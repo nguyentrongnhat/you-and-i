@@ -163,16 +163,8 @@ All new tables MUST follow this standard so the app stays visually consistent.
 - Import shared breakpoints in SCSS: `@use "variables" as v;` and use
   `v.$breakpoint-xs` etc. for responsive rules.
 
-## 15.2 Card wrapper
-- Wrap every `<p-table>` in a card container `&__card`:
-  - `border-radius: 16px`
-  - `border: 1px solid var(--p-content-border-color, #e5e7eb)`
-  - subtle two-layer shadow:
-    `0 1px 2px rgba(16,24,40,0.04), 0 1px 3px rgba(16,24,40,0.06)`
-  - DO NOT set `overflow: hidden` on the card — it clips the rows-per-page
-    dropdown overlay. Round corners on the header cells and paginator instead.
 
-## 15.3 Table styling (via `::ng-deep` scoped by a table styleClass)
+## 15.2 Table styling (via `::ng-deep` scoped by a table styleClass)
 - Give the table a unique class (e.g. `styleClass="feature__table p-datatable-sm"`)
   and scope deep styles as `:host ::ng-deep .feature__table { ... }`.
 - Header `th`: muted uppercase labels —
@@ -185,7 +177,7 @@ All new tables MUST follow this standard so the app stays visually consistent.
 - Clickable rows use a `&__row` class with `cursor: pointer` and a hover
   background `var(--p-content-hover-background)`.
 
-## 15.4 Pagination (MANDATORY look)
+## 15.3 Pagination (MANDATORY look)
 - Scope under the table class: `:host ::ng-deep .feature__table .p-paginator`.
 - The paginator is a full-width row: `display: flex; width: 100%; flex-wrap: nowrap`.
   Spread items evenly — current-page report on the left (`margin-right: auto`),
@@ -202,21 +194,21 @@ All new tables MUST follow this standard so the app stays visually consistent.
   with `[showCurrentPageReport]="true"`.
 - Only wrap + center the items as a fallback at `v.$breakpoint-xs`.
 
-## 15.5 User / entity cells
+## 15.4 User / entity cells
 - Show an avatar + 2-line info (name + muted `@username` / secondary line).
 - Avatar fallback uses initials with `background: var(--p-primary-color)` and a
   white ring; truncate long text with ellipsis.
 
-## 15.6 Empty state
+## 15.5 Empty state
 - Use `#emptymessage` with a centered block: large muted `pi` icon + short text,
   generous padding (~2.75rem). Class `&__empty`.
 
-## 15.7 Responsiveness
+## 15.6 Responsiveness
 - Hide non-essential columns on small mobile via `PlatformService.isSmallMobileDevice()`
   (never via raw `window` checks).
 - Keep the same column-hiding pattern in both header and body templates, and update
   the empty `colspan` accordingly.
 
-## 15.8 Reference implementations
+## 15.7 Reference implementations
 - `features/user-management/pages/user-management` (full pattern)
 - `features/games/find-number-game/components/game-histories` (compact pattern)

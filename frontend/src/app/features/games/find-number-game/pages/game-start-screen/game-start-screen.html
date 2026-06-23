@@ -31,12 +31,8 @@
          </div>
 
          <div class="find-number__actions">
-            <div class="start-button">
-               <p-button label="Bắt đầu" icon="pi pi-play" severity="contrast" (onClick)="startGame($event)" />
-            </div>
-            <div class="history-button">
-               <p-button label="Lịch sử" icon="pi pi-history" [text]="true" (onClick)="showGameHistoriesDialog()" />
-            </div>
+            <p-button label="Bắt đầu" icon="pi pi-play" severity="contrast" (onClick)="startGame($event)" />
+            <p-button label="Lịch sử" icon="pi pi-history" [text]="true" (onClick)="showGameHistoriesDialog()" />
          </div>
       </div>
 
