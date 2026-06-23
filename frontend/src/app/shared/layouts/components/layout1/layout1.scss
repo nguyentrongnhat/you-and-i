@@ -138,7 +138,7 @@
 
     .side-menu-and-content {
         display: flex;
-        padding-bottom: calc(85px + env(safe-area-inset-bottom, 0px));
+        min-height: calc(85px + env(safe-area-inset-bottom, 0px));
 
         .mini-side-menu {
             display: none;
