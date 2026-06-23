@@ -12,9 +12,9 @@ import java.util.UUID;
 
 @Repository
 public interface FindNumberGameRepository extends JpaRepository<FindNumberGame, UUID> {
-    List<FindNumberGame> findByPlayerAndEndTimeIsNotNull(MyUserDetail player);
+    List<FindNumberGame> findByPlayerUsernameAndEndTimeIsNotNull(String playerUsername);
 
-    List<FindNumberGame> findByPlayerAndEndTimeIsNull(MyUserDetail player);
+    List<FindNumberGame> findByPlayerUsernameAndEndTimeIsNull(String playerUsername);
 
     @Query(value = """
         SELECT g.*

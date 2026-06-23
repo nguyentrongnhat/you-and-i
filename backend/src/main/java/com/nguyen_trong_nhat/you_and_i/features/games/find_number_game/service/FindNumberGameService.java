@@ -25,15 +25,15 @@ public class FindNumberGameService {
     private final FindNumberGameBestRecordService findNumberGameBestRecordService;
     private final UserRepository userRepository;
 
-    public FindNumberGame createNewGame(String userName, CreateNewFindNumberGameRequest gameInfo) {
+    public FindNumberGame createNewGame(String username, CreateNewFindNumberGameRequest gameInfo) {
 
-        Optional<MyUserDetail> playerOpt = userRepository.findByUsername(userName);
+        Optional<MyUserDetail> playerOpt = userRepository.findByUsername(username);
 
         if(playerOpt.isEmpty()) throw new BadRequestException("");
 
         MyUserDetail player = playerOpt.get();
 
-        var gamesAreNotFinish = findNumberGameRepository.findByPlayerAndEndTimeIsNull(player);
+        var gamesAreNotFinish = findNumberGameRepository.findByPlayerUsernameAndEndTimeIsNull(username);
 
         findNumberGameRepository.deleteAll(gamesAreNotFinish);
 
@@ -116,13 +116,7 @@ public class FindNumberGameService {
 
     public List<FindNumberGameHistoryItem> getGameHistory(String userName) {
 
-        Optional<MyUserDetail> playerOpt = userRepository.findByUsername(userName);
-
-        if(playerOpt.isEmpty()) throw new BadRequestException("User not found!");
-
-        MyUserDetail player = playerOpt.get();
-
-        List<FindNumberGame> gameFinished = findNumberGameRepository.findByPlayerAndEndTimeIsNotNull(player);
+        List<FindNumberGame> gameFinished = findNumberGameRepository.findByPlayerUsernameAndEndTimeIsNotNull(userName);
 
         return gameFinished.stream().map(game ->
             new FindNumberGameHistoryItem(
@@ -137,7 +131,6 @@ public class FindNumberGameService {
 
     public List<FindNumberGameDTO> getUnfinishedGamesForCurrentUser() {
         String username = SecurityUtils.getLoggedInUsername();
-        MyUserDetail user = userRepository.findByUsername(username).orElseThrow(() -> new BadRequestException("User not found!"));
-        return findNumberGameRepository.findByPlayerAndEndTimeIsNull(user).stream().map(FindNumberGameDataMapper::toDTO).toList();
+        return findNumberGameRepository.findByPlayerUsernameAndEndTimeIsNull(username).stream().map(FindNumberGameDataMapper::toDTO).toList();
     }
 }

@@ -47,8 +47,6 @@ export class GamePlayScreen {
 
    protected GAME_STATUSES = GAME_STATUSES;
 
-   protected lastFinishTime = signal<number>(0);
-
    protected TOTAL_NUMBERS = 100;
 
    protected currentGameInfo: FindNumberGameDTO | undefined = undefined;
@@ -214,10 +212,12 @@ export class GamePlayScreen {
 
    private loadGameFromLastUpdateInDB() {
       if (this.currentGameInfo!.lastSelectedNumber === this.TOTAL_NUMBERS) {
-         this.timer = Number(this.currentGameInfo!.elapsedTime || 0);
+         // The game is already finished but acesstoken and refresh token are expired, so after login again we can directly finish the game and go to the result screen.
+         this.timer = this.currentGameInfo!.elapsedTime || 0;
          this.finishGame();
          return;
       }
+
       this.gameCurrentStatus.set(GAME_STATUSES.PLAYING);
       this.findNumberGameService.currentSeclectedNumber.set(this.currentGameInfo!.lastSelectedNumber || 0);
 
@@ -267,9 +267,17 @@ export class GamePlayScreen {
 
 
    protected finishGame(): void {
+      // Pre-set game info to make sure the game status is updated to DONE in case the request 
+      // to finish game api failed due to access token expired or other error
+      // , we can still navigate user to result screen and display the correct game status and completion time.
+      this.currentGameInfo!.gameStatus = GAME_STATUSES.PLAYING;
+      this.currentGameInfo!.lastSelectedNumber = this.TOTAL_NUMBERS;
+      this.currentGameInfo!.completionTime = this.timer;
+      this.findNumberGameService.currentGameInfo.set(this.currentGameInfo);
+      
+
       this.stopTimer();
       this.loaderService.show();
-      this.lastFinishTime.set(this.timer);
       this.findNumberGameService.finishGame(this.gameId()!, this.timer)
          .pipe(takeUntilDestroyed(this.destroyRef))
          .subscribe({
@@ -286,10 +294,6 @@ export class GamePlayScreen {
                   return;
                }
                else if(err.error.status === 401 || err.error.status === 403) {
-                  this.currentGameInfo!.gameStatus = GAME_STATUSES.PLAYING;
-                  this.currentGameInfo!.lastSelectedNumber = this.TOTAL_NUMBERS;
-                  this.currentGameInfo!.completionTime = this.timer;
-                  this.findNumberGameService.currentGameInfo.set(this.currentGameInfo);
                   this.authService.refreshToken();
                }
                else {
