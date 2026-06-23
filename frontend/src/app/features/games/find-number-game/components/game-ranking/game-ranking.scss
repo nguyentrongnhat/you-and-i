@@ -296,6 +296,41 @@
   50% { transform: translateY(-4px) rotate(-6deg); }
 }
 
+/* ===== Mobile: keep the table within the viewport ===== */
+@media (max-width: v.$breakpoint-xs) {
+  :host ::ng-deep .histories__heading-icon {
+    width: 2.4rem;
+    height: 2.4rem;
+    font-size: 1.1rem;
+  }
+
+  :host ::ng-deep .histories__heading-title {
+    font-size: 1.05rem;
+  }
+
+  :host ::ng-deep .histories__table {
+    /* override the inline min-width so it can shrink to fit small screens */
+    .p-datatable-table {
+      min-width: 0 !important;
+    }
+
+    /* Hide the long Date column – not essential on a ranking list */
+    .p-datatable-thead > tr > th:nth-child(3),
+    .p-datatable-tbody > tr > td:nth-child(3) {
+      display: none;
+    }
+
+    .p-datatable-thead > tr > th,
+    .p-datatable-tbody > tr > td {
+      padding: 0.55rem 0.5rem;
+    }
+
+    .histories__player-name {
+      max-width: 7.5rem;
+    }
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .histories__heading-icon {
     animation: none;

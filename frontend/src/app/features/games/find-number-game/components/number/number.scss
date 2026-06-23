@@ -23,6 +23,8 @@
 
     canvas {
       pointer-events: none;
+      max-width: 100%;
+      max-height: 100%;
     }
 
     &:hover {
@@ -73,6 +75,21 @@
   0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.5); }
   70% { box-shadow: 0 0 0 12px rgba(99, 102, 241, 0); }
   100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+}
+
+/* ===== Mobile: scale tiles down so they fit the grid cells ===== */
+@media (max-width: 575px) {
+  .grid-item .item {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (max-width: 360px) {
+  .grid-item .item {
+    width: 40px;
+    height: 40px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
