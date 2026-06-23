@@ -47,7 +47,7 @@ export class GamePlayScreen {
 
    protected GAME_STATUSES = GAME_STATUSES;
 
-   protected TOTAL_NUMBERS = 100;
+   protected TOTAL_NUMBERS = 3;
 
    protected currentGameInfo: FindNumberGameDTO | undefined = undefined;
 
