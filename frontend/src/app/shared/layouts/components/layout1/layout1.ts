@@ -59,7 +59,7 @@ export class Layout1 implements OnInit {
     /** Danh sách ngôn ngữ hỗ trợ */
     protected readonly languages: AppLanguage[] = [
         { code: 'vi', label: 'Tiếng Việt', flag: '🇻🇳' },
-        { code: 'en', label: 'English', flag: 'EN' },
+        { code: 'en', label: 'English', flag: '🇬🇧' },
     ];
 
     protected currentLanguageCode = signal<AppLanguageCode>('vi');
