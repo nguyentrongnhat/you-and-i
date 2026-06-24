@@ -1,153 +1,230 @@
 <div class="user-detail">
   <!-- Loading skeleton -->
   @if (loaderService.isLoading()) {
-  <div class="user-detail__profile">
-    <p-skeleton shape="circle" size="6rem" />
-    <p-skeleton width="12rem" height="1.5rem" styleClass="mt-3" />
-    <p-skeleton width="8rem" height="1rem" styleClass="mt-2" />
-  </div>
-  <div class="user-detail__form">
+  <section class="user-detail__card user-detail__hero">
+    <p-skeleton shape="circle" size="5rem" />
+    <div class="user-detail__hero-skeleton">
+      <p-skeleton width="11rem" height="1.4rem" />
+      <p-skeleton width="7rem" height="0.9rem" />
+      <p-skeleton width="14rem" height="1.6rem" />
+    </div>
+  </section>
+  <section class="user-detail__card user-detail__panel">
     @for (row of [1,2,3,4,5,6]; track row) {
     <div class="user-detail__skeleton-row">
-      <p-skeleton width="7rem" height="1rem" />
-      <p-skeleton width="100%" height="2.5rem" />
+      <p-skeleton width="6rem" height="0.85rem" />
+      <p-skeleton width="100%" height="2.6rem" />
     </div>
     }
-  </div>
+  </section>
   }
 
   <!-- Not found / error -->
   @else if (notFound()) {
-  <div class="user-detail__empty">
+  <section class="user-detail__card user-detail__empty">
     <i class="pi pi-user-minus user-detail__empty-icon"></i>
     <h3>Không tìm thấy người dùng</h3>
     <p>Người dùng bạn đang tìm không tồn tại hoặc đã bị xoá.</p>
     <p-button label="Thử lại" icon="pi pi-refresh" (onClick)="reload()" />
-  </div>
+  </section>
   }
 
   <!-- Content -->
   @else if (user(); as u) {
-  <!-- Profile header -->
-  <div class="user-detail__profile">
+  <!-- Hero / identity card -->
+  <section class="user-detail__card user-detail__hero">
     @if (profile()?.avatarUrl) {
     <p-avatar
       [image]="profile()!.avatarUrl"
-      size="xlarge"
       shape="circle"
       styleClass="user-detail__avatar"
     />
     } @else {
     <p-avatar
       [label]="initials()"
-      size="xlarge"
       shape="circle"
       styleClass="user-detail__avatar user-detail__avatar--text"
     />
     }
 
-    <h2 class="user-detail__name">
-      {{ profile()?.fullName || profile()?.displayName || u.username }}
-    </h2>
-    <span class="user-detail__username">&#64;{{ u.username }}</span>
+    <div class="user-detail__hero-info">
+      <h2 class="user-detail__name">
+        {{ profile()?.fullName || profile()?.displayName || u.username }}
+      </h2>
+      <span class="user-detail__username">&#64;{{ u.username }}</span>
 
-    <div class="user-detail__status">
-      <p-tag
-        [value]="u.enabled ? 'Đang hoạt động' : 'Đã khoá'"
-        [severity]="u.enabled ? 'success' : 'danger'"
-        [icon]="u.enabled ? 'pi pi-check-circle' : 'pi pi-ban'"
-      />
-      <p-tag
-        [value]="u.emailVerified ? 'Đã xác thực' : 'Chưa xác thực'"
-        [severity]="u.emailVerified ? 'success' : 'warn'"
-        [icon]="u.emailVerified ? 'pi pi-verified' : 'pi pi-exclamation-circle'"
-      />
-    </div>
+      <div class="user-detail__badges">
+        <p-tag
+          [value]="u.enabled ? 'Đang hoạt động' : 'Đã khoá'"
+          [severity]="u.enabled ? 'success' : 'danger'"
+          [icon]="u.enabled ? 'pi pi-check-circle' : 'pi pi-ban'"
+          [rounded]="true"
+        />
+        <p-tag
+          [value]="u.emailVerified ? 'Đã xác thực' : 'Chưa xác thực'"
+          [severity]="u.emailVerified ? 'success' : 'warn'"
+          [icon]="u.emailVerified ? 'pi pi-verified' : 'pi pi-exclamation-circle'"
+          [rounded]="true"
+        />
+      </div>
 
-    @if (u.roles.length) {
-    <div class="user-detail__roles">
-      @for (role of u.roles; track role) {
-      <p-chip [label]="role" icon="pi pi-shield" />
+      @if (u.roles.length) {
+      <div class="user-detail__roles">
+        @for (role of u.roles; track role) {
+        <span class="user-detail__role-chip">
+          <i class="pi pi-shield"></i>{{ roleLabel(role) }}
+        </span>
+        }
+      </div>
       }
     </div>
-    }
-  </div>
+  </section>
 
-  <hr class="user-detail__divider" />
-
-  <!-- Details: signal-based form -->
-  <form class="user-detail__form" (ngSubmit)="save()">
-    <div class="user-detail__field">
-      <label for="fullName">Họ và tên</label>
-      <input pInputText id="fullName" [formField]="userForm.fullName" fluid />
-    </div>
-
-    <div class="user-detail__field">
-      <label for="displayName">Tên hiển thị</label>
-      <input pInputText id="displayName" [formField]="userForm.displayName" fluid />
-    </div>
-
-    <div class="user-detail__field">
-      <label for="phone">Số điện thoại</label>
-      <input pInputText id="phone" [formField]="userForm.phone" fluid />
-      @if (userForm.phone().touched() && userForm.phone().invalid()) {
-      <small class="user-detail__error">Số điện thoại không hợp lệ.</small>
-      }
-    </div>
-
-    <div class="user-detail__field">
-      <label for="dateOfBirth">Ngày sinh</label>
-      <p-datepicker
-        inputId="dateOfBirth"
-        [ngModel]="formData().dateOfBirth"
-        (ngModelChange)="updateField('dateOfBirth', $event)"
-        [ngModelOptions]="{ standalone: true }"
-        dateFormat="yy-mm-dd"
-        [showIcon]="true"
-        fluid
-      />
-    </div>
+  <!-- Role management (admins only) -->
+  @if (canEditRoles()) {
+  <section class="user-detail__card user-detail__panel">
+    <header class="user-detail__panel-head">
+      <i class="pi pi-shield user-detail__panel-icon"></i>
+      <div class="user-detail__panel-heading">
+        <h3 class="user-detail__panel-title">Phân quyền</h3>
+        <p class="user-detail__panel-sub">Quản lý vai trò của người dùng này.</p>
+      </div>
+    </header>
 
     <div class="user-detail__field user-detail__field--full">
-      <label for="gender">Giới tính</label>
-      <p-select
-        inputId="gender"
-        [ngModel]="formData().gender"
-        (ngModelChange)="updateField('gender', $event)"
+      <label for="roles">Vai trò</label>
+      <p-multiselect
+        inputId="roles"
+        [options]="roleOptions()"
+        [ngModel]="selectedRoles()"
+        (ngModelChange)="selectedRoles.set($event)"
         [ngModelOptions]="{ standalone: true }"
-        [options]="genderOptions"
         optionLabel="label"
         optionValue="value"
-        placeholder="Chọn giới tính"
-        [showClear]="true"
+        optionDisabled="disabled"
+        placeholder="Chọn vai trò"
+        display="chip"
+        panelStyleClass="user-detail__role-overlay"
+        [showClear]="false"
         fluid
+      >
+        <ng-template #selecteditems let-items let-removeChip="removeChip">
+          @for (item of items; track item.value) {
+          <p-chip
+            [label]="item.label"
+            [removable]="!item.disabled"
+            (onRemove)="removeChip(item.value, $event)"
+            styleClass="user-detail__role-token"
+          />
+          }
+        </ng-template>
+      </p-multiselect>
+    </div>
+
+    @if (rolesChanged()) {
+    <div class="user-detail__panel-actions">
+      <p-button
+        icon="pi pi-shield"
+        label="Cập nhật vai trò"
+        severity="secondary"
+        [loading]="savingRoles()"
+        (onClick)="saveRoles()"
       />
     </div>
+    }
+  </section>
+  }
 
-    <div class="user-detail__field user-detail__field--full">
-      <label for="address">Địa chỉ</label>
-      <input pInputText id="address" [formField]="userForm.address" fluid />
-    </div>
+  <!-- Profile details -->
+  <section class="user-detail__card user-detail__panel">
+    <header class="user-detail__panel-head">
+      <i class="pi pi-id-card user-detail__panel-icon"></i>
+      <div class="user-detail__panel-heading">
+        <h3 class="user-detail__panel-title">Thông tin cá nhân</h3>
+        <p class="user-detail__panel-sub">Cập nhật hồ sơ của người dùng.</p>
+      </div>
+    </header>
 
-    <div class="user-detail__field user-detail__field--full">
-      <label for="bio">Giới thiệu</label>
-      <textarea
-        pTextarea
-        id="bio"
-        [ngModel]="formData().bio"
-        (ngModelChange)="updateField('bio', $event)"
-        [ngModelOptions]="{ standalone: true }"
-        rows="3"
-        [autoResize]="true"
-        fluid
-      ></textarea>
-    </div>
+    <form class="user-detail__form" (ngSubmit)="save()">
+      <div class="user-detail__field">
+        <label for="fullName">Họ và tên</label>
+        <input pInputText id="fullName" [formField]="userForm.fullName" fluid />
+      </div>
 
-    <div class="user-detail__field user-detail__field--full">
-      <label for="userId">ID người dùng</label>
-      <input pInputText id="userId" [value]="u.id" [disabled]="true" fluid />
-    </div>
-  </form>
+      <div class="user-detail__field">
+        <label for="displayName">Tên hiển thị</label>
+        <input pInputText id="displayName" [formField]="userForm.displayName" fluid />
+      </div>
+
+      <div class="user-detail__field">
+        <label for="phone">Số điện thoại</label>
+        <input
+          pInputText
+          id="phone"
+          [formField]="userForm.phone"
+          pKeyFilter="int"
+          inputmode="numeric"
+          fluid
+        />
+        @if (userForm.phone().touched() && userForm.phone().invalid()) {
+        <small class="user-detail__error">Số điện thoại không hợp lệ.</small>
+        }
+      </div>
+
+      <div class="user-detail__field">
+        <label for="dateOfBirth">Ngày sinh</label>
+        <p-datepicker
+          inputId="dateOfBirth"
+          [ngModel]="formData().dateOfBirth"
+          (ngModelChange)="updateField('dateOfBirth', $event)"
+          [ngModelOptions]="{ standalone: true }"
+          dateFormat="yy-mm-dd"
+          [showIcon]="true"
+          fluid
+        />
+      </div>
+
+      <div class="user-detail__field user-detail__field--full">
+        <label for="gender">Giới tính</label>
+        <p-select
+          inputId="gender"
+          [ngModel]="formData().gender"
+          (ngModelChange)="updateField('gender', $event)"
+          [ngModelOptions]="{ standalone: true }"
+          [options]="genderOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Chọn giới tính"
+          [showClear]="true"
+          fluid
+        />
+      </div>
+
+      <div class="user-detail__field user-detail__field--full">
+        <label for="address">Địa chỉ</label>
+        <input pInputText id="address" [formField]="userForm.address" fluid />
+      </div>
+
+      <div class="user-detail__field user-detail__field--full">
+        <label for="bio">Giới thiệu</label>
+        <textarea
+          pTextarea
+          id="bio"
+          [ngModel]="formData().bio"
+          (ngModelChange)="updateField('bio', $event)"
+          [ngModelOptions]="{ standalone: true }"
+          rows="3"
+          [autoResize]="true"
+          fluid
+        ></textarea>
+      </div>
+
+      <div class="user-detail__field user-detail__field--full">
+        <label for="userId">ID người dùng</label>
+        <input pInputText id="userId" [value]="u.id" [disabled]="true" fluid />
+      </div>
+    </form>
+  </section>
 
   <!-- Sticky save bar -->
   @if (hasChanges()) {

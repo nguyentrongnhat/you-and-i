@@ -1,5 +1,4 @@
 import { AfterViewInit, Component, inject, model, OnInit, signal } from '@angular/core';
-import { Router } from '@angular/router';
 import { AnimateOnScrollModule } from 'primeng/animateonscroll';
 import { AvatarModule } from 'primeng/avatar';
 import { ButtonModule } from 'primeng/button';
@@ -8,6 +7,7 @@ import { GalleriaModule } from 'primeng/galleria';
 import { PanelModule } from 'primeng/panel';
 import { TableModule } from 'primeng/table';
 import { PhotoService } from '../../services/photo.service';
+import { NavigationService } from '../../services/navigation.service';
 import { UserService } from '../user-management/services/user.service';
 import { LoaderService } from '../../services/loader.service';
 import { PlatformService } from '../../services/platform.service';
@@ -24,7 +24,7 @@ export class Dashboard implements OnInit, AfterViewInit {
 
 	protected readonly userService = inject(UserService);
 
-	private readonly router = inject(Router);
+	private readonly navigationService = inject(NavigationService);
 
 	private readonly loaderService = inject(LoaderService);
 
@@ -66,6 +66,6 @@ export class Dashboard implements OnInit, AfterViewInit {
 
 
 	navigateTo(url: string) {
-		this.router.navigateByUrl(url);
+		this.navigationService.navigate(url);
 	}
 }

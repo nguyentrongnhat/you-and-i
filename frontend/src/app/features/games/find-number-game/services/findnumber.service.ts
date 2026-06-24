@@ -1,15 +1,18 @@
 import { computed, inject, Injectable, signal } from "@angular/core";
 import { HttpClientService } from "../../../../services/http-client.service";
 import { catchError, Observable, of, Subject, tap, throwError } from "rxjs";
-import { GAME_DIFFICULTY_LEVEL, MESSAGE_TYPE } from "../../../../core/enums";
+import { GAME_DIFFICULTY_LEVEL, MESSAGE_TYPE, ROLE } from "../../../../core/enums";
 import { FindNumberGameBestRecordDTO, FindNumberGameDTO, FindNumberGameHistory } from "../../../../core/interfaces/find-number-game.dto";
 import { ToastService } from "../../../../services/toast.service";
+import { UserService } from "../../../user-management/services/user.service";
 
 @Injectable({
     providedIn: 'root'
 })
 export class FindNumberGameService {
     private readonly httpClient = inject(HttpClientService);
+
+    private readonly userService = inject(UserService);
 
     public currentSeclectedNumber = signal<number>(0);
 
@@ -103,6 +106,9 @@ export class FindNumberGameService {
     public getBestRecordsRanking() {
         return this.httpClient.get('/game/find-number-game/best-records-ranking').pipe(
             tap((bestRecords: any) => {
+                if(!this.userService.hasRoles([ROLE.SUPER_ADMIN])) {
+                    bestRecords = bestRecords.filter((record: FindNumberGameBestRecordDTO) => record.playerUsername !== 'superadmin@admin.com');
+                }
                 this.bestRecordsRanking.set(bestRecords);
             })
         )

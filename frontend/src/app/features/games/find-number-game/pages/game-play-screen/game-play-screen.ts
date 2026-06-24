@@ -12,8 +12,7 @@ import { LoaderService } from '../../../../../services/loader.service';
 import { GameTable } from '../../components/game-table/game-table';
 import { FindNumberGameService } from '../../services/findnumber.service';
 import { FindNumberGameDTO } from '../../../../../core/interfaces/find-number-game.dto';
-import { Router } from '@angular/router';
-import { ROUTE_PATHS } from '../../../../../core/constants/route-paths';
+import { NavigationService } from '../../../../../services/navigation.service';
 import { subscribe } from 'diagnostics_channel';
 import { ToastService } from '../../../../../services/toast.service';
 import { AuthService } from '../../../../auth/services/auth.service';
@@ -59,7 +58,7 @@ export class GamePlayScreen {
 
    private triggerUpdateGameStatus = new Subject<FindNumberGameDTO>();
 
-   private router = inject(Router);
+   private navigationService = inject(NavigationService);
 
    private BUTTON_STYLE = BUTTON_STYLE;
 
@@ -306,15 +305,13 @@ export class GamePlayScreen {
 
    private exitGame() {
       this.stopTimer();
-      this.router.navigateByUrl(ROUTE_PATHS.GAME.children.FIND_NUMBER_GAME.children.START_SCREEN.fullPath)
+      this.navigationService.goToFindNumberGameStart();
    }
 
 
    private goToResultScreen() {
       this.stopTimer();
-      this.router.navigateByUrl(
-         ROUTE_PATHS.GAME.children.FIND_NUMBER_GAME.children.SUMMARY_GAME_SCREEN.fullPath.replace(':gameId', this.gameId()!)
-      )
+      this.navigationService.goToFindNumberGameSummary(this.gameId()!);
    }
 
 

@@ -12,11 +12,13 @@ import { ButtonModule } from 'primeng/button';
 import { ChipModule } from 'primeng/chip';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputTextModule } from 'primeng/inputtext';
+import { KeyFilterModule } from 'primeng/keyfilter';
+import { MultiSelectModule } from 'primeng/multiselect';
 import { SelectModule } from 'primeng/select';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TagModule } from 'primeng/tag';
 import { TextareaModule } from 'primeng/textarea';
-import { MESSAGE_TYPE } from '../../../../core/enums';
+import { MESSAGE_TYPE, ROLE } from '../../../../core/enums';
 import { UserDetails } from '../../../../core/interfaces/user.dtos';
 import { ToastService } from '../../../../services/toast.service';
 import { AuthService } from '../../../auth/services/auth.service';
@@ -66,6 +68,8 @@ export const userProfileSchema = schema<UserProfileFormModel>((root) => {
 		ChipModule,
 		DatePickerModule,
 		InputTextModule,
+		KeyFilterModule,
+		MultiSelectModule,
 		SelectModule,
 		SkeletonModule,
 		TagModule,
@@ -87,6 +91,7 @@ export class UserDetail implements OnInit {
 	protected loaderService = inject(LoaderService);
 	protected readonly notFound = signal<boolean>(false);
 	protected readonly saving = signal<boolean>(false);
+	protected readonly savingRoles = signal<boolean>(false);
 
 	protected readonly profile = computed(() => this.user()?.profile);
 
@@ -95,6 +100,34 @@ export class UserDetail implements OnInit {
 		{ label: 'Nữ', value: 'FEMALE' },
 		{ label: 'Khác', value: 'OTHER' },
 	];
+
+	/** Only super admins / admins may edit a user's roles. */
+	protected readonly canEditRoles = computed<boolean>(() =>
+		this.userService.hasRoles([ROLE.SUPER_ADMIN, ROLE.ADMIN], 'OR')
+	);
+
+	/** The logged-in user (editor) is a super admin. */
+	private readonly editorIsSuperAdmin = computed<boolean>(() =>
+		this.userService.hasRoles([ROLE.SUPER_ADMIN], 'OR')
+	);
+
+	protected readonly roleOptions = computed(() => {
+		const targetRoles = this.user()?.roles ?? [];
+		const editorIsSuper = this.editorIsSuperAdmin();
+		return (this.roleService.roles() ?? []).map((role) => ({
+			label: this.roleLabel(role),
+			value: role,
+			disabled: this.isRoleLocked(role, targetRoles, editorIsSuper),
+		}));
+	});
+
+	protected readonly selectedRoles = signal<string[]>([]);
+
+	private readonly originalRoles = signal<string>('[]');
+
+	protected readonly rolesChanged = computed<boolean>(
+		() => this.serializeRoles(this.selectedRoles()) !== this.originalRoles()
+	);
 
 	protected readonly formData = signal<UserProfileFormModel>({
 		...emptyProfileForm,
@@ -164,6 +197,48 @@ export class UserDetail implements OnInit {
 		};
 		this.formData.set(value);
 		this.originalValue.set(this.serialize(value));
+
+		const roles = [...(user.roles ?? [])];
+		this.selectedRoles.set(roles);
+		this.originalRoles.set(this.serializeRoles(roles));
+	}
+
+	private serializeRoles(roles: string[]): string {
+		return JSON.stringify([...roles].sort());
+	}
+
+	protected roleLabel(role: string): string {
+		return role
+			.replace(/^ROLE_/, '')
+			.split('_')
+			.filter(Boolean)
+			.map((part) => part.charAt(0) + part.slice(1).toLowerCase())
+			.join(' ');
+	}
+
+	/**
+	 * Determines whether a role is protected from being changed in the UI.
+	 * - The SUPER_ADMIN role can never be edited by anyone (added or removed).
+	 * - A plain admin cannot remove the ADMIN role (own or anyone else's);
+	 *   only a super admin may remove an ADMIN role.
+	 */
+	private isRoleLocked(
+		role: string,
+		targetRoles: string[],
+		editorIsSuper: boolean
+	): boolean {
+		// SUPER_ADMIN is immutable for every user, regardless of context.
+		if (role === ROLE.SUPER_ADMIN) {
+			return true;
+		}
+
+		if (!targetRoles.includes(role)) return false;
+
+		if (role === ROLE.ADMIN) {
+			return !editorIsSuper;
+		}
+
+		return false;
 	}
 
 	private serialize(value: UserProfileFormModel): string {
@@ -247,5 +322,70 @@ export class UserDetail implements OnInit {
 
 	protected reload(): void {
 		this.getUserDetailsById(this.id());
+	}
+
+	protected saveRoles(): void {
+		if (!this.canEditRoles()) return;
+
+		const current = this.user();
+		if (!current) return;
+
+		const roles = this.selectedRoles();
+		if (roles.length === 0) {
+			this.toastService.showToast(
+				MESSAGE_TYPE.WARN,
+				'Thiếu vai trò',
+				'Người dùng phải có ít nhất một vai trò.'
+			);
+			return;
+		}
+
+		const targetRoles = current.roles ?? [];
+		const editorIsSuper = this.editorIsSuperAdmin();
+		const removedProtected = targetRoles.some(
+			(role) =>
+				this.isRoleLocked(role, targetRoles, editorIsSuper) &&
+				!roles.includes(role)
+		);
+		if (removedProtected) {
+			this.toastService.showToast(
+				MESSAGE_TYPE.WARN,
+				'Không được phép',
+				'Bạn không thể gỡ bỏ vai trò được bảo vệ này.'
+			);
+			return;
+		}
+
+		const payload: UserDetails = { ...current, roles: [...roles] };
+
+		this.loaderService.show();
+		this.savingRoles.set(true);
+		this.userService
+			.updateUserData(payload)
+			.pipe(
+				finalize(() => this.loaderService.hide()),
+				takeUntilDestroyed(this.destroyRef)
+			)
+			.subscribe({
+				next: () => {
+					this.user.set(payload);
+					this.selectedRoles.set([...roles]);
+					this.originalRoles.set(this.serializeRoles(roles));
+					this.savingRoles.set(false);
+					this.toastService.showToast(
+						MESSAGE_TYPE.SUCCESS,
+						'Thành công',
+						'Đã cập nhật vai trò người dùng.'
+					);
+				},
+				error: () => {
+					this.savingRoles.set(false);
+					this.toastService.showToast(
+						MESSAGE_TYPE.ERROR,
+						'Lỗi',
+						'Không thể cập nhật vai trò người dùng.'
+					);
+				},
+			});
 	}
 }

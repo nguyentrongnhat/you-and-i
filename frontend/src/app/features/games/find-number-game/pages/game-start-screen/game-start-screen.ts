@@ -1,6 +1,5 @@
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -10,10 +9,10 @@ import { ProgressBarModule } from 'primeng/progressbar';
 import { SpeedDialModule } from 'primeng/speeddial';
 import { TagModule } from 'primeng/tag';
 import { finalize, forkJoin } from 'rxjs';
-import { ROUTE_PATHS } from '../../../../../core/constants/route-paths';
 import { BUTTON_STYLE, GAME_DIFFICULTY_LEVEL, ROLE } from '../../../../../core/enums';
 import { FindNumberGameDTO } from '../../../../../core/interfaces/find-number-game.dto';
 import { LoaderService } from '../../../../../services/loader.service';
+import { NavigationService } from '../../../../../services/navigation.service';
 import { GameHistories } from '../../components/game-histories/game-histories';
 import { FindNumberGameService } from '../../services/findnumber.service';
 import { FormsModule } from '@angular/forms';
@@ -49,7 +48,7 @@ export class GameStartScreen {
    
    private unfinishedGames = signal<FindNumberGameDTO | undefined>(undefined);
 
-   private readonly router = inject(Router);
+   private readonly navigationService = inject(NavigationService);
    
    protected showGameHistories = signal<boolean>(false);
 
@@ -145,13 +144,6 @@ export class GameStartScreen {
 
 
    private navigationToPlayGameScreen(gameId: string): void {
-      this.router.navigateByUrl(
-         ROUTE_PATHS
-            .GAME
-            .children
-            .FIND_NUMBER_GAME
-            .children
-            .PLAY_GAME_SCREEN.fullPath.replace(':gameId', gameId)
-      )
+      this.navigationService.goToFindNumberGamePlay(gameId);
    }
 }

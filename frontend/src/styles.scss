@@ -38,6 +38,11 @@ body {
   z-index: 1000 !important;
 }
 
+/* Keep the user-detail role multiselect overlay below the sticky header */
+.p-overlay:has(.user-detail__role-overlay) {
+  z-index: 900 !important;
+}
+
 /* ============================================================
    Find-number game · History dialog skin
    Shared by game-start-screen & game-result-screen

@@ -1,6 +1,5 @@
 import { Component, computed, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { MenuModule } from 'primeng/menu';
@@ -8,9 +7,9 @@ import { ProgressBarModule } from 'primeng/progressbar';
 import { SpeedDialModule } from 'primeng/speeddial';
 import { TagModule } from 'primeng/tag';
 import { finalize } from 'rxjs';
-import { ROUTE_PATHS } from '../../../../../core/constants/route-paths';
 import { FindNumberGameDTO } from '../../../../../core/interfaces/find-number-game.dto';
 import { LoaderService } from '../../../../../services/loader.service';
+import { NavigationService } from '../../../../../services/navigation.service';
 import { PlatformService } from '../../../../../services/platform.service';
 import { GameHistories } from '../../components/game-histories/game-histories';
 import { FindNumberGameService } from '../../services/findnumber.service';
@@ -64,7 +63,7 @@ export class GameResultScreen {
 
    private readonly toastService = inject(ToastService);
 
-   private router = inject(Router);
+   private navigationService = inject(NavigationService);
 
    /** Thời gian (giây) của ván vừa hoàn thành */
    protected lastFinishTime = signal<number>(0);
@@ -137,7 +136,7 @@ export class GameResultScreen {
 
 
    private goToGameStartScreen() {
-      this.router.navigateByUrl(ROUTE_PATHS.GAME.children.FIND_NUMBER_GAME.children.START_SCREEN.fullPath);
+      this.navigationService.goToFindNumberGameStart();
    }
 
 
@@ -160,6 +159,6 @@ export class GameResultScreen {
    }
 
    protected startGame() {
-      this.router.navigateByUrl(ROUTE_PATHS.GAME.children.FIND_NUMBER_GAME.children.START_SCREEN.fullPath);
+      this.navigationService.goToFindNumberGameStart();
    }
 }

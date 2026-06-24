@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, computed, DestroyRef, effect, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { email, form, FormField, minLength, required, schema } from '@angular/forms/signals';
-import { Router } from '@angular/router';
 import { AutoFocusModule } from 'primeng/autofocus'; // This module is not used in the template.
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
@@ -16,7 +15,7 @@ import { HttpClientService } from '../../../services/http-client.service';
 import { SessionStorageService } from '../../../services/session-storage.service';
 import { ToastService } from '../../../services/toast.service';
 import { VerifyAccountService } from '../services/verify-account.service';
-import { ROUTE_PATHS } from '../../../core/constants/route-paths';
+import { NavigationService } from '../../../services/navigation.service';
 import { MESSAGE_TYPE } from '../../../core/enums';
 import { LoaderService } from '../../../services/loader.service';
 import { finalize } from 'rxjs';
@@ -72,7 +71,7 @@ export class VerifyAccount implements OnInit, OnDestroy, AfterViewInit {
 
   protected toastService = inject(ToastService);
 
-  protected router = inject(Router);
+  protected navigationService = inject(NavigationService);
 
   private readonly httpService = inject(HttpClientService);
   
@@ -192,7 +191,7 @@ export class VerifyAccount implements OnInit, OnDestroy, AfterViewInit {
     )
     .subscribe({
       next: (res) => {
-        this.router.navigateByUrl(ROUTE_PATHS.AUTH.children.LOGIN.fullPath);
+        this.navigationService.goToLogin();
       },
       error: (err) => {
         console.log(err.error.message)

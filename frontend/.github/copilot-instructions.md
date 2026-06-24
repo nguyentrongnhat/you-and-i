@@ -212,3 +212,31 @@ All new tables MUST follow this standard so the app stays visually consistent.
 ## 15.7 Reference implementations
 - `features/user-management/pages/user-management` (full pattern)
 - `features/games/find-number-game/components/game-histories` (compact pattern)
+
+---
+
+# 16. Workflow & AI Execution Rules
+
+- Break work into small, sequential steps.
+- IMPORTANT: each step must NOT keep a connection open to the AI server for more
+  than 30 seconds, to avoid the proxy dropping the connection mid-way.
+- Keep each tool call / response focused and short so it completes well under the
+  30s limit; split large edits across multiple steps instead of one long operation.
+
+---
+
+# 17. Minimalism UI Design Principles
+
+These principles apply to ALL UI work (components, layouts, surfaces):
+
+- UI must be simple, tidy, yet refined and MODERN — minimalism style.
+- Optimize for airy, uncluttered display space; never make the screen busy or
+  visually noisy.
+- Light transparency effects may be applied to elements that benefit from them
+  (e.g. headers, floating bars) — keep them subtle.
+- Backgrounds should favor white or black with transparency (translucent
+  surfaces), not heavy solid fills.
+- Do NOT apply glow effects carelessly (no colored drop-shadows / box-shadow
+  halos used as decoration).
+- Drop tacky / "quê mùa" color gradients; prefer flat translucent surfaces with a
+  single restrained accent (the primary color) used sparingly.

@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, computed, DestroyRef, inject, signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { email, form, FormField, required, schema, validate } from '@angular/forms/signals';
-import { Router } from '@angular/router';
 import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -14,13 +13,13 @@ import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { TooltipModule } from 'primeng/tooltip';
-import { ROUTE_PATHS } from '../../../core/constants/route-paths';
 import { MESSAGE_TYPE } from '../../../core/enums';
 import { UsernamePasswordLoginResponse } from '../../../core/interfaces/user.dtos';
 import { PlatformService } from '../../../services/platform.service';
 import { SessionStorageService } from '../../../services/session-storage.service';
 import { ToastService } from '../../../services/toast.service';
 import { AuthService } from '../services/auth.service';
+import { NavigationService } from '../../../services/navigation.service';
 import { VerifyAccountService } from '../services/verify-account.service';
 import { LoaderService } from '../../../services/loader.service';
 import { finalize } from 'rxjs';
@@ -109,7 +108,7 @@ export class Signup implements AfterViewInit {
 
   protected toastService = inject(ToastService);
 
-  protected router = inject(Router);
+  protected navigationService = inject(NavigationService);
   
   protected signupFormData = signal<SignupModel>(initialData);
 
@@ -175,7 +174,7 @@ export class Signup implements AfterViewInit {
 
 
   protected navigateToVerifyAccountPage(): void {
-    this.router.navigateByUrl(ROUTE_PATHS.AUTH.children.VERIFY_ACCOUNT.fullPath);
+    this.navigationService.goToVerifyAccount();
   }
 
 

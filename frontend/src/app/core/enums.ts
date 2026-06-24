@@ -22,7 +22,8 @@ export enum MESSAGE_TYPE {
 export enum ROLE {
 	SUPER_ADMIN = 'ROLE_SUPER_ADMIN',
 	ADMIN = 'ROLE_ADMIN',
-	USER = 'ROLE_USER'
+	USER = 'ROLE_USER',
+	GUEST = 'ROLE_GUEST'
 }
 
 export enum BUTTON_STYLE {

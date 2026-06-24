@@ -1,16 +1,19 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/auth.guard';
+import { roleGuard } from './core/auth/role.guard';
 import { ROUTE_PATHS } from './core/constants/route-paths';
+import { ALL_ROLES, NON_GUEST_ROLES } from './core/constants/access-control';
 import { LAYOUT } from './core/enums';
 
 export const routes: Routes = [
   {
     path: ROUTE_PATHS.HOME.path,
     loadComponent: () => import('./features/dashboard/dashboard').then(c => c.Dashboard),
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
     data: {
       animation: 'DashboardPage',
-      layout: LAYOUT.LAYOUT_1
+      layout: LAYOUT.LAYOUT_1,
+      roles: NON_GUEST_ROLES
     }
   },
   {
@@ -45,7 +48,10 @@ export const routes: Routes = [
   // Game group: /game/find-number-game
   {
     path: ROUTE_PATHS.GAME.path,
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
+    data: {
+      roles: ALL_ROLES
+    },
     children: [
       {
         path: ROUTE_PATHS.GAME.children.FIND_NUMBER_GAME.path,
@@ -80,7 +86,10 @@ export const routes: Routes = [
   },
   {
     path: ROUTE_PATHS.USER.path,
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard],
+    data: {
+      roles: NON_GUEST_ROLES
+    },
     children: [
         {
           path: ROUTE_PATHS.USER.children.MANAGEMENT.path,

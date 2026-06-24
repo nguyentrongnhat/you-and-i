@@ -1,6 +1,5 @@
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { AvatarModule } from 'primeng/avatar';
 import { ButtonModule } from 'primeng/button';
 import { IconFieldModule } from 'primeng/iconfield';
@@ -9,9 +8,9 @@ import { InputTextModule } from 'primeng/inputtext';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
-import { ROUTE_PATHS } from '../../../../core/constants/route-paths';
 import { UserDetails } from '../../../../core/interfaces/user.dtos';
 import { PlatformService } from '../../../../services/platform.service';
+import { NavigationService } from '../../../../services/navigation.service';
 import { UserService } from '../../services/user.service';
 import { LoaderService } from '../../../../services/loader.service';
 import { finalize } from 'rxjs';
@@ -38,7 +37,7 @@ export class UserManagement {
 
 	protected platformService = inject(PlatformService);
 
-	private readonly router = inject(Router);
+	private readonly navigationService = inject(NavigationService);
 
 	protected readonly users = signal<UserDetails[]>([]);
 	
@@ -117,8 +116,6 @@ export class UserManagement {
 	}
 
 	protected navigateToUserDetail(user: UserDetails): void {
-		this.router.navigateByUrl(
-			ROUTE_PATHS.USER.children.DETAIL.fullPath.replace(':id', user.id)
-		);
+		this.navigationService.goToUserDetail(user.id);
 	}
 }
