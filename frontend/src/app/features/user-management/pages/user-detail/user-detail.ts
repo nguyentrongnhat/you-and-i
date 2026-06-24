@@ -148,7 +148,11 @@ export class UserDetail implements OnInit {
 		const source =
 			profile?.fullName || profile?.displayName || this.user()?.username || '';
 		const parts = source.trim().split(/\s+/).filter(Boolean);
-		if (parts.length === 0) return '?';
+		if (parts.length === 0) return 'U';
+		const lastPart = parts[parts.length - 1];
+        // Kiểm tra từ cuối có phải emoji không
+        const emojiRegex = /^\p{Extended_Pictographic}$/u;
+        if (emojiRegex.test(lastPart)) return lastPart;
 		if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
 		return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
 	});
