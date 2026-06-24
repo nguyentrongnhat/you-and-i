@@ -38,7 +38,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @CacheEvict(value = "userDetails", key = "#username.toLowerCase()")
     public MyUserDetail createUserWithUsernameAndPassword(String username, String password) {
-        Optional<Role> defaultRoleOpt = roleRepository.findByName(Constants.ROLE_USER);
+        Optional<Role> defaultRoleOpt = roleRepository.findByName(Constants.ROLE_GUEST);
 
         if(defaultRoleOpt.isEmpty()) {
             throw new RuntimeException("Not found ROLE_USER in database");
