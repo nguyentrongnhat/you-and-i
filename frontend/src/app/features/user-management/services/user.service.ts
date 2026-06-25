@@ -38,4 +38,19 @@ export class UserService {
             return requiredRoles.some(role => currentRoles.includes(role));
         }
     }
+
+    public extractAvatarFromName(name: string): string {
+        const parts = name.split(' ').filter(Boolean);
+        if (parts.length === 0) return 'U';
+        
+        const lastPart = parts[parts.length - 1];
+
+        // Kiểm tra từ cuối có phải emoji không
+        const emojiRegex = /^\p{Extended_Pictographic}$/u;
+
+        if (emojiRegex.test(lastPart)) return lastPart;
+
+        if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+        return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+    }
 }

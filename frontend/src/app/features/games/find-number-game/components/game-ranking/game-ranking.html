@@ -9,14 +9,14 @@
 
   <div class="histories__card">
     <p-table
-      [value]="bestRecords()"
-      [paginator]="bestRecords().length > 5"
+      [value]="bestRecordsRanking()"
+      [paginator]="bestRecordsRanking().length > 5"
       [rows]="5"
       [rowsPerPageOptions]="[5, 10, 20]"
       [tableStyle]="{ 'min-width': '22rem' }"
       styleClass="histories__table p-datatable-sm"
       currentPageReportTemplate="Hiển thị {first} – {last} trong {totalRecords}"
-      [showCurrentPageReport]="bestRecords().length > 5"
+      [showCurrentPageReport]="bestRecordsRanking().length > 5"
     >
       <ng-template #header>
         <tr>
@@ -45,8 +45,8 @@
 
           <td>
             <div class="histories__player">
-              <span class="histories__avatar">{{ history.playerDisplayname | slice:0:1 }}</span>
-              <span class="histories__player-name">{{ history.playerDisplayname }}</span>
+              <span class="histories__avatar">{{ userService.extractAvatarFromName(history.playerDisplayName) }}</span>
+              <span class="histories__player-name">{{ history.playerDisplayName }}</span>
             </div>
           </td>
           <td>{{ history.archivedTime | date:'dd/MM/yyyy - HH:mm' }}</td>
