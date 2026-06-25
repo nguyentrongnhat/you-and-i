@@ -4,13 +4,14 @@
 
 .find-number {
 	display: flex;
-	//justify-content: center;
+	flex-direction: column;
 	align-items: center;
 	padding: 2rem 1.5rem;
 	padding-top: 5rem;
 	min-height: 100vh;
 	height: 100%;
 	overflow: hidden;
+	position: relative;
 
 	/* ===== Confetti ===== */
 	&__confetti {
