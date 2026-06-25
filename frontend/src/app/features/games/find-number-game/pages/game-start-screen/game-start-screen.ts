@@ -54,7 +54,7 @@ export class GameStartScreen {
 
    protected continueOrNewGameDialogVisible = signal<boolean>(false);
 
-   protected totalGames = computed(() => this.findNumberGameService.gameHistories().history.length);
+   protected totalGames = computed(() => this.findNumberGameService.gameHistories().totalGamesPlayed);
 
    protected BUTTON_STYLE = BUTTON_STYLE;
 
@@ -85,19 +85,16 @@ export class GameStartScreen {
       this.loaderService.show();
       forkJoin([
          this.findNumberGameService.getGameHistories(), 
-         this.findNumberGameService.getUnfinishedGame(),
          this.findNumberGameService.getBestRecordsRanking()
       ])
       .pipe(
          takeUntilDestroyed(this.destroyRef),
          finalize(() => this.loaderService.hide())
       ).subscribe({
-         next: ([histories, unfinishedGames, bestRecords]) => {
-            if (unfinishedGames.length > 0) {
-               this.unfinishedGames.set(unfinishedGames[0]);
+         next: ([histories, bestRecords]) => {
+            if (histories.unfinishedGames.length > 0) {
+               this.unfinishedGames.set(histories.unfinishedGames[0]);
             }
-
-            console.log('bestRecords: ', bestRecords);
          }
       })
    }

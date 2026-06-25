@@ -6,17 +6,17 @@ import com.nguyen_trong_nhat.you_and_i.common.exception.UnauthorizedException;
 import com.nguyen_trong_nhat.you_and_i.common.security.util.SecurityUtils;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.dto.*;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGame;
+import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGameStats;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.mapper.FindNumberGameDataMapper;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.repository.FindNumberGameRepository;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
 import com.nguyen_trong_nhat.you_and_i.features.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
@@ -108,29 +108,72 @@ public class FindNumberGameService {
 
         game = findNumberGameRepository.save(game);
 
-        findNumberGameBestRecordService.updateBestRecordForUser(game.getPlayer(), game);
+        FindNumberGameStats gameStats = findNumberGameBestRecordService.updateGameStatsForUser(game.getPlayer(), game, true);
+
+        int numberOfGameToKeep = 10;
+
+        this.cleanupOldGames(userName, numberOfGameToKeep, gameStats);
 
         return game;
     }
 
 
-    public List<FindNumberGameHistoryItem> getGameHistory(String userName) {
+    public FindNumberGameHistory getGameHistory(String username) {
 
-        List<FindNumberGame> gameFinished = findNumberGameRepository.findByPlayerUsernameAndEndTimeIsNotNull(userName);
+        List<FindNumberGameHistoryItem> gameFinished
+                = findNumberGameRepository
+                    .findByPlayerUsernameAndEndTimeIsNotNull(username)
+                    .stream().map(game ->
+                        new FindNumberGameHistoryItem(
+                            game.getStartTime(),
+                            game.getEndTime(),
+                            game.getCompletionTime(),
+                            game.getBonusTime()
+                        )
+                    ).toList();
 
-        return gameFinished.stream().map(game ->
-            new FindNumberGameHistoryItem(
-                    game.getStartTime(),
-                    game.getEndTime(),
-                    game.getCompletionTime(),
-                    game.getBonusTime()
-            )
-        ).toList();
+        List<FindNumberGameDTO> unfinishedGames = this.getUnfinishedGamesForCurrentUser();
+
+        FindNumberGameStats gameStats = findNumberGameBestRecordService.getGameStatsByPlayerUsername(username);
+
+
+        return new FindNumberGameHistory(
+                gameFinished,
+                FindNumberGameDataMapper.toBestRecordDTO(gameStats),
+                unfinishedGames,
+                gameStats == null ? 0 : gameStats.getTotalGamesPlayed()
+        );
     }
 
 
     public List<FindNumberGameDTO> getUnfinishedGamesForCurrentUser() {
         String username = SecurityUtils.getLoggedInUsername();
         return findNumberGameRepository.findByPlayerUsernameAndEndTimeIsNull(username).stream().map(FindNumberGameDataMapper::toDTO).toList();
+    }
+
+    @Transactional
+    public void cleanupOldGames(String username, int keepCount, FindNumberGameStats gameStats) {
+
+        UUID bestGameId = gameStats.getBestRecordGame().getId();
+
+        List<UUID> recentIds = findNumberGameRepository.findRecentGame(
+                username,
+                PageRequest.of(0, keepCount)
+        ).stream().map(FindNumberGame::getId).toList();
+
+        Set<UUID> keepIds = new LinkedHashSet<>();
+        keepIds.add(bestGameId);
+
+        for (UUID id : recentIds) {
+            if (keepIds.size() >= keepCount) {
+                break;
+            }
+            keepIds.add(id);
+        }
+
+        findNumberGameRepository.deleteAllByPlayerIdAndIdNotIn(
+                username,
+                keepIds
+        );
     }
 }

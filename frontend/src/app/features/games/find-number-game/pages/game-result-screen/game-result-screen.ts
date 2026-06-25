@@ -71,7 +71,7 @@ export class GameResultScreen {
    /** Kỷ lục tốt nhất trước khi vào ván hiện tại */
    private previousBest = signal<number | null>(null);
    /** Tổng số ván đã chơi */
-   protected totalGames = computed(() => this.findNumberGameService.gameHistories().history.length);
+   protected totalGames = computed(() => this.findNumberGameService.gameHistories().totalGamesPlayed);
 
    /** Thời gian tốt nhất (giây) từ lịch sử */
    protected bestTime = computed<number | null>(() => {

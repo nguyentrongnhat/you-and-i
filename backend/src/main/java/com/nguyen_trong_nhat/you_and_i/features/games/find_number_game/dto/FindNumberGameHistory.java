@@ -14,4 +14,6 @@ import java.util.List;
 public class FindNumberGameHistory {
     List<FindNumberGameHistoryItem> history;
     FindNumberGameBestRecordDTO bestRecord;
+    List<FindNumberGameDTO> unfinishedGames;
+    Integer totalGamesPlayed;
 }

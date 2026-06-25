@@ -12,12 +12,12 @@ import org.hibernate.annotations.UuidGenerator;
 import java.util.UUID;
 
 @Entity
-@Table(name = "find_number_game_user_best_record")
+@Table(name = "find_number_game_stats")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class FindNumberGameUserBestRecord extends BaseEntity {
+public class FindNumberGameStats extends BaseEntity {
 
     @Id
     @GeneratedValue
@@ -29,9 +29,12 @@ public class FindNumberGameUserBestRecord extends BaseEntity {
     private MyUserDetail player;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "best_game_id", nullable = false)
-    private FindNumberGame bestGame;
+    @JoinColumn(name = "best_record_game_id", nullable = false)
+    private FindNumberGame bestRecordGame;
 
-    @Column(name="completion_time", nullable = false)
+    @Column(name="best_completion_time", nullable = false)
     private Integer bestCompletionTime;
+
+    @Column(name = "total_games_played")
+    private Integer totalGamesPlayed;
 }

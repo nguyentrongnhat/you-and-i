@@ -18,7 +18,7 @@ export class FindNumberGameService {
 
     public curentTargetNumber = computed(() => this.currentSeclectedNumber() + 1);
 
-    public gameHistories = signal<FindNumberGameHistory>({ history: [], bestRecord: {} as FindNumberGameBestRecordDTO });
+    public gameHistories = signal<FindNumberGameHistory>({ history: [], bestRecord: {} as FindNumberGameBestRecordDTO, unfinishedGames: [], totalGamesPlayed: 0 });
 
     public bestRecordsRanking = signal<FindNumberGameBestRecordDTO[]>([]);
 
@@ -81,9 +81,9 @@ export class FindNumberGameService {
     }
 
 
-    public getGameHistories() {
-        return this.httpClient.get('/game/find-number-game/history').pipe(
-            tap((histories: any) => {
+    public getGameHistories(): Observable<FindNumberGameHistory> {
+        return this.httpClient.get<FindNumberGameHistory>('/game/find-number-game/history').pipe(
+            tap((histories: FindNumberGameHistory) => {
                 this.gameHistories.set(histories);
             })
         )

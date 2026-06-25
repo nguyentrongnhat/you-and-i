@@ -15,7 +15,7 @@ import java.util.UUID;
 public class FindNumberGameBestRecordDTO {
     private UUID gameId;
     private String playerFullName;
-    private String playerDisplayname;
+    private String playerDisplayName;
     private String playerUsername;
     private Instant archivedTime;
     private Integer completionTime;

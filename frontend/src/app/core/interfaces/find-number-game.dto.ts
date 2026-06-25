@@ -34,6 +34,8 @@ export interface FindNumberGameHistoryItem {
 export interface FindNumberGameHistory {
   history: FindNumberGameHistoryItem[];
   bestRecord: FindNumberGameBestRecordDTO;
+  unfinishedGames: FindNumberGameDTO[];
+  totalGamesPlayed: number;
 }
 
 export interface FindNumberGameHistory {

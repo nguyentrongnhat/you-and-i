@@ -17,17 +17,16 @@ export class GameHistories {
 
 	protected readonly gameHistories = computed(() => this.findNumberGameService.gameHistories());
 
-
 	protected readonly history = computed<FindNumberGameHistoryItem[]>(() => this.gameHistories().history.sort((a, b) => b.endTime.localeCompare(a.endTime)));
 
 	/** Thời gian tốt nhất (giây) để đánh dấu kỷ lục */
 	protected bestTime = computed<number | null>(() => {
 		const histories = this.gameHistories();
-		return histories.bestRecord.completionTime || null;
+		return histories.bestRecord?.completionTime || null;
 	});
 
 	/** Tổng số ván đã hoàn thành (display-only) */
-	protected readonly totalGames = computed<number>(() => this.history().length);
+	protected readonly totalGames = computed<number>(() => this.gameHistories().totalGamesPlayed);
 
 	/** Thời gian trung bình các ván (giây, display-only) */
 	protected readonly averageTime = computed<number | null>(() => {
