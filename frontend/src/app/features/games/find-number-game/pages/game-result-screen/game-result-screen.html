@@ -37,7 +37,7 @@
 
       <div class="find-number__actions">
          <p-button label="Bắt đầu ván mới" icon="pi pi-replay" severity="contrast" (onClick)="startGame()" />
-         <p-button label="Lịch sử" icon="pi pi-history" [text]="true" (onClick)="showGameHistoriesDialog()" />
+         <p-button label="Thành tích" icon="pi pi-chart-bar" severity="warn" styleClass="gold-button" (onClick)="showGameHistoriesDialog()" />
       </div>
    </div>
 
@@ -48,12 +48,12 @@
    styleClass="history-dialog">
    <ng-template #header>
       <div class="history-dialog__head">
-         <span class="history-dialog__head-icon"><i class="pi pi-history"></i></span>
+         <span class="history-dialog__head-icon"><i class="pi pi-chart-bar"></i></span>
          <div class="history-dialog__head-text">
-            <h3 class="history-dialog__head-title">Lịch sử chơi</h3>
-            <span class="history-dialog__head-sub">Hành trình chinh phục của bạn</span>
+            <h3 class="history-dialog__head-title">Thành tích</h3>
+            <span class="history-dialog__head-sub">Lịch sử &amp; bảng xếp hạng</span>
          </div>
       </div>
    </ng-template>
-   <app-game-histories />
+   <app-game-overview />
 </p-dialog>

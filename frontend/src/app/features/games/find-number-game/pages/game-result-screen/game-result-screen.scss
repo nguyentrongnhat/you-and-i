@@ -4,9 +4,10 @@
 
 .find-number {
 	display: flex;
-	justify-content: center;
+	//justify-content: center;
 	align-items: center;
 	padding: 2rem 1.5rem;
+	padding-top: 5rem;
 	min-height: 100vh;
 	height: 100%;
 	overflow: hidden;
@@ -288,6 +289,7 @@
 @media (max-width: v.$breakpoint-xs) {
 	.find-number {
 		padding: 1.5rem 1rem;
+		padding-top: 5rem;
 
 		&__column {
 			gap: 1rem;

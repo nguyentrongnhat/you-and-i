@@ -13,10 +13,9 @@ import { BUTTON_STYLE, GAME_DIFFICULTY_LEVEL, ROLE } from '../../../../../core/e
 import { FindNumberGameDTO } from '../../../../../core/interfaces/find-number-game.dto';
 import { LoaderService } from '../../../../../services/loader.service';
 import { NavigationService } from '../../../../../services/navigation.service';
-import { GameHistories } from '../../components/game-histories/game-histories';
 import { FindNumberGameService } from '../../services/findnumber.service';
 import { FormsModule } from '@angular/forms';
-import { GameRanking } from '../../components/game-ranking/game-ranking';
+import { GameOverview } from '../../components/game-overview/game-overview';
 import { UserService } from '../../../../user-management/services/user.service';
 
 @Component({
@@ -28,10 +27,9 @@ import { UserService } from '../../../../user-management/services/user.service';
       TagModule,
       MenuModule,
       SpeedDialModule,
-      GameHistories,
+      GameOverview,
       ConfirmDialogModule,
       FormsModule,
-      GameRanking
    ],
    providers: [ConfirmationService],
    templateUrl: './game-start-screen.html',

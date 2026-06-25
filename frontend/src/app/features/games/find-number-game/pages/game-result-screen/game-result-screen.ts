@@ -11,7 +11,7 @@ import { FindNumberGameDTO } from '../../../../../core/interfaces/find-number-ga
 import { LoaderService } from '../../../../../services/loader.service';
 import { NavigationService } from '../../../../../services/navigation.service';
 import { PlatformService } from '../../../../../services/platform.service';
-import { GameHistories } from '../../components/game-histories/game-histories';
+import { GameOverview } from '../../components/game-overview/game-overview';
 import { FindNumberGameService } from '../../services/findnumber.service';
 import { MESSAGE_TYPE } from '../../../../../core/enums';
 import { ToastService } from '../../../../../services/toast.service';
@@ -30,7 +30,7 @@ export enum FIND_NUMBER_GAME_STATUSES {
       DialogModule,
       ProgressBarModule,
       TagModule,
-      GameHistories,
+      GameOverview,
       MenuModule,
       SpeedDialModule,
    ],
