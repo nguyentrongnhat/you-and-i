@@ -132,7 +132,7 @@ public class FindNumberGameService {
                         )
                     ).toList();
 
-        List<FindNumberGameDTO> unfinishedGames = this.getUnfinishedGamesForCurrentUser();
+        List<FindNumberGameDTO> unfinishedGames = this.getUnfinishedGamesByPlayerUsername(username);
 
         FindNumberGameStats gameStats = findNumberGameBestRecordService.getGameStatsByPlayerUsername(username);
 
@@ -146,8 +146,7 @@ public class FindNumberGameService {
     }
 
 
-    public List<FindNumberGameDTO> getUnfinishedGamesForCurrentUser() {
-        String username = SecurityUtils.getLoggedInUsername();
+    public List<FindNumberGameDTO> getUnfinishedGamesByPlayerUsername(String username) {
         return findNumberGameRepository.findByPlayerUsernameAndEndTimeIsNull(username).stream().map(FindNumberGameDataMapper::toDTO).toList();
     }
 

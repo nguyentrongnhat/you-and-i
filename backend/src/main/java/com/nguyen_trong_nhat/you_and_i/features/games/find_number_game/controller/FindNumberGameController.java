@@ -52,7 +52,8 @@ public class FindNumberGameController {
 
     @GetMapping("/unfinish-games")
     public ResponseEntity<List<FindNumberGameDTO>> getUnfinishedGames() {
-        return ResponseEntity.ok().body(findNumberGameService.getUnfinishedGamesForCurrentUser());
+        String userName = SecurityUtils.getLoggedInUsername();
+        return ResponseEntity.ok().body(findNumberGameService.getUnfinishedGamesByPlayerUsername(userName));
     }
 
     @PostMapping("/finish-game")
@@ -70,10 +71,9 @@ public class FindNumberGameController {
 
     @GetMapping("/history")
     public ResponseEntity<FindNumberGameHistory> getGameHistory() {
+        String userName = SecurityUtils.getLoggedInUsername();
         return ResponseEntity.ok().body(
-                findNumberGameService.getGameHistory(
-                    SecurityUtils.getLoggedInUsername()
-                )
+                findNumberGameService.getGameHistory(userName)
         );
     }
 
