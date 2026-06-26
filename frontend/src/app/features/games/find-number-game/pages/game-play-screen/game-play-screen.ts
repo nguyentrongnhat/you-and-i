@@ -12,8 +12,7 @@ import { LoaderService } from '../../../../../services/loader.service';
 import { GameTable } from '../../components/game-table/game-table';
 import { FindNumberGameService } from '../../services/findnumber.service';
 import { FindNumberGameDTO } from '../../../../../core/interfaces/find-number-game.dto';
-import { Router } from '@angular/router';
-import { ROUTE_PATHS } from '../../../../../core/constants/route-paths';
+import { NavigationService } from '../../../../../services/navigation.service';
 import { subscribe } from 'diagnostics_channel';
 import { ToastService } from '../../../../../services/toast.service';
 import { AuthService } from '../../../../auth/services/auth.service';
@@ -39,15 +38,13 @@ export class GamePlayScreen {
 
    protected timer: number = 0;
 
-   protected currentSelectedNumber = signal<number>(0);
+   protected currentSelectedNumber = computed(() => this.findNumberGameService.currentSeclectedNumber());
 
    protected timeToDisplay = signal<string>('00:00:00')
 
    protected timeInterval!: ReturnType<typeof setInterval>;
 
    protected GAME_STATUSES = GAME_STATUSES;
-
-   protected lastFinishTime = signal<number>(0);
 
    protected TOTAL_NUMBERS = 100;
 
@@ -61,7 +58,7 @@ export class GamePlayScreen {
 
    private triggerUpdateGameStatus = new Subject<FindNumberGameDTO>();
 
-   private router = inject(Router);
+   private navigationService = inject(NavigationService);
 
    private BUTTON_STYLE = BUTTON_STYLE;
 
@@ -73,8 +70,8 @@ export class GamePlayScreen {
 
    protected bestTime = computed<number | null>(() => {
       const histories = this.findNumberGameService.gameHistories();
-      if (!histories.length) return null;
-      return Math.min(...histories.map((h) => h.timeToFinish));
+      if (!histories.history.length) return null;
+      return histories.bestRecord.completionTime || null;
    });
 
    protected bestTimeDisplay = computed(() => {
@@ -82,22 +79,44 @@ export class GamePlayScreen {
       return best === null ? '--' : this.findNumberGameService.convertTimerToTimeDisplay(best);
    });
 
-   protected totalGames = computed(() => this.findNumberGameService.gameHistories().length);
+   protected totalGames = computed(() => this.findNumberGameService.gameHistories().history.length);
 
-   protected items = signal<any[]>([
-      {
+   protected actionItems = computed<any[]>(() => {
+      const paused = {
          label: 'Pause',
          icon: 'pi pi-pause',
          command: () => this.pauseGame(),
          style: this.BUTTON_STYLE.WARN
-      },
-      {
+      }
+      
+      const resume = {
+         label: 'Resume',
+         icon: 'pi pi-play-circle',
+         command: () => this.resumeFromPause(),
+         style: this.BUTTON_STYLE.PRIMARY
+      }
+      
+      const shuffle = {
+         label: 'Shuffle',
+         icon: 'pi pi-sync',
+         command: () => this.findNumberGameService.shuffleNumbers.next(true),
+         style: this.BUTTON_STYLE.SUCCESS
+      }
+
+      const exit = {
          label: 'Exit',
          icon: 'pi pi-sign-out',
          command: () => this.exitGame(),
          style: this.BUTTON_STYLE.DANGER
       }
-   ]);
+      
+      const gameStatus = this.gameCurrentStatus();
+
+      if (gameStatus === GAME_STATUSES.PAUSED) {
+         return [resume, exit];
+      }
+      return [paused, shuffle, exit];
+   });
 
 
    constructor() {
@@ -105,6 +124,18 @@ export class GamePlayScreen {
          const currentGameId = this.gameId();
          if (!currentGameId) return;
          untracked(() => this.getCurrentGameInfo(currentGameId));
+      }),
+
+
+      effect(() => {
+         const currentSelectedNumber = this.currentSelectedNumber();
+
+         if (currentSelectedNumber === (this.currentGameInfo?.lastSelectedNumber || 0)) return;
+         
+         this.updateGameStatusAfterSeclectEachNumber(currentSelectedNumber, this.timer)
+         if (this.findNumberGameService.currentSeclectedNumber() === this.TOTAL_NUMBERS) {
+            this.finishGame();
+         }
       })
    }
 
@@ -180,26 +211,14 @@ export class GamePlayScreen {
 
    private loadGameFromLastUpdateInDB() {
       if (this.currentGameInfo!.lastSelectedNumber === this.TOTAL_NUMBERS) {
-         this.timer = Number(this.currentGameInfo!.completionTime);
+         // The game is already finished but acesstoken and refresh token are expired, so after login again we can directly finish the game and go to the result screen.
+         this.timer = this.currentGameInfo!.elapsedTime || 0;
          this.finishGame();
          return;
       }
+
       this.gameCurrentStatus.set(GAME_STATUSES.PLAYING);
-      this.currentSelectedNumber.set(this.currentGameInfo!.lastSelectedNumber || 0);
-      this.items.set([
-         {
-            label: 'Pause',
-            icon: 'pi pi-pause',
-            command: () => this.pauseGame(),
-            style: this.BUTTON_STYLE.WARN
-         },
-         {
-            label: 'Exit',
-            icon: 'pi pi-sign-out',
-            command: () => this.exitGame(),
-            style: this.BUTTON_STYLE.DANGER
-         }
-      ]);
+      this.findNumberGameService.currentSeclectedNumber.set(this.currentGameInfo!.lastSelectedNumber || 0);
 
       this.startTimer(new Date(this.currentGameInfo!.updateAt));
    }
@@ -207,25 +226,17 @@ export class GamePlayScreen {
 
    private resumeFromPause() {
       this.gameCurrentStatus.set(GAME_STATUSES.PLAYING);
-      this.currentSelectedNumber.set(this.currentGameInfo!.lastSelectedNumber);
-      this.items.set([
-         {
-            label: 'Pause',
-            icon: 'pi pi-pause',
-            command: () => this.pauseGame(),
-            style: this.BUTTON_STYLE.WARN
-         },
-         {
-            label: 'Exit',
-            icon: 'pi pi-sign-out',
-            command: () => this.exitGame(),
-            style: this.BUTTON_STYLE.DANGER
-         }
-      ]);
-
+      this.findNumberGameService.currentSeclectedNumber.set(this.currentGameInfo!.lastSelectedNumber);
       this.currentGameInfo!.gameStatus = GAME_STATUSES.PLAYING
       this.startTimer();
-      this.findNumberGameService.updateGameInfo(this.currentGameInfo!).subscribe();
+      this.findNumberGameService.updateGameInfo(this.currentGameInfo!).subscribe({
+         error: err => {
+            const toastSummary = 'An error occurred!!';
+            const toastDetail = err.error.message;
+            this.toastService.showToast(MESSAGE_TYPE.ERROR, toastSummary, toastDetail);
+            this.exitGame();
+         }
+      });
    }
 
 
@@ -233,55 +244,39 @@ export class GamePlayScreen {
       this.stopTimer();
       this.gameCurrentStatus.set(GAME_STATUSES.PAUSED);
 
-      this.currentSelectedNumber.set(this.currentGameInfo!.lastSelectedNumber ?? 0);
+      this.findNumberGameService.currentSeclectedNumber.set(this.currentGameInfo!.lastSelectedNumber ?? 0);
       this.timeToDisplay.set(this.findNumberGameService.convertTimerToTimeDisplay(Number(this.currentGameInfo!.elapsedTime) ?? 0));
-      
-      this.items.set([
-         {
-            label: 'Resume',
-            icon: 'pi pi-play-circle',
-            command: () => this.resumeFromPause(),
-            style: this.BUTTON_STYLE.PRIMARY
-         },
-         {
-            label: 'Exit',
-            icon: 'pi pi-sign-out',
-            command: () => this.exitGame(),
-            style: this.BUTTON_STYLE.DANGER
-         }
-      ]);
    }
 
 
    private pauseGame() {
       this.stopTimer();
       this.gameCurrentStatus.set(GAME_STATUSES.PAUSED);
-
       this.currentGameInfo!.gameStatus = GAME_STATUSES.PAUSED;
-      this.currentGameInfo!.elapsedTime = this.timer.toString();
-      this.findNumberGameService.updateGameInfo(this.currentGameInfo!).subscribe();
-      
-      this.items.set([
-         {
-            label: 'Resume',
-            icon: 'pi pi-play-circle',
-            command: () => this.resumeFromPause(),
-            style: this.BUTTON_STYLE.PRIMARY
-         },
-         {
-            label: 'Exit',
-            icon: 'pi pi-sign-out',
-            command: () => this.exitGame(),
-            style: this.BUTTON_STYLE.DANGER
+      this.currentGameInfo!.elapsedTime = this.timer;
+      this.findNumberGameService.updateGameInfo(this.currentGameInfo!).subscribe({
+         error: err => {
+            const toastSummary = 'An error occurred!!';
+            const toastDetail = err.error.message;
+            this.toastService.showToast(MESSAGE_TYPE.ERROR, toastSummary, toastDetail);
+            this.exitGame();
          }
-      ]);
+      });
    }
 
 
    protected finishGame(): void {
+      // Pre-set game info to make sure the game status is updated to DONE in case the request 
+      // to finish game api failed due to access token expired or other error
+      // , we can still navigate user to result screen and display the correct game status and completion time.
+      this.currentGameInfo!.gameStatus = GAME_STATUSES.PLAYING;
+      this.currentGameInfo!.lastSelectedNumber = this.TOTAL_NUMBERS;
+      this.currentGameInfo!.completionTime = this.timer;
+      this.findNumberGameService.currentGameInfo.set(this.currentGameInfo);
+      
+
       this.stopTimer();
       this.loaderService.show();
-      this.lastFinishTime.set(this.timer);
       this.findNumberGameService.finishGame(this.gameId()!, this.timer)
          .pipe(takeUntilDestroyed(this.destroyRef))
          .subscribe({
@@ -290,12 +285,19 @@ export class GamePlayScreen {
                this.goToResultScreen();
             },
             error: (err) => {
-               console.log(err)
-               this.currentGameInfo!.gameStatus = GAME_STATUSES.PLAYING;
-               this.currentGameInfo!.lastSelectedNumber = this.TOTAL_NUMBERS;
-               this.currentGameInfo!.completionTime = this.timer.toString();
-               this.findNumberGameService.currentGameInfo.set(this.currentGameInfo);
-               this.authService.refreshToken();
+               if(err.error.status === 404) {
+                  const toastSummary = 'The game is not exist anymore';
+                  const toastDetail = 'Please start a new game.';
+                  this.toastService.showToast(MESSAGE_TYPE.ERROR, toastSummary, toastDetail);
+                  this.exitGame();
+                  return;
+               }
+               else if(err.error.status === 401 || err.error.status === 403) {
+                  this.authService.refreshToken();
+               }
+               else {
+                  this.goToResultScreen();
+               }
             }
          })
    }
@@ -303,21 +305,19 @@ export class GamePlayScreen {
 
    private exitGame() {
       this.stopTimer();
-      this.router.navigateByUrl(ROUTE_PATHS.GAME.children.FIND_NUMBER_GAME.children.START_SCREEN.fullPath)
+      this.navigationService.goToFindNumberGameStart();
    }
 
 
    private goToResultScreen() {
       this.stopTimer();
-      this.router.navigateByUrl(
-         ROUTE_PATHS.GAME.children.FIND_NUMBER_GAME.children.SUMMARY_GAME_SCREEN.fullPath.replace(':gameId', this.gameId()!)
-      )
+      this.navigationService.goToFindNumberGameSummary(this.gameId()!);
    }
 
 
    public updateGameStatusAfterSeclectEachNumber(lastSelected: number, elapsedTime: number) {
       this.currentGameInfo!.lastSelectedNumber = lastSelected
-      this.currentGameInfo!.elapsedTime = elapsedTime.toString();
+      this.currentGameInfo!.elapsedTime = elapsedTime;
       this.timerStartPoint = new Date();
       
       if(lastSelected > 90) return;
@@ -332,18 +332,12 @@ export class GamePlayScreen {
             debounceTime(5000),
             takeUntilDestroyed(this.destroyRef),
             switchMap((game: FindNumberGameDTO) => this.findNumberGameService.updateGameInfo(game))
-         ).subscribe()
+         ).subscribe({
+            error: (err) => {
+               this.exitGame();
+            }
+         })
    }
-
-
-   protected onSelectNumber(num: number) {
-      this.currentSelectedNumber.set(num);
-      this.updateGameStatusAfterSeclectEachNumber(this.currentSelectedNumber(), this.timer)
-      if (this.currentSelectedNumber() === this.TOTAL_NUMBERS) {
-         this.finishGame();
-      }
-   }
-
 
    private startTimer(startPoint?: Date): void {
       this.timerStartPoint = startPoint || new Date();
@@ -370,7 +364,6 @@ export class GamePlayScreen {
 
 
    protected getHistories() {
-      if (this.findNumberGameService.gameHistories().length) return;
       this.findNumberGameService.getGameHistories()
          .pipe(
             takeUntilDestroyed(this.destroyRef),

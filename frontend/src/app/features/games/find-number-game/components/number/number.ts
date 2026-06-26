@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, Component, effect, ElementRef, inject, input, output, signal, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, input, output, signal, ViewChild } from '@angular/core';
 import { PlatformService } from '../../../../../services/platform.service';
 import { UserService } from '../../../../user-management/services/user.service';
 import { ROLE } from '../../../../../core/enums';
 import { NumberData } from '../../../../../core/type';
+import { FindNumberGameService } from '../../services/findnumber.service';
+import { SoundService } from '../../services/sound.service';
 
 @Component({
   selector: 'app-number',
@@ -22,26 +24,40 @@ export class Number implements AfterViewInit {
 
   public onSelected = output<number>();
 
-  public currentNumber = input<number>(0);
-
-  protected isIndicate = signal<boolean>(false);
-
-  protected isTarget = signal<boolean>(false);
-
-  protected isSelected = signal<boolean>(false);
-
   private readonly userService = inject(UserService);
 
   private readonly platformService = inject(PlatformService);
 
+  private readonly findNumberGameService = inject(FindNumberGameService);
+
+  private readonly soundService = inject(SoundService);
+
+  private currentSelectedNumber = computed(() => this.findNumberGameService.currentSeclectedNumber());
+
+  private targetNumber = computed(() => this.findNumberGameService.curentTargetNumber());
+
+  protected isTargetNumber = computed<boolean>(() => this.targetNumber() === this.data()?.value);
+
+  protected isSelected = computed<boolean>(() => {
+    const numberData: number = this.data()?.value || 0;
+    return numberData <= this.currentSelectedNumber();
+  });
+
+  protected isIndicate = computed<boolean>(() => {
+    const numberData: number = this.data()?.value || 0;
+    if (!this.userService.hasRoles([ROLE.SUPER_ADMIN])) return false;
+    return numberData === this.targetNumber();
+  });
+
   constructor() {
+    if (this.data()) {
+      this.drawNumber(this.data() as NumberData);
+    }
+    
     effect(() => {
       const numberData = this.data() as NumberData;
       if (this.platformService.isBrowser()) {
         this.drawNumber(numberData);
-        const currentNumber = this.currentNumber();
-        this.updateForSelectedNumber(currentNumber);
-        this.upDateIndicate(currentNumber);
       }
     });
   }
@@ -58,33 +74,17 @@ export class Number implements AfterViewInit {
     return {
       left: this.data()?.tx + '%',
       top: this.data()?.ty + '%',
-      transform: `translate(-50%, -50%) rotate(${this.data()?.rotate}deg)`
+      transform: `translate(-15%, -15%) rotate(${this.data()?.rotate}deg)`
     };
   }
 
 
   protected onSelect() {
-    const numberData: number = this.data()?.value ?? -1
-    if(this.currentNumber() + 1 === numberData) {
-      this.updateForSelectedNumber(this.currentNumber());
-      this.onSelected.emit(numberData)
+    const numberData: number = this.data()!.value
+    if(this.targetNumber() === numberData) {
+      this.findNumberGameService.currentSeclectedNumber.set(numberData);
+      this.soundService.playSound('correct');
     }
-  }
-
-
-  protected updateForSelectedNumber(currentNumber: number) {
-    const numberData: number = this.data()?.value ?? -1
-    if(numberData <= currentNumber) {
-      this.isSelected.set(true);
-    }
-  }
-
-
-  protected upDateIndicate(currentNumber: number) {
-    const numberData: number = this.data()?.value ?? -1
-    this.isTarget.set(currentNumber + 1 === numberData);
-    if (!this.userService.hasRoles([ROLE.SUPER_ADMIN])) return;
-    this.isIndicate.set(currentNumber + 1 === numberData);
   }
 
 
@@ -107,7 +107,7 @@ export class Number implements AfterViewInit {
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
-      const value = drawData?.value ?? -1;
+      const value = drawData?.value;
 
       ctx.fillText(
         value.toString(),

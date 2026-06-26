@@ -1,0 +1,82 @@
+<div class="ranking">
+  <!-- ===== Heading ===== -->
+  <div class="ranking__heading">
+    <span class="ranking__heading-icon"><i class="pi pi-trophy"></i></span>
+    <div class="ranking__heading-text">
+      <h3 class="ranking__heading-title">Bảng vinh danh</h3>
+      <span class="ranking__heading-sub">Những huyền thoại nhanh nhất</span>
+    </div>
+  </div>
+
+  @if (bestRecordsRanking().length) {
+    <!-- ===== Podium: Top 3 ===== -->
+    <div class="podium">
+      <div class="podium__glow"></div>
+      @for (entry of podium(); track entry.rank) {
+        <div
+          class="podium__slot"
+          [class.podium__slot--first]="entry.rank === 0"
+          [class.podium__slot--second]="entry.rank === 1"
+          [class.podium__slot--third]="entry.rank === 2"
+        >
+          @if (entry.rank === 0) {
+            <i class="pi pi-crown podium__crown"></i>
+          }
+
+          <div class="podium__avatar-ring">
+            <span class="podium__avatar">
+              {{ userService.extractAvatarFromName(entry.item.playerDisplayName) }}
+            </span>
+            <span class="podium__medal">
+              @if (entry.rank === 0) { <i class="pi pi-star-fill"></i> }
+              @else { {{ entry.rank + 1 }} }
+            </span>
+          </div>
+
+          <span class="podium__name">{{ entry.item.playerDisplayName }}</span>
+          <span class="podium__time">
+            <i class="pi pi-clock"></i>
+            {{ findNumberGameService.convertTimerToTimeDisplay(entry.item.completionTime) }}
+          </span>
+
+          <div class="podium__stand">
+            <span class="podium__stand-rank">{{ entry.rank + 1 }}</span>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- ===== List: rank 4+ ===== -->
+    @if (others().length) {
+      <div class="ranking__list">
+        @for (item of others(); track $index; let i = $index) {
+          <div class="ranking__item">
+            <span class="ranking__rank">{{ i + 4 }}</span>
+
+            <span class="ranking__avatar">
+              {{ userService.extractAvatarFromName(item.playerDisplayName) }}
+            </span>
+
+            <div class="ranking__main">
+              <span class="ranking__name">{{ item.playerDisplayName }}</span>
+              <span class="ranking__sub">
+                <i class="pi pi-calendar"></i>
+                {{ item.archivedTime | date:'dd/MM/yyyy - HH:mm' }}
+              </span>
+            </div>
+
+            <span class="ranking__time">
+              {{ findNumberGameService.convertTimerToTimeDisplay(item.completionTime) }}
+            </span>
+          </div>
+        }
+      </div>
+    }
+  } @else {
+    <div class="ranking__empty">
+      <i class="pi pi-inbox"></i>
+      <span>Chưa có kỷ lục nào được ghi nhận.</span>
+      <small>Hoàn thành một ván để có tên trên bảng vinh danh.</small>
+    </div>
+  }
+</div>

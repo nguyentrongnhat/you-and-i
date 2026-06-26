@@ -1,0 +1,47 @@
+<div class="overview">
+  @if (canViewRanking()) {
+    <div class="overview__switch" role="tablist" aria-label="Chế độ hiển thị">
+      <span
+        class="overview__thumb"
+        [class.overview__thumb--ranking]="activeTab() === 'ranking'"
+        aria-hidden="true"
+      ></span>
+
+      <button
+        type="button"
+        role="tab"
+        class="overview__tab"
+        [class.overview__tab--active]="activeTab() === 'history'"
+        [attr.aria-selected]="activeTab() === 'history'"
+        (click)="setTab('history')"
+      >
+        <i class="pi pi-history"></i>
+        <span>Lịch sử</span>
+      </button>
+
+      <button
+        type="button"
+        role="tab"
+        class="overview__tab"
+        [class.overview__tab--active]="activeTab() === 'ranking'"
+        [attr.aria-selected]="activeTab() === 'ranking'"
+        (click)="setTab('ranking')"
+      >
+        <i class="pi pi-trophy"></i>
+        <span>Xếp hạng</span>
+      </button>
+    </div>
+  }
+
+  <div class="overview__panel">
+    @if (activeTab() === 'history' || !canViewRanking()) {
+      <div class="overview__pane" animate.enter="overview-pane-in">
+        <app-game-histories />
+      </div>
+    } @else {
+      <div class="overview__pane" animate.enter="overview-pane-in">
+        <app-game-ranking />
+      </div>
+    }
+  </div>
+</div>

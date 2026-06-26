@@ -6,32 +6,34 @@ import com.nguyen_trong_nhat.you_and_i.common.exception.UnauthorizedException;
 import com.nguyen_trong_nhat.you_and_i.common.security.util.SecurityUtils;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.dto.*;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGame;
+import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGameStats;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.mapper.FindNumberGameDataMapper;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.repository.FindNumberGameRepository;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
 import com.nguyen_trong_nhat.you_and_i.features.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @AllArgsConstructor
 public class FindNumberGameService {
     private final FindNumberGameRepository findNumberGameRepository;
+    private final FindNumberGameBestRecordService findNumberGameBestRecordService;
     private final UserRepository userRepository;
 
-    public FindNumberGame createNewGame(String userName, CreateNewFindNumberGameRequest gameInfo) {
+    public FindNumberGame createNewGame(String username, CreateNewFindNumberGameRequest gameInfo) {
 
-        Optional<MyUserDetail> playerOpt = userRepository.findByUsername(userName);
+        Optional<MyUserDetail> playerOpt = userRepository.findByUsername(username);
 
         if(playerOpt.isEmpty()) throw new BadRequestException("");
 
         MyUserDetail player = playerOpt.get();
 
-        var gamesAreNotFinish = findNumberGameRepository.findByPlayerAndEndTimeIsNull(player);
+        var gamesAreNotFinish = findNumberGameRepository.findByPlayerUsernameAndEndTimeIsNull(username);
 
         findNumberGameRepository.deleteAll(gamesAreNotFinish);
 
@@ -83,6 +85,7 @@ public class FindNumberGameService {
     }
 
 
+    @Transactional
     public FindNumberGame finishGame(String userName, FinishFindNumberGameRequest gameInfo) {
 
         Optional<FindNumberGame> gameOpt = findNumberGameRepository.findById(gameInfo.getGameId());
@@ -103,34 +106,73 @@ public class FindNumberGameService {
 
         game.setGameStatus(GameStatus.DONE);
 
-        return findNumberGameRepository.save(game);
+        game = findNumberGameRepository.save(game);
+
+        FindNumberGameStats gameStats = findNumberGameBestRecordService.updateGameStatsForUser(game.getPlayer(), game, true);
+
+        int numberOfGameToKeep = 10;
+
+        this.cleanupOldGames(userName, numberOfGameToKeep, gameStats);
+
+        return game;
     }
 
 
-    public List<FindNumberGameHistoryResponse> getGameHistory(String userName) {
+    public FindNumberGameHistory getGameHistory(String username) {
 
-        Optional<MyUserDetail> playerOpt = userRepository.findByUsername(userName);
+        List<FindNumberGameHistoryItem> gameFinished
+                = findNumberGameRepository
+                    .findByPlayerUsernameAndEndTimeIsNotNull(username)
+                    .stream().map(game ->
+                        new FindNumberGameHistoryItem(
+                            game.getStartTime(),
+                            game.getEndTime(),
+                            game.getCompletionTime(),
+                            game.getBonusTime()
+                        )
+                    ).toList();
 
-        if(playerOpt.isEmpty()) throw new BadRequestException("User not found!");
+        List<FindNumberGameDTO> unfinishedGames = this.getUnfinishedGamesByPlayerUsername(username);
 
-        MyUserDetail player = playerOpt.get();
+        FindNumberGameStats gameStats = findNumberGameBestRecordService.getGameStatsByPlayerUsername(username);
 
-        List<FindNumberGame> gameFinished = findNumberGameRepository.findByPlayerAndEndTimeIsNotNull(player);
 
-        return gameFinished.stream().map(game ->
-            new FindNumberGameHistoryResponse(
-                    game.getStartTime(),
-                    game.getEndTime(),
-                    game.getCompletionTime(),
-                    game.getBonusTime()
-            )
-        ).toList();
+        return new FindNumberGameHistory(
+                gameFinished,
+                FindNumberGameDataMapper.toBestRecordDTO(gameStats),
+                unfinishedGames,
+                gameStats == null ? 0 : gameStats.getTotalGamesPlayed()
+        );
     }
 
 
-    public List<FindNumberGameDTO> getUnfinishedGamesForCurrentUser() {
-        String username = SecurityUtils.getLoggedInUsername();
-        MyUserDetail user = userRepository.findByUsername(username).orElseThrow(() -> new BadRequestException("User not found!"));
-        return findNumberGameRepository.findByPlayerAndEndTimeIsNull(user).stream().map(FindNumberGameDataMapper::toDTO).toList();
+    public List<FindNumberGameDTO> getUnfinishedGamesByPlayerUsername(String username) {
+        return findNumberGameRepository.findByPlayerUsernameAndEndTimeIsNull(username).stream().map(FindNumberGameDataMapper::toDTO).toList();
+    }
+
+    @Transactional
+    public void cleanupOldGames(String username, int keepCount, FindNumberGameStats gameStats) {
+
+        UUID bestGameId = gameStats.getBestRecordGame().getId();
+
+        List<UUID> recentIds = findNumberGameRepository.findRecentGame(
+                username,
+                PageRequest.of(0, keepCount)
+        ).stream().map(FindNumberGame::getId).toList();
+
+        Set<UUID> keepIds = new LinkedHashSet<>();
+        keepIds.add(bestGameId);
+
+        for (UUID id : recentIds) {
+            if (keepIds.size() >= keepCount) {
+                break;
+            }
+            keepIds.add(id);
+        }
+
+        findNumberGameRepository.deleteAllByPlayerIdAndIdNotIn(
+                username,
+                keepIds
+        );
     }
 }

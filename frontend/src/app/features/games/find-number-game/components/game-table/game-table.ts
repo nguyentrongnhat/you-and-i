@@ -13,23 +13,19 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 })
 export class GameTable implements OnInit, AfterViewInit {
 
-	public currentNumber = input<number>(0);
-
 	private readonly destroyRef = inject(DestroyRef);
 
 	private findNumberGameService = inject(FindNumberGameService);
 
-	screenWidth = signal(0);
+	protected screenWidth = signal(0);
 
-	columns = computed(() => this.screenWidth() < 768 ? 5 : 10);
+	protected columns = computed(() => this.screenWidth() < 768 ? 5 : 10);
 
-	numbers = signal<NumberData[]>(this.generateItems());
+	protected numbers = signal<NumberData[]>(this.generateItems());
 
-	onSelectNumber = output<number>();
+	protected onSelectNumber = output<number>();
 
-	platformService = inject(PlatformService);
-
-	ready = false;
+	protected platformService = inject(PlatformService);
 
 	constructor() {}
 
@@ -45,11 +41,11 @@ export class GameTable implements OnInit, AfterViewInit {
 			this.screenWidth.set(window.innerWidth);
 		}
 
-		this.onShuttleNumbers();
+		this.onShuffleNumbers();
 	}
 
 
-	onShuttleNumbers() {
+	onShuffleNumbers() {
 		this.findNumberGameService.shuffleNumbers.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
 			this.numbers.set(this.generateItems());
 		})
@@ -59,10 +55,6 @@ export class GameTable implements OnInit, AfterViewInit {
 	ngAfterViewInit(): void {
 		if (this.platformService.isBrowser()) {
 			this.screenWidth.set(window.innerWidth);
-
-			setTimeout(() => {
-				this.ready = true;
-			});
 		}
 	}
 
@@ -78,9 +70,9 @@ export class GameTable implements OnInit, AfterViewInit {
 		return arr.map(num => {
 			return {
 				value: num,
-				rotate: this.random(-180, 170),
-				tx: this.random(0, 100),
-				ty: this.random(0, 100),
+				rotate: this.random(-180, 175),
+				tx: this.random(0, 60),
+				ty: this.random(0, 110),
 				fontSize: this.random(13, 20)
 			};
 		});
@@ -89,11 +81,6 @@ export class GameTable implements OnInit, AfterViewInit {
 
 	private random(min: number, max: number) {
 		return Math.random() * (max - min) + min;
-	}
-
-
-	public selectNumber() {
-		this.onSelectNumber.emit(this.currentNumber()+1)
 	}
 }
 

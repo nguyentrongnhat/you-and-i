@@ -6,12 +6,7 @@
       [style.gridTemplateColumns]="'repeat(' + columns() + ', 1fr)'"
     >
       @for(item of numbers(); track item) {
-        @if(ready) {
-          <app-number
-            [data]="item"
-            [currentNumber]="currentNumber()"
-            (onSelected)="selectNumber()"></app-number>
-        }
+        <app-number [data]="item"></app-number>
       }
     </div>
   </div>

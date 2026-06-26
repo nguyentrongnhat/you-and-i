@@ -1,58 +1,149 @@
-<div class="wrapper" style="width: 100%;">
+<div class="wrapper">
     <nav class="header">
-        <i class="pi pi-bars size-menu-toggle-icon" (click)="toggleSideMenu()"></i>
-        <div class="topbar-logo-render" (click)="navigateTo(this.ROUTE_PATHS.HOME.path)">
-            <p-avatar image="/icons/jarofmessages.svg" class="mr-2" shape="circle" />
-            Jar of Messages
+        <button type="button" class="header__menu-btn" (click)="toggleSideMenu()" aria-label="Toggle menu">
+            <span class="header__menu-icon" [class.is-open]="expandSideMenu()">
+                <span></span><span></span><span></span>
+            </span>
+        </button>
+
+        <div class="header__brand" (click)="navigateTo(this.ROUTE_PATHS.HOME.path)">
+            <p-avatar image="/icons/jarofmessages.svg" shape="circle" styleClass="header__brand-logo" />
+            <span class="header__brand-name">Jar of Messages</span>
         </div>
 
         <ul class="navigation-item">
-            @for(item of this.navigationItems(); track item) {
-                
-                <li 
-                    (click)="navigateTo(item.url)" 
-                    tooltipPosition="bottom" pTooltip="{{item.name}}" 
-                    [ngClass]="{'active': item.active}"
+            @for (item of this.navigationItems(); track item.name) {
+                <li
+                    (click)="navigateTo(item.url)"
+                    tooltipPosition="bottom" pTooltip="{{ item.name }}"
+                    [ngClass]="{ 'active': item.active }"
                 >
-                    <i class="pi {{item.icon}}"></i>
+                    <i class="pi {{ item.icon }}"></i>
                 </li>
-                
             }
-            
         </ul>
 
-        <div class="account-and-setting">
-            <p-avatar class="avartar" (click)="op.toggle($event)" image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" class="mr-2" shape="circle" />
-            <p-popover #op>
-                <ng-template #content>
-                    <!-- <p-menu [model]="accountMenu" #content /> -->
-                    @for (item of accountMenu; track item) {
-                        <div class="account-menu-item" (click)="item?.command({})">
-                            <i class="pi {{item.icon}} mr-2"></i>
-                            {{item.label}}
-                        </div>
-                    }
-                </ng-template>
-            </p-popover>
+        <div class="header__actions">
+            <button
+                #settingsBtn
+                type="button"
+                class="header__icon-btn"
+                [class.is-active]="settingsOpen()"
+                (click)="toggleSettings()"
+                pTooltip="Cài đặt" tooltipPosition="bottom"
+                aria-label="Settings"
+            >
+                <i class="pi pi-cog"></i>
+            </button>
+
+            <button
+                #avatarBtn
+                type="button"
+                class="header__avatar-btn"
+                [class.is-active]="accountOpen()"
+                (click)="toggleAccount()"
+                aria-label="Account menu"
+            >
+                @if (avatarUrl()) {
+                    <p-avatar [image]="avatarUrl()!" shape="circle" styleClass="header__avatar" />
+                } @else {
+                    <p-avatar [label]="userInitials()" shape="circle" styleClass="header__avatar header__avatar--initials" />
+                }
+            </button>
         </div>
     </nav>
 
+    <!-- Dropdown menus: fixed, không bị ảnh hưởng bởi scroll -->
+    @if (settingsOpen() || accountOpen()) {
+        <div class="menu-backdrop" (click)="closeMenus()"></div>
+    }
+
+    @if (settingsOpen()) {
+        <div class="dropdown dropdown--settings" role="menu">
+            <p class="dropdown__title">Cài đặt</p>
+
+            <div class="dropdown__section">
+                <span class="dropdown__label">
+                    <i class="pi pi-globe"></i> Ngôn ngữ
+                </span>
+                <div class="dropdown__langs">
+                    @for (language of languages; track language.code) {
+                        <button
+                            type="button"
+                            class="lang-chip"
+                            [ngClass]="{ 'lang-chip--active': language.code === currentLanguageCode() }"
+                            (click)="setLanguage(language.code)"
+                        >
+                            <span class="lang-chip__flag">{{ language.flag }}</span>
+                            <span class="lang-chip__label">{{ language.label }}</span>
+                            @if (language.code === currentLanguageCode()) {
+                                <i class="pi pi-check lang-chip__check"></i>
+                            }
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (accountOpen()) {
+        <div class="dropdown dropdown--account" role="menu">
+            <div class="dropdown__account-header">
+                @if (avatarUrl()) {
+                    <p-avatar [image]="avatarUrl()!" size="large" shape="circle" styleClass="dropdown__avatar" />
+                } @else {
+                    <p-avatar [label]="userInitials()" size="large" shape="circle" styleClass="dropdown__avatar dropdown__avatar--initials" />
+                }
+                <div class="dropdown__identity">
+                    <span class="dropdown__name">{{ displayName() }}</span>
+                    @if (userHandle()) {
+                        <span class="dropdown__handle">{{ userHandle() }}</span>
+                    }
+                    <span class="dropdown__role">
+                        <i class="pi pi-shield"></i>{{ primaryRoleLabel() }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="dropdown__divider"></div>
+
+            <button type="button" class="dropdown__item" (click)="navigateToProfilePage(); closeMenus()">
+                <i class="pi pi-user"></i>
+                <span>Trang cá nhân</span>
+                <i class="pi pi-angle-right dropdown__item-arrow"></i>
+            </button>
+
+            <button type="button" class="dropdown__item" (click)="openSettingsFromAccount()">
+                <i class="pi pi-cog"></i>
+                <span>Cài đặt</span>
+                <i class="pi pi-angle-right dropdown__item-arrow"></i>
+            </button>
+
+            <div class="dropdown__divider"></div>
+
+            <button type="button" class="dropdown__item dropdown__item--danger" (click)="signOut(); closeMenus()">
+                <i class="pi pi-sign-out"></i>
+                <span>Đăng xuất</span>
+            </button>
+        </div>
+    }
+
 
     <div class="side-menu-and-content">
-        <div class="mini-side-menu" [ngClass]="{'expand': this.expandSideMenu()}">
+        <div class="mini-side-menu" [ngClass]="{ 'expand': this.expandSideMenu() }">
             <ul class="navigation-item">
-                @for(item of this.navigationItems(); track item) {
-                    <li 
-                        (click)="navigateTo(item.url)" 
-                        tooltipPosition="right" pTooltip="{{item.name}}" 
-                        [ngClass]="{'active': item.active}"
+                @for (item of this.navigationItems(); track item.name) {
+                    <li
+                        (click)="navigateTo(item.url)"
+                        tooltipPosition="right" pTooltip="{{ item.name }}"
+                        [ngClass]="{ 'active': item.active }"
                     >
-                            <i class="pi {{item.icon}}"></i>
+                        <i class="pi {{ item.icon }}"></i>
                     </li>
                 }
             </ul>
         </div>
-        <div class="content max-w-[1200px] mx-auto">
+        <div class="content mx-auto">
             <ng-content></ng-content>
         </div>
     </div>
@@ -60,16 +151,17 @@
     <!-- Mobile bottom navigation -->
     <nav class="bottom-nav" [ngClass]="{ 'bottom-nav--hidden': hideBottomNav() }">
         <ul class="bottom-nav__list">
-            @for (item of this.navigationItems(); track item) {
-            <li
-                class="bottom-nav__item"
-                [ngClass]="{ 'active': item.active }"
-                (click)="navigateTo(item.url)"
-                pTooltip="{{ item.name }}"
-                tooltipPosition="top"
-            >
-                <i class="pi {{ item.icon }}"></i>
-            </li>
+            @for (item of this.navigationItems(); track item.name) {
+                <li
+                    class="bottom-nav__item"
+                    [ngClass]="{ 'active': item.active }"
+                    (click)="navigateTo(item.url)"
+                >
+                    <span class="bottom-nav__icon">
+                        <i class="pi {{ item.icon }}"></i>
+                    </span>
+                    <span class="bottom-nav__label">{{ item.name }}</span>
+                </li>
             }
         </ul>
     </nav>

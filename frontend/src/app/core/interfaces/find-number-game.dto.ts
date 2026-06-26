@@ -1,27 +1,44 @@
-import { GAME_DIFFICULTY_LEVEL, GAME_STATUSES } from "../enums";
+import { GAME_DIFFICULTY_LEVEL, GAME_STATUSES } from '../enums';
 
 export interface FindNumberGameDTO {
-	id: string;
+  id: string;
+  player: string;
+  totalNumbersToFind: number;
+  difficultyLevel: GAME_DIFFICULTY_LEVEL;
+  startTime: Date;
+  endTime: Date;
+  completionTime: number;
+  gameStatus: GAME_STATUSES;
+  lastSelectedNumber: number;
+  elapsedTime: number;
+  bonusTime: number;
+  updateAt: Date;
+}
 
-	player: string;
+export interface FindNumberGameBestRecordDTO {
+  gameId: string;
+  playerFullName: string;
+  playerDisplayName: string;
+  playerUsername: string;
+  archivedTime: string;
+  completionTime: number;
+}
 
-	totalNumbersToFind: number;
+export interface FindNumberGameHistoryItem {
+  startTime: string;
+  endTime: string;
+  completionTime: number;
+  bonusTime: number;
+}
 
-	difficultyLevel: GAME_DIFFICULTY_LEVEL;
+export interface FindNumberGameHistory {
+  history: FindNumberGameHistoryItem[];
+  bestRecord: FindNumberGameBestRecordDTO;
+  unfinishedGames: FindNumberGameDTO[];
+  totalGamesPlayed: number;
+}
 
-	startTime: Date;
-
-	endTime: string;
-
-	completionTime: string;
-
-	gameStatus: GAME_STATUSES;
-
-	lastSelectedNumber: number;
-
-	elapsedTime: string;
-
-	bonusTime: number;
-
-	updateAt: Date;
+export interface FindNumberGameHistory {
+  history: FindNumberGameHistoryItem[];
+  bestRecord: FindNumberGameBestRecordDTO;
 }

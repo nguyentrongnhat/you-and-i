@@ -1,10 +1,9 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { Router } from '@angular/router';
 import { BehaviorSubject, catchError, filter, switchMap, take, throwError } from 'rxjs';
 import { PlatformService } from '../../services/platform.service';
+import { NavigationService } from '../../services/navigation.service';
 import { API_ENDPOINTS } from '../constants/api-endpoints';
-import { ROUTE_PATHS } from '../constants/route-paths';
 import { AuthService } from '../../features/auth/services/auth.service';
 
 let isRefreshingToken = false;
@@ -16,7 +15,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     
     const platformService = inject(PlatformService);
     
-    const router = inject(Router);
+    const navigationService = inject(NavigationService);
 
     const accessToken = authService.accessToken();
 
@@ -28,7 +27,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         return next(req).pipe(
             catchError(err => {
                 if (platformService.isBrowser()) {
-                    router.navigateByUrl(ROUTE_PATHS.AUTH.children.LOGIN.fullPath);
+                    navigationService.goToLogin();
                 }
                 return throwError(() => err);
             })

@@ -37,3 +37,164 @@ body {
 .p-overlay-mask.p-speeddial-mask {
   z-index: 1000 !important;
 }
+
+/* Keep the user-detail role multiselect overlay below the sticky header */
+.p-overlay:has(.user-detail__role-overlay) {
+  z-index: 900 !important;
+}
+
+/* ============================================================
+   Find-number game · History dialog skin
+   Shared by game-start-screen & game-result-screen
+   ============================================================ */
+.history-dialog.p-dialog {
+  width: 52rem;
+  max-width: 94vw;
+  border-radius: 22px;
+  overflow: hidden;
+  border: 1px solid var(--p-content-border-color, #e5e7eb);
+  box-shadow: 0 24px 60px rgba(16, 24, 40, 0.28);
+  animation: history-dialog-in 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+
+  .p-dialog-header {
+    padding: 1.15rem 1.35rem;
+    border-bottom: 1px solid var(--p-content-border-color, #eef0f3);
+    background: linear-gradient(135deg,
+      rgba(99, 102, 241, 0.08),
+      rgba(168, 85, 247, 0.05));
+  }
+
+  .p-dialog-content {
+    padding: 1.35rem;
+    background: var(--p-content-background, #fff);
+  }
+
+  /* Custom header layout */
+  .history-dialog__head {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+  }
+
+  .history-dialog__head-icon {
+    display: grid;
+    place-items: center;
+    width: 2.85rem;
+    height: 2.85rem;
+    border-radius: 13px;
+    font-size: 1.2rem;
+    color: #fff;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+  }
+
+  .history-dialog__head-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .history-dialog__head-title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--p-text-color, #111827);
+  }
+
+  .history-dialog__head-sub {
+    font-size: 0.8rem;
+    color: var(--p-text-muted-color, #6b7280);
+  }
+
+  /* Close button polish */
+  .p-dialog-header-actions .p-dialog-header-icon,
+  .p-dialog-close-button {
+    border-radius: 10px;
+    transition: background-color 0.18s ease, transform 0.18s ease;
+
+    &:hover {
+      background: var(--p-content-hover-background, #f3f4f6);
+      transform: rotate(90deg);
+    }
+  }
+}
+
+@media (max-width: 575px) {
+  .history-dialog.p-dialog {
+    border-radius: 18px;
+
+    .p-dialog-header {
+      padding: 0.95rem 1rem;
+    }
+
+    .p-dialog-content {
+      padding: 1rem;
+    }
+
+    .history-dialog__head-icon {
+      width: 2.5rem;
+      height: 2.5rem;
+      font-size: 1.05rem;
+    }
+
+    .history-dialog__head-title {
+      font-size: 1.05rem;
+    }
+  }
+}
+
+@keyframes history-dialog-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .history-dialog.p-dialog {
+    animation: none;
+  }
+}
+
+/* ============================================================
+   Gold (hoàng kim) button — dùng cho nút "Thành tích"
+   ============================================================ */
+.p-button.gold-button {
+  border: none;
+  color: #fff;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 45%, #f97316 100%);
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.35);
+  transition: transform 0.18s ease, box-shadow 0.25s ease, filter 0.25s ease;
+
+  .p-button-icon,
+  .p-button-label {
+    color: #fff;
+  }
+
+  &:enabled:hover,
+  &:not(:disabled):hover {
+    background: linear-gradient(135deg, #fcd34d 0%, #f59e0b 45%, #ea580c 100%);
+    box-shadow: 0 10px 22px rgba(245, 158, 11, 0.45);
+    transform: translateY(-1px);
+    filter: brightness(1.02);
+  }
+
+  &:enabled:active,
+  &:not(:disabled):active {
+    transform: translateY(0) scale(0.98);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(245, 158, 11, 0.6);
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .p-button.gold-button {
+    transition: none;
+
+    &:hover {
+      transform: none;
+    }
+  }
+}

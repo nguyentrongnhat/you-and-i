@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- Separate index for username to speed up queries
-CREATE UNIQUE INDEX idx_users_username ON users(username);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username ON users(username);
 
 CREATE TABLE IF NOT EXISTS roles (
     id UUID PRIMARY KEY DEFAULT uuidv7(),
@@ -30,8 +30,8 @@ CREATE TABLE IF NOT EXISTS user_roles (
 );
 
 -- Indexes to quickly query roles of a user or users by role
-CREATE INDEX idx_user_roles_user_id ON user_roles(user_id);
-CREATE INDEX idx_user_roles_role_id ON user_roles(role_id);
+CREATE INDEX IF NOT EXISTS idx_user_roles_user_id ON user_roles(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_roles_role_id ON user_roles(role_id);
 
 -- =========================
 -- User_verifications table (email verification codes)
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS user_verifications (
 );
 
 -- Index to quickly find unused codes by user_id
-CREATE INDEX idx_user_verifications_user_id_used
+CREATE INDEX IF NOT EXISTS idx_user_verifications_user_id_used
     ON user_verifications(user_id, used);
 
 
@@ -82,13 +82,6 @@ INSERT INTO roles (name)
 VALUES
     ('ROLE_SUPER_ADMIN'),
     ('ROLE_ADMIN'),
-    ('ROLE_USER')
+    ('ROLE_USER'),
+    ('ROLE_GUEST')
 ON CONFLICT (name) DO NOTHING;
-
--- =========================
--- Assign admin role to the admin user
-INSERT INTO user_roles(user_id, role_id)
-SELECT u.id, r.id
-FROM users u JOIN roles r ON r.name = 'ROLE_ADMIN'
-WHERE u.username = 'admin@admin.com'
-ON CONFLICT DO NOTHING;

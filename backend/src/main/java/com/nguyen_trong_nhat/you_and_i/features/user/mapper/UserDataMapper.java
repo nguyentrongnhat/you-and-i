@@ -1,11 +1,11 @@
 package com.nguyen_trong_nhat.you_and_i.features.user.mapper;
 
+import com.nguyen_trong_nhat.you_and_i.features.role.repository.RoleRepository;
 import com.nguyen_trong_nhat.you_and_i.features.user.dto.UserDetailDTO;
 import com.nguyen_trong_nhat.you_and_i.features.user.dto.UserProfileDTO;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.Role;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.UserProfile;
-import com.nguyen_trong_nhat.you_and_i.features.user.repository.RoleRepository;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;

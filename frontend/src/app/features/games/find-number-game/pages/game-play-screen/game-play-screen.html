@@ -10,12 +10,16 @@
                   {{ timeToDisplay() }}
                </span>
             </div>
-            <div class="find-number__cell">
+            <div class="find-number__cell find-number__cell--progress">
                <span class="find-number__cell-label">
                   <i class="pi pi-check-circle"></i> Đã tìm
                </span>
                <span class="find-number__cell-value">
                   {{ currentSelectedNumber() }}<small>/ {{ TOTAL_NUMBERS }}</small>
+               </span>
+               <span class="find-number__progress">
+                  <span class="find-number__progress-bar"
+                     [style.width.%]="(currentSelectedNumber() / TOTAL_NUMBERS) * 100"></span>
                </span>
             </div>
             <div class="find-number__cell">
@@ -30,17 +34,21 @@
 
       @if (gameCurrentStatus() === GAME_STATUSES.PLAYING) {
          <div class="find-number__game-area">
-            <app-game-table (onSelectNumber)="onSelectNumber($event)" [currentNumber]="currentSelectedNumber()" />
+            <app-game-table/>
          </div>
       }
       @else if (gameCurrentStatus() === GAME_STATUSES.PAUSED) {
-         <div class="find-number__game-pause" style="margin-top: 200px;">
-            Đang tạm dừng
+         <div class="find-number__game-pause">
+            <span class="find-number__pause-icon">
+               <i class="pi pi-pause"></i>
+            </span>
+            <span class="find-number__pause-text">Đang tạm dừng</span>
+            <span class="find-number__pause-hint">Mở menu để tiếp tục chơi</span>
          </div>
       }
 
       <p-speeddial 
-         [model]="items()" 
+         [model]="actionItems()" 
          direction="up" 
          mask 
          [transitionDelay]="80"

@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { email, form, FormField, required, schema } from '@angular/forms/signals';
-import { Router } from '@angular/router';
 import { AutoFocusModule } from 'primeng/autofocus';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -13,13 +12,13 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
-import { ROUTE_PATHS } from '../../../core/constants/route-paths';
 import { MESSAGE_TYPE, STORAGE_KEY } from '../../../core/enums';
 import { UsernamePasswordLoginResponse } from '../../../core/interfaces/user.dtos';
 import { PlatformService } from '../../../services/platform.service';
 import { SessionStorageService } from '../../../services/session-storage.service';
 import { ToastService } from '../../../services/toast.service';
 import { AuthService } from '../services/auth.service';
+import { NavigationService } from '../../../services/navigation.service';
 import { UserService } from '../../user-management/services/user.service';
 import { LoaderService } from '../../../services/loader.service';
 import { finalize } from 'rxjs';
@@ -82,7 +81,7 @@ export class Login implements AfterViewInit {
 
   protected toastService = inject(ToastService);
 
-  protected router = inject(Router);
+  protected navigationService = inject(NavigationService);
   
   protected loginFormData = signal<LoginModel>(initialData);
 
@@ -128,10 +127,10 @@ export class Login implements AfterViewInit {
         const redirectUrl = this.sessionStorageService.getItem(STORAGE_KEY.REDIRECT_URL);
         if (redirectUrl) {
           this.sessionStorageService.removeItem(STORAGE_KEY.REDIRECT_URL);
-          this.router.navigateByUrl(redirectUrl);
+          this.navigationService.navigate(redirectUrl);
         } 
         else {
-          this.router.navigateByUrl(ROUTE_PATHS.HOME.fullPath);
+          this.navigationService.goToHome();
         }
       },
       error: err => {
@@ -144,7 +143,7 @@ export class Login implements AfterViewInit {
   }
 
   protected navigateToSignupPage(): void {
-    this.router.navigateByUrl(ROUTE_PATHS.AUTH.children.SIGNUP.fullPath);
+    this.navigationService.goToSignup();
   }
 
   protected toggleWithAutoHidePassword() {

@@ -1,6 +1,5 @@
 import { Component, computed, DestroyRef, effect, inject, input, signal, untracked } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { MenuModule } from 'primeng/menu';
@@ -8,12 +7,14 @@ import { ProgressBarModule } from 'primeng/progressbar';
 import { SpeedDialModule } from 'primeng/speeddial';
 import { TagModule } from 'primeng/tag';
 import { finalize } from 'rxjs';
-import { ROUTE_PATHS } from '../../../../../core/constants/route-paths';
 import { FindNumberGameDTO } from '../../../../../core/interfaces/find-number-game.dto';
 import { LoaderService } from '../../../../../services/loader.service';
+import { NavigationService } from '../../../../../services/navigation.service';
 import { PlatformService } from '../../../../../services/platform.service';
-import { GameHistories } from '../../components/game-histories/game-histories';
+import { GameOverview } from '../../components/game-overview/game-overview';
 import { FindNumberGameService } from '../../services/findnumber.service';
+import { MESSAGE_TYPE } from '../../../../../core/enums';
+import { ToastService } from '../../../../../services/toast.service';
 
 export enum FIND_NUMBER_GAME_STATUSES {
    NONE = 'none',
@@ -29,7 +30,7 @@ export enum FIND_NUMBER_GAME_STATUSES {
       DialogModule,
       ProgressBarModule,
       TagModule,
-      GameHistories,
+      GameOverview,
       MenuModule,
       SpeedDialModule,
    ],
@@ -40,6 +41,9 @@ export class GameResultScreen {
    protected gameId = input<string | undefined>(undefined);
 
    protected readonly TOTAL_NUMBERS = 3;
+
+   /** Decorative confetti pieces for the celebration screen (display only) */
+   protected readonly confettiPieces = Array.from({ length: 24 });
 
    protected visible = signal<boolean>(false);
 
@@ -57,9 +61,9 @@ export class GameResultScreen {
 
    protected currentGameId: number = 0;
 
-   private platformService = inject(PlatformService);
+   private readonly toastService = inject(ToastService);
 
-   private router = inject(Router);
+   private navigationService = inject(NavigationService);
 
    /** Thời gian (giây) của ván vừa hoàn thành */
    protected lastFinishTime = signal<number>(0);
@@ -67,13 +71,12 @@ export class GameResultScreen {
    /** Kỷ lục tốt nhất trước khi vào ván hiện tại */
    private previousBest = signal<number | null>(null);
    /** Tổng số ván đã chơi */
-   protected totalGames = computed(() => this.findNumberGameService.gameHistories().length);
+   protected totalGames = computed(() => this.findNumberGameService.gameHistories().totalGamesPlayed);
 
    /** Thời gian tốt nhất (giây) từ lịch sử */
    protected bestTime = computed<number | null>(() => {
       const histories = this.findNumberGameService.gameHistories();
-      if (!histories.length) return null;
-      return Math.min(...histories.map((h) => h.timeToFinish));
+      return histories.bestRecord.completionTime || null;
    });
 
 
@@ -112,6 +115,7 @@ export class GameResultScreen {
       }
 
       if (currentGameInfo) {
+         this.loaderService.hide();
          this.extractDataToDisplayResult();
       }
       else {
@@ -119,9 +123,20 @@ export class GameResultScreen {
             next: (game: FindNumberGameDTO) => {
                this.loaderService.hide();
                this.extractDataToDisplayResult();
+            },
+            error: (err) => {
+               const toastSummary = 'Can not load game';
+               const toastDetail = err.error.message;
+               this.toastService.showToast(MESSAGE_TYPE.ERROR, toastSummary, toastDetail);
+               this.goToGameStartScreen();
             }
          })
       }
+   }
+
+
+   private goToGameStartScreen() {
+      this.navigationService.goToFindNumberGameStart();
    }
 
 
@@ -136,7 +151,6 @@ export class GameResultScreen {
    }
 
    protected getHistories() {
-      this.loaderService.show();
       this.findNumberGameService.getGameHistories()
          .pipe(
             takeUntilDestroyed(this.destroyRef),
@@ -145,6 +159,6 @@ export class GameResultScreen {
    }
 
    protected startGame() {
-      this.router.navigateByUrl(ROUTE_PATHS.GAME.children.FIND_NUMBER_GAME.children.START_SCREEN.fullPath);
+      this.navigationService.goToFindNumberGameStart();
    }
 }

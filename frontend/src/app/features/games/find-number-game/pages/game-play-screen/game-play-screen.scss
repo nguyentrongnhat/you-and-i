@@ -1,3 +1,5 @@
+@use "variables" as v;
+
 .find-number {
 	display: flex;
 	justify-content: center;
@@ -10,36 +12,34 @@
 		display: flex;
 		justify-content: center;
 		top: 0;
+		left: 0;
+		right: 0;
 		width: 100%;
 		height: 100px;
 		position: fixed;
-		padding: 1rem;
+		padding: 0.75rem 1rem;
 		z-index: 10;
-		background-color: white;
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+		background: var(--p-content-background, rgba(255, 255, 255, 0.85));
+		backdrop-filter: blur(14px);
+		border-bottom: 1px solid var(--p-content-border-color, #e5e7eb);
+		box-shadow: 0 4px 18px rgba(16, 24, 40, 0.06);
+		animation: hud-drop 0.5s ease both;
 	}
 
 	&__game-area {
-		margin-top: 120px; 
+		margin-top: 130px;
 		width: 100%;
 		margin-bottom: 150px;
+		animation: rise-in 0.5s ease both;
 	}
 
-	/* ===== Cell rows (divided, centered, symmetric) ===== */
-	&__hud,
-	&__stats {
+	/* ===== HUD ===== */
+	&__hud {
 		width: 100%;
+		max-width: 640px;
 		display: flex;
 		justify-content: center;
 		align-items: stretch;
-	}
-
-	&__hud {
-		max-width: 640px;
-	}
-
-	&__stats {
-		max-width: 420px;
 	}
 
 	&__cell {
@@ -51,7 +51,6 @@
 		gap: 0.4rem;
 		padding: 0.5rem 1.25rem;
 
-		/* vạch ngăn đối xứng giữa các cell trong hàng */
 		&+& {
 			border-left: 1px solid var(--p-content-border-color, #e5e7eb);
 		}
@@ -80,6 +79,7 @@
 			font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 			letter-spacing: 0.06em;
 			color: var(--p-primary-color, #6366f1);
+			animation: tick 1s steps(1) infinite;
 		}
 
 		small {
@@ -89,7 +89,26 @@
 			margin-left: 0.2rem;
 		}
 	}
-	
+
+	&__progress {
+		display: block;
+		width: 100%;
+		max-width: 90px;
+		height: 5px;
+		margin-top: 0.35rem;
+		border-radius: 999px;
+		background: var(--p-content-border-color, #e5e7eb);
+		overflow: hidden;
+	}
+
+	&__progress-bar {
+		display: block;
+		height: 100%;
+		border-radius: inherit;
+		background: linear-gradient(90deg, #6366f1, #a855f7);
+		transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
 	/* ===== Playing ===== */
 	&__play {
 		width: 100%;
@@ -100,39 +119,140 @@
 		gap: 1.5rem;
 	}
 
+	/* ===== Pause state ===== */
+	&__game-pause {
+		margin-top: 180px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.75rem;
+		text-align: center;
+		animation: rise-in 0.45s ease both;
+	}
+
+	&__pause-icon {
+		display: grid;
+		place-items: center;
+		width: 5rem;
+		height: 5rem;
+		border-radius: 50%;
+		font-size: 2rem;
+		color: #fff;
+		background: linear-gradient(135deg, #f59e0b, #f97316);
+		box-shadow: 0 12px 28px rgba(245, 158, 11, 0.35);
+		animation: pause-breathe 2.4s ease-in-out infinite;
+	}
+
+	&__pause-text {
+		font-size: 1.4rem;
+		font-weight: 800;
+		color: var(--p-text-color, #111827);
+	}
+
+	&__pause-hint {
+		font-size: 0.85rem;
+		color: var(--p-text-muted-color, #6b7280);
+	}
+
 	app-game-table {
 		display: block;
 		width: 100%;
 	}
 }
 
-@media (max-width: 575px) {
-	.find-number {
-		padding: 0 1rem;
+/* ===== Keyframes ===== */
+@keyframes hud-drop {
+	from { opacity: 0; transform: translateY(-100%); }
+	to { opacity: 1; transform: translateY(0); }
+}
 
-		&__title {
-			font-size: 1.6rem;
+@keyframes rise-in {
+	from { opacity: 0; transform: translateY(18px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes tick {
+	0%, 100% { opacity: 1; }
+	50% { opacity: 0.78; }
+}
+
+@keyframes pause-breathe {
+	0%, 100% { transform: scale(1); box-shadow: 0 12px 28px rgba(245, 158, 11, 0.35); }
+	50% { transform: scale(1.06); box-shadow: 0 16px 36px rgba(245, 158, 11, 0.5); }
+}
+
+/* ===== SpeedDial polish ===== */
+:host ::ng-deep .p-speeddial-button {
+	box-shadow: 0 10px 26px rgba(17, 24, 39, 0.28);
+	transition: transform 0.2s ease, box-shadow 0.25s ease;
+
+	&:hover {
+		transform: scale(1.06);
+		box-shadow: 0 14px 32px rgba(17, 24, 39, 0.36);
+	}
+
+	&:active {
+		transform: scale(0.94);
+	}
+}
+
+@media (max-width: v.$breakpoint-xs) {
+	.find-number {
+		padding: 0 0.75rem;
+
+		&__game-info {
+			height: 82px;
+			padding: 0.6rem 0.6rem;
 		}
 
-		&__result-time {
-			font-size: 2.4rem;
+		&__game-area {
+			margin-top: 98px;
+			margin-bottom: 120px;
 		}
 
 		&__cell {
-			padding: 0.4rem 0.6rem;
+			padding: 0.4rem 0.45rem;
+			gap: 0.3rem;
 		}
 
 		&__cell-value {
-			font-size: 1.2rem;
+			font-size: 1.15rem;
 		}
 
 		&__cell-label {
-			font-size: 0.66rem;
+			font-size: 0.62rem;
+			letter-spacing: 0.02em;
 
 			i {
 				display: none;
 			}
 		}
+
+		&__progress {
+			max-width: 54px;
+			margin-top: 0.25rem;
+		}
+
+		&__game-pause {
+			margin-top: 130px;
+		}
+
+		&__pause-icon {
+			width: 4rem;
+			height: 4rem;
+			font-size: 1.6rem;
+		}
+
+		&__pause-text {
+			font-size: 1.15rem;
+		}
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.find-number__cell-value--primary,
+	.find-number__pause-icon {
+		animation: none !important;
 	}
 }
 

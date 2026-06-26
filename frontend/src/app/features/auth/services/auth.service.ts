@@ -2,7 +2,6 @@ import { computed, inject, Injectable, signal } from "@angular/core";
 import { Router } from "@angular/router";
 import { catchError, finalize, map, of, take, tap, throwError } from "rxjs";
 import { API_ENDPOINTS } from "../../../core/constants/api-endpoints";
-import { ROUTE_PATHS } from "../../../core/constants/route-paths";
 import { UsernamePasswordLoginResponse } from "../../../core/interfaces/user.dtos";
 import { HttpClientService } from "../../../services/http-client.service";
 import { SignupModel } from "../signup/signup";
@@ -10,6 +9,7 @@ import { UserService } from "../../user-management/services/user.service";
 import { LoaderService } from "../../../services/loader.service";
 import { PlatformService } from "../../../services/platform.service";
 import { SessionStorageService } from "../../../services/session-storage.service";
+import { NavigationService } from "../../../services/navigation.service";
 import { STORAGE_KEY } from "../../../core/enums";
 
 @Injectable({
@@ -31,6 +31,8 @@ export class AuthService {
     private readonly platformService = inject(PlatformService);
 
     private readonly sessionStorageService = inject(SessionStorageService);
+
+    private readonly navigationService = inject(NavigationService);
 
 
     public readonly accessTokenPayload = computed(() => {
@@ -91,7 +93,7 @@ export class AuthService {
             take(1)
         ).subscribe({
             next: () => {
-                this.router.navigateByUrl(ROUTE_PATHS.AUTH.children.LOGIN.fullPath);
+                this.navigationService.goToLogin();
             },
             error: (err) => console.log('Error during logout:', err)
         });

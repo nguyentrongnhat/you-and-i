@@ -39,9 +39,9 @@ public class FindNumberGame extends BaseEntity {
 
     private Instant endTime;
 
-    private String elapsedTime;
+    private Integer elapsedTime;
 
-    private String completionTime;
+    private Integer completionTime;
 
     @Enumerated(EnumType.STRING)
     private GameStatus gameStatus;

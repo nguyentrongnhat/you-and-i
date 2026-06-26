@@ -1,0 +1,503 @@
+@use "variables" as v;
+
+:host {
+  display: block;
+}
+
+.ranking {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+
+  /* ============================================================
+     Heading
+     ============================================================ */
+  &__heading {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+  }
+
+  &__heading-icon {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    color: #fff;
+    background: linear-gradient(135deg, #f59e0b, #f97316);
+    box-shadow: 0 8px 20px rgba(245, 158, 11, 0.35);
+    animation: trophy-bob 3.5s ease-in-out infinite;
+  }
+
+  &__heading-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  &__heading-title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 900;
+    letter-spacing: 0.01em;
+    background: linear-gradient(135deg, #b45309, #f59e0b 45%, #fbbf24);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  &__heading-sub {
+    font-size: 0.78rem;
+    color: var(--p-text-muted-color, #6b7280);
+  }
+
+  /* ============================================================
+     List
+     ============================================================ */
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    max-height: 22rem;
+    overflow-y: auto;
+    padding-right: 0.25rem;
+    margin-right: -0.25rem;
+
+    /* slim scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: var(--p-content-border-color, #d1d5db) transparent;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: var(--p-content-border-color, #d1d5db);
+      border-radius: 999px;
+    }
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.7rem 0.85rem;
+    border-radius: 13px;
+    background: var(--p-content-background, #fff);
+    border: 1px solid var(--p-content-border-color, #eef0f3);
+    transition: transform 0.18s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    animation: item-in 0.35s ease both;
+
+    &:hover {
+      transform: translateX(3px);
+      border-color: var(--p-primary-color, #6366f1);
+      box-shadow: 0 6px 18px rgba(99, 102, 241, 0.12);
+    }
+
+    &--podium {
+      border-color: rgba(245, 158, 11, 0.5);
+      background: linear-gradient(90deg, rgba(245, 158, 11, 0.08), transparent 65%);
+    }
+  }
+
+  /* ---------- Rank badge ---------- */
+  &__rank {
+    display: inline-grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 50%;
+    font-size: 0.8rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--p-text-muted-color, #6b7280);
+    background: var(--p-content-hover-background, #f3f4f6);
+
+    &--gold {
+      color: #fff;
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.45);
+    }
+
+    &--silver {
+      color: #fff;
+      background: linear-gradient(135deg, #d1d5db, #9ca3af);
+      box-shadow: 0 4px 12px rgba(156, 163, 175, 0.4);
+    }
+
+    &--bronze {
+      color: #fff;
+      background: linear-gradient(135deg, #d8a06a, #b45309);
+      box-shadow: 0 4px 12px rgba(180, 83, 9, 0.4);
+    }
+  }
+
+  /* ---------- Avatar ---------- */
+  &__avatar {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #fff;
+    background: var(--p-primary-color, #6366f1);
+    box-shadow: 0 0 0 2px var(--p-content-background, #fff);
+  }
+
+  /* ---------- Main info ---------- */
+  &__main {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    margin-right: auto;
+    min-width: 0;
+  }
+
+  &__name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--p-text-color, #111827);
+  }
+
+  &__sub {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.78rem;
+    color: var(--p-text-muted-color, #6b7280);
+
+    i {
+      font-size: 0.72rem;
+    }
+  }
+
+  /* ---------- Time ---------- */
+  &__time {
+    display: inline-block;
+    flex-shrink: 0;
+    padding: 0.32rem 0.7rem;
+    border-radius: 9px;
+    background: var(--p-content-hover-background, #f3f4f6);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--p-text-color, #111827);
+  }
+
+  /* ============================================================
+     Empty state
+     ============================================================ */
+  &__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.4rem;
+    padding: 3rem 1rem;
+    color: var(--p-text-muted-color, #6b7280);
+
+    i {
+      font-size: 2.5rem;
+      margin-bottom: 0.4rem;
+      color: var(--p-text-muted-color, #9ca3af);
+    }
+
+    span {
+      font-weight: 600;
+      color: var(--p-text-color, #111827);
+    }
+
+    small {
+      font-size: 0.8rem;
+    }
+  }
+}
+
+/* ============================================================
+   Podium — Top 3 hall of fame
+   ============================================================ */
+.podium {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  align-items: end;
+  gap: 0.6rem;
+  padding: 1.25rem 0.75rem 0;
+  border-radius: 20px;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 50% -10%, rgba(251, 191, 36, 0.16), transparent 60%),
+    linear-gradient(180deg, rgba(245, 158, 11, 0.06), transparent 70%);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+
+  &__glow {
+    position: absolute;
+    top: -40%;
+    left: 50%;
+    width: 60%;
+    height: 90%;
+    transform: translateX(-50%);
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.35), transparent 65%);
+    filter: blur(28px);
+    pointer-events: none;
+    animation: podium-aura 5s ease-in-out infinite;
+  }
+
+  &__slot {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    animation: podium-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+    &--first { animation-delay: 0.05s; }
+    &--second { animation-delay: 0.15s; }
+    &--third { animation-delay: 0.25s; }
+  }
+
+  /* ---------- Crown above champion ---------- */
+  &__crown {
+    font-size: 1.6rem;
+    color: #f59e0b;
+    filter: drop-shadow(0 3px 6px rgba(245, 158, 11, 0.55));
+    margin-bottom: 0.15rem;
+    animation: crown-float 3s ease-in-out infinite;
+  }
+
+  /* ---------- Avatar ---------- */
+  &__avatar-ring {
+    position: relative;
+    border-radius: 50%;
+    padding: 3px;
+  }
+
+  &__avatar {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    font-size: 1.05rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #fff;
+    background: var(--p-primary-color, #6366f1);
+  }
+
+  &__medal {
+    position: absolute;
+    right: -4px;
+    bottom: -4px;
+    display: grid;
+    place-items: center;
+    width: 1.35rem;
+    height: 1.35rem;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #fff;
+    border: 2px solid var(--p-content-background, #fff);
+  }
+
+  &__name {
+    margin-top: 0.55rem;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: var(--p-text-color, #111827);
+  }
+
+  &__time {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin: 0.3rem 0 0.7rem;
+    padding: 0.18rem 0.6rem;
+    border-radius: 999px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--p-text-color, #111827);
+    background: var(--p-content-background, #fff);
+    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.1);
+
+    i { font-size: 0.7rem; opacity: 0.7; }
+  }
+
+  /* ---------- Stand / step ---------- */
+  &__stand {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    border-radius: 12px 12px 0 0;
+    color: rgba(255, 255, 255, 0.92);
+    font-weight: 900;
+  }
+
+  &__stand-rank {
+    font-size: 1.5rem;
+    line-height: 1;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+  }
+
+  /* ---------- Champion (1st) ---------- */
+  &__slot--first {
+    .podium__avatar-ring {
+      background: conic-gradient(from 0deg, #fbbf24, #f59e0b, #fcd34d, #f59e0b, #fbbf24);
+      box-shadow: 0 8px 26px rgba(245, 158, 11, 0.5);
+    }
+    .podium__avatar {
+      width: 3.6rem;
+      height: 3.6rem;
+      font-size: 1.2rem;
+    }
+    .podium__medal {
+      background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    }
+    .podium__name { font-size: 1rem; }
+    .podium__stand {
+      height: 5.5rem;
+      background: linear-gradient(180deg, #fbbf24, #f59e0b);
+      box-shadow: 0 -2px 16px rgba(245, 158, 11, 0.4);
+    }
+    .podium__stand-rank { font-size: 1.9rem; }
+  }
+
+  /* ---------- Runner-up (2nd) ---------- */
+  &__slot--second {
+    .podium__avatar-ring {
+      background: conic-gradient(from 0deg, #e5e7eb, #9ca3af, #f3f4f6, #9ca3af, #e5e7eb);
+      box-shadow: 0 6px 18px rgba(156, 163, 175, 0.45);
+    }
+    .podium__medal {
+      background: linear-gradient(135deg, #d1d5db, #9ca3af);
+    }
+    .podium__stand {
+      height: 4rem;
+      background: linear-gradient(180deg, #d1d5db, #9ca3af);
+      box-shadow: 0 -2px 12px rgba(156, 163, 175, 0.35);
+    }
+  }
+
+  /* ---------- Third place (3rd) ---------- */
+  &__slot--third {
+    .podium__avatar-ring {
+      background: conic-gradient(from 0deg, #e8b486, #b45309, #f0c49b, #b45309, #e8b486);
+      box-shadow: 0 6px 18px rgba(180, 83, 9, 0.4);
+    }
+    .podium__medal {
+      background: linear-gradient(135deg, #d8a06a, #b45309);
+    }
+    .podium__stand {
+      height: 3.25rem;
+      background: linear-gradient(180deg, #d8a06a, #b45309);
+      box-shadow: 0 -2px 12px rgba(180, 83, 9, 0.32);
+    }
+  }
+}
+
+/* ===== Keyframes ===== */
+@keyframes item-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes trophy-bob {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-4px) rotate(-6deg); }
+}
+
+@keyframes podium-rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes podium-aura {
+  0%, 100% { opacity: 0.7; transform: translateX(-50%) scale(1); }
+  50% { opacity: 1; transform: translateX(-50%) scale(1.08); }
+}
+
+@keyframes crown-float {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-4px) rotate(-5deg); }
+}
+
+/* ============================================================
+   Mobile
+   ============================================================ */
+@media (max-width: v.$breakpoint-xs) {
+  .ranking {
+    gap: 1rem;
+
+    &__heading-icon {
+      width: 2.4rem;
+      height: 2.4rem;
+      font-size: 1.1rem;
+    }
+
+    &__heading-title {
+      font-size: 1.05rem;
+    }
+
+    &__item {
+      gap: 0.6rem;
+      padding: 0.6rem 0.65rem;
+    }
+
+    &__avatar {
+      width: 2.2rem;
+      height: 2.2rem;
+      font-size: 0.78rem;
+    }
+
+    &__name {
+      font-size: 0.88rem;
+      max-width: 9rem;
+    }
+
+    &__time {
+      padding: 0.25rem 0.55rem;
+      font-size: 0.85rem;
+    }
+  }
+
+  .podium {
+    gap: 0.4rem;
+    padding: 1rem 0.5rem 0;
+
+    &__avatar { width: 2.6rem; height: 2.6rem; font-size: 0.9rem; }
+    &__slot--first .podium__avatar { width: 3rem; height: 3rem; font-size: 1rem; }
+    &__name { font-size: 0.78rem; }
+    &__slot--first .podium__name { font-size: 0.85rem; }
+    &__time { font-size: 0.7rem; padding: 0.15rem 0.45rem; }
+    &__crown { font-size: 1.3rem; }
+    &__slot--first .podium__stand { height: 4.25rem; }
+    &__slot--second .podium__stand { height: 3.1rem; }
+    &__slot--third .podium__stand { height: 2.5rem; }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ranking__heading-icon,
+  .ranking__item,
+  .podium__slot,
+  .podium__glow,
+  .podium__crown {
+    animation: none !important;
+  }
+}

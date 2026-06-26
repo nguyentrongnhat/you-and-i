@@ -6,18 +6,19 @@ import com.nguyen_trong_nhat.you_and_i.common.exception.ForbidenException;
 import com.nguyen_trong_nhat.you_and_i.common.exception.NotFoundException;
 import com.nguyen_trong_nhat.you_and_i.common.security.util.SecurityUtils;
 import com.nguyen_trong_nhat.you_and_i.common.util.OtpGenerator;
+import com.nguyen_trong_nhat.you_and_i.features.role.repository.RoleRepository;
 import com.nguyen_trong_nhat.you_and_i.features.user.dto.UserDetailDTO;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.Role;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.UserProfile;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.UserVerification;
 import com.nguyen_trong_nhat.you_and_i.features.user.mapper.UserDataMapper;
-import com.nguyen_trong_nhat.you_and_i.features.user.repository.RoleRepository;
 import com.nguyen_trong_nhat.you_and_i.features.user.repository.UserProfileRepository;
 import com.nguyen_trong_nhat.you_and_i.features.user.repository.UserRepository;
 import com.nguyen_trong_nhat.you_and_i.features.user.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -35,15 +36,16 @@ public class UserServiceImpl implements UserService {
     private final UserDataMapper userDataMapper;
 
     @Override
+    @CacheEvict(value = "userDetails", key = "#username.toLowerCase()")
     public MyUserDetail createUserWithUsernameAndPassword(String username, String password) {
-        Optional<Role> defaultRoleOpt = roleRepository.findByName(Constants.ROLE_USER);
+        Optional<Role> defaultRoleOpt = roleRepository.findByName(Constants.ROLE_GUEST);
 
         if(defaultRoleOpt.isEmpty()) {
             throw new RuntimeException("Not found ROLE_USER in database");
         }
 
         MyUserDetail user = new MyUserDetail();
-        user.setUsername(username);
+        user.setUsername(username.toLowerCase());
         user.setPassword(passwordEncoder.encode(password));
         user.setRoles(Set.of(defaultRoleOpt.get()));
         user.setEnabled(false);
@@ -99,6 +101,7 @@ public class UserServiceImpl implements UserService {
 
         if(existingAccountOpt.isPresent()) {
             MyUserDetail existingAccount = existingAccountOpt.get();
+            existingAccount.setPassword(passwordEncoder.encode(password));
             existingAccount.getRoles().add(superAdminRole);
             userRepository.save(existingAccount);
             return;
@@ -124,12 +127,11 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
+    @CacheEvict(value = "userDetails", key = "#userDetailDTO.username")
     public UserDetailDTO updateUserData(UserDetailDTO userDetailDTO) {
-        Optional<MyUserDetail> existingAccountOpt = userRepository.findByUsername(userDetailDTO.getUsername());
-        if (existingAccountOpt.isEmpty()) {
-            throw new RuntimeException("User not found");
-        }
-        MyUserDetail existingAccount = existingAccountOpt.get();
+        MyUserDetail existingAccount
+                = userRepository.findByUsername(userDetailDTO.getUsername())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
         existingAccount = userDataMapper.updateEntityFromDTO(userDetailDTO, existingAccount);
 

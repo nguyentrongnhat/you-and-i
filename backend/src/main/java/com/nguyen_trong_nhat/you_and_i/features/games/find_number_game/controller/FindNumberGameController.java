@@ -7,11 +7,13 @@ import com.nguyen_trong_nhat.you_and_i.common.security.util.SecurityUtils;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.dto.*;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGame;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.mapper.FindNumberGameDataMapper;
+import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.service.FindNumberGameBestRecordService;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.service.FindNumberGameService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.List;
 
 @RestController
@@ -19,6 +21,8 @@ import java.util.List;
 @AllArgsConstructor
 public class FindNumberGameController {
     private final FindNumberGameService findNumberGameService;
+
+    private final FindNumberGameBestRecordService findNumberGameBestRecordService;
 
     @PostMapping("")
     public ResponseEntity<FindNumberGameDTO> createNewGame(@RequestBody CreateNewFindNumberGameRequest gameInfo) {
@@ -32,7 +36,7 @@ public class FindNumberGameController {
     public ResponseEntity<FindNumberGameDTO> getGameById(@PathVariable String gameId) {
 
         if(gameId == null) {
-            throw new BadRequestException("Gameid is required");
+            throw new BadRequestException("Game id is required");
         }
 
         FindNumberGame game = findNumberGameService.getGameById(gameId);
@@ -48,7 +52,8 @@ public class FindNumberGameController {
 
     @GetMapping("/unfinish-games")
     public ResponseEntity<List<FindNumberGameDTO>> getUnfinishedGames() {
-        return ResponseEntity.ok().body(findNumberGameService.getUnfinishedGamesForCurrentUser());
+        String userName = SecurityUtils.getLoggedInUsername();
+        return ResponseEntity.ok().body(findNumberGameService.getUnfinishedGamesByPlayerUsername(userName));
     }
 
     @PostMapping("/finish-game")
@@ -65,9 +70,36 @@ public class FindNumberGameController {
     }
 
     @GetMapping("/history")
-    public ResponseEntity<List<FindNumberGameHistoryResponse>> getGameHistory() {
+    public ResponseEntity<FindNumberGameHistory> getGameHistory() {
         String userName = SecurityUtils.getLoggedInUsername();
-        var history = this.findNumberGameService.getGameHistory(userName);
-        return ResponseEntity.ok().body(history);
+        return ResponseEntity.ok().body(
+                findNumberGameService.getGameHistory(userName)
+        );
+    }
+
+    @GetMapping("/best-records-ranking")
+    public ResponseEntity<List<FindNumberGameBestRecordDTO>> getBestRecordsRanking() {
+
+        List<FindNumberGameBestRecordDTO> bestRecordsDTO
+                = findNumberGameBestRecordService.getBestRecordRanking()
+                    .stream()
+                        .map(FindNumberGameDataMapper::toBestRecordDTO)
+                        .sorted(Comparator.comparing(FindNumberGameBestRecordDTO::getCompletionTime))
+                        .toList();
+
+        return ResponseEntity.ok().body(bestRecordsDTO);
+    }
+
+    @GetMapping("/best-record")
+    public ResponseEntity<FindNumberGameBestRecordDTO> getBestRecordByPlayerUsername() {
+        String playerUsername = SecurityUtils.getLoggedInUsername();
+        return ResponseEntity
+                .ok()
+                .body(
+                        FindNumberGameDataMapper
+                                .toBestRecordDTO(
+                                        findNumberGameBestRecordService
+                                                .getGameStatsByPlayerUsername(playerUsername))
+                );
     }
 }

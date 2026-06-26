@@ -1,49 +1,74 @@
 <div class="histories">
-  <div class="histories__card">
-    <p-table
-      [value]="gameHistories()"
-      [paginator]="gameHistories().length > 5"
-      [rows]="5"
-      [rowsPerPageOptions]="[5, 10, 20]"
-      [tableStyle]="{ 'min-width': '22rem' }"
-      styleClass="histories__table p-datatable-sm"
-      currentPageReportTemplate="Hiển thị {first} – {last} trong {totalRecords}"
-      [showCurrentPageReport]="gameHistories().length > 5"
-    >
-      <ng-template #header>
-        <tr>
-          <th class="histories__col-center">#</th>
-          <th>Ngày chơi</th>
-          <th>Thời gian hoàn thành</th>
-        </tr>
-      </ng-template>
-      <ng-template #body let-history let-i="rowIndex">
-        <tr class="histories__row">
-          <td class="histories__col-center histories__index">{{ i + 1 }}</td>
-          <td>{{ history.startTime | date:'dd/MM/yyyy - HH:mm' }}</td>
-          <td>
-            <span class="histories__time">
-              {{ findNumberGameService.convertTimerToTimeDisplay(history.timeToFinish) }}
-            </span>
-            @if (history.timeToFinish === bestTime()) {
-            <p-tag
-              icon="pi pi-star-fill"
-              value="Kỷ lục"
-              severity="warn"
-              [rounded]="true"
-            />
-            }
-          </td>
-        </tr>
-      </ng-template>
-      <ng-template #emptymessage>
-        <tr>
-          <td colspan="3" class="histories__empty">
-            <i class="pi pi-inbox"></i>
-            <span>Chưa có ván nào được ghi nhận.</span>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
+  <!-- ===== Summary ===== -->
+  <div class="histories__summary">
+    <div class="histories__stat histories__stat--best">
+      <span class="histories__stat-icon"><i class="pi pi-bolt"></i></span>
+      <div class="histories__stat-body">
+        <span class="histories__stat-value">{{ bestTimeDisplay() }}</span>
+        <span class="histories__stat-label">Kỷ lục</span>
+      </div>
+    </div>
+
+    <div class="histories__stat">
+      <span class="histories__stat-icon"><i class="pi pi-flag"></i></span>
+      <div class="histories__stat-body">
+        <span class="histories__stat-value">{{ totalGames() }}</span>
+        <span class="histories__stat-label">Số ván</span>
+      </div>
+    </div>
+
+    <div class="histories__stat">
+      <span class="histories__stat-icon"><i class="pi pi-chart-line"></i></span>
+      <div class="histories__stat-body">
+        <span class="histories__stat-value">{{ averageTimeDisplay() }}</span>
+        <span class="histories__stat-label">Trung bình</span>
+      </div>
+    </div>
   </div>
+
+  <!-- ===== List ===== -->
+  @if (history().length) {
+    <div class="histories__list">
+      @for (item of history(); track item.endTime; let i = $index) {
+        <div
+          class="histories__item"
+          [class.histories__item--best]="bestTime() !== null && item.completionTime === bestTime()"
+        >
+          <span
+            class="histories__avatar"
+            [class.histories__avatar--best]="bestTime() !== null && item.completionTime === bestTime()"
+          >
+            @if (bestTime() !== null && item.completionTime === bestTime()) {
+              <i class="pi pi-crown"></i>
+            } @else {
+              <i class="pi pi-calendar"></i>
+            }
+          </span>
+
+          <div class="histories__main">
+            <span class="histories__date">{{ item.startTime | date:'dd/MM/yyyy' }}</span>
+            <span class="histories__sub">
+              <i class="pi pi-clock"></i>
+              {{ item.startTime | date:'HH:mm' }}
+            </span>
+          </div>
+
+          <div class="histories__result">
+            @if (bestTime() !== null && item.completionTime === bestTime()) {
+              <p-tag icon="pi pi-star-fill" value="Kỷ lục" severity="warn" [rounded]="true" />
+            }
+            <span class="histories__duration">
+              {{ findNumberGameService.convertTimerToTimeDisplay(item.completionTime) }}
+            </span>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="histories__empty">
+      <i class="pi pi-inbox"></i>
+      <span>Chưa có ván nào được ghi nhận.</span>
+      <small>Hoàn thành một ván để bắt đầu lưu lịch sử của bạn.</small>
+    </div>
+  }
 </div>

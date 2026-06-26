@@ -5,15 +5,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.Instant;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Setter
 @Getter
-public class FindNumberGameHistoryResponse {
-    Instant startTime;
-    Instant endTime;
-    String timeToFinish;
-    Integer bonusTime;
+public class FindNumberGameHistory {
+    List<FindNumberGameHistoryItem> history;
+    FindNumberGameBestRecordDTO bestRecord;
+    List<FindNumberGameDTO> unfinishedGames;
+    Integer totalGamesPlayed;
 }

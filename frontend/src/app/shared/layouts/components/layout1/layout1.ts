@@ -5,17 +5,26 @@ import { AvatarModule } from 'primeng/avatar';
 import { TooltipModule } from 'primeng/tooltip';
 import { CommonModule } from '@angular/common';
 import { PlatformService } from '../../../../services/platform.service';
+import { NavigationService } from '../../../../services/navigation.service';
 import { filter } from 'rxjs';
 import { AuthService } from '../../../../features/auth/services/auth.service';
 import { ROLE } from '../../../../core/enums';
 import { UserService } from '../../../../features/user-management/services/user.service';
-import { PopoverModule } from 'primeng/popover';
-import { MenuModule } from 'primeng/menu';
-import { MenuItem } from 'primeng/api';
+import { SessionStorageService } from '../../../../services/session-storage.service';
+
+type AppLanguageCode = 'vi' | 'en';
+
+interface AppLanguage {
+    code: AppLanguageCode;
+    label: string;
+    flag: string;
+}
+
+const LANGUAGE_STORAGE_KEY = 'jom_app_lang';
 
 @Component({
     selector: 'app-layout1',
-    imports: [AvatarModule, TooltipModule, CommonModule, PopoverModule, MenuModule],
+    imports: [AvatarModule, TooltipModule, CommonModule],
     templateUrl: './layout1.html',
     styleUrl: './layout1.scss',
 })
@@ -23,20 +32,70 @@ export class Layout1 implements OnInit {
 
     private readonly router = inject(Router);
 
+    private readonly navigationService = inject(NavigationService);
+
+    private readonly platformService = inject(PlatformService);
+
+    private readonly authService = inject(AuthService);
+
+    private readonly sessionStorageService = inject(SessionStorageService);
+
+    protected userService = inject(UserService);
+
     protected ROUTE_PATHS = ROUTE_PATHS;
 
     protected expandSideMenu = signal<boolean>(false);
+
+    /** Trạng thái mở của hai dropdown trên header */
+    protected settingsOpen = signal<boolean>(false);
+
+    protected accountOpen = signal<boolean>(false);
 
     /** Ẩn bottom navigation khi cuộn xuống, hiện lại khi cuộn lên */
     protected hideBottomNav = signal<boolean>(false);
 
     private lastScrollTop = 0;
 
-    private readonly platformService = inject(PlatformService);
+    /** Danh sách ngôn ngữ hỗ trợ */
+    protected readonly languages: AppLanguage[] = [
+        { code: 'vi', label: 'Tiếng Việt', flag: '🇻🇳' },
+        { code: 'en', label: 'English', flag: '🇬🇧' },
+    ];
 
-    private readonly authService = inject(AuthService);
+    protected currentLanguageCode = signal<AppLanguageCode>('vi');
 
-    protected userService = inject(UserService);
+    /** Thông tin hiển thị của người dùng (dẫn xuất từ UserService) */
+    protected displayName = computed<string>(() => {
+        const user = this.userService.currentUser();
+        return (
+            user?.profile?.displayName?.trim() ||
+            user?.profile?.fullName?.trim() ||
+            user?.username ||
+            'Guest'
+        );
+    });
+
+    protected userHandle = computed<string>(() => {
+        const username = this.userService.currentUser()?.username;
+        return username ? `@${username}` : '';
+    });
+
+    protected avatarUrl = computed<string | undefined>(
+        () => this.userService.currentUser()?.profile?.avatarUrl || undefined
+    );
+
+    protected userInitials = computed<string>(() => {
+        const source = this.displayName();
+        return this.userService.extractAvatarFromName(source);
+    });
+
+    protected primaryRoleLabel = computed<string>(() => {
+        const roles = this.userService.userRoles();
+        if (roles.includes(ROLE.SUPER_ADMIN)) return 'Super Admin';
+        if (roles.includes(ROLE.ADMIN)) return 'Admin';
+        if (roles.includes(ROLE.USER)) return 'Member';
+        return 'Member';
+    });
 
     protected fullNavigationItems = signal(
         [
@@ -85,23 +144,6 @@ export class Layout1 implements OnInit {
         ]
     )
 
-    protected accountMenu: MenuItem[] = [
-        {
-            label: 'Your Profile',
-            icon: 'pi pi-user',
-            command: () => {
-                this.navigateToProfilePage();
-            }
-        },
-        {
-            label: 'Sign out',
-            icon: 'pi pi-sign-out',
-            command: () => {
-                this.signOut();
-            }
-        }
-    ];
-
     protected navigationItems = computed(() =>  {
         const curreentUserRoles = this.userService.userRoles();
         return this.fullNavigationItems().filter(item => item.requiredRoles.every(role => curreentUserRoles.includes(role)));
@@ -109,6 +151,7 @@ export class Layout1 implements OnInit {
     
 
     ngOnInit(): void {
+        this.restoreLanguage();
         this.setActiveByUrl(this.router.url);
         this.router.events
             .pipe(filter(event => event instanceof NavigationEnd))
@@ -145,7 +188,7 @@ export class Layout1 implements OnInit {
 
     protected navigateTo(url: string): void {
         if (url === '#') url = ROUTE_PATHS.HOME.fullPath;
-        this.router.navigateByUrl(url);
+        this.navigationService.navigate(url);
     }
 
 
@@ -165,12 +208,50 @@ export class Layout1 implements OnInit {
     }
 
 
+    protected setLanguage(code: AppLanguageCode): void {
+        this.currentLanguageCode.set(code);
+        this.sessionStorageService.setItem(LANGUAGE_STORAGE_KEY, code);
+    }
+    private restoreLanguage(): void {
+        const saved = this.sessionStorageService.getItem(LANGUAGE_STORAGE_KEY) as AppLanguageCode | null;
+        if (saved && this.languages.some(l => l.code === saved)) {
+            this.currentLanguageCode.set(saved);
+        }
+    }
+
+
     protected signOut(): void {
         this.authService.logout();
     }
 
+    /** ===== Dropdown menus ===== */
+    @HostListener('document:keydown.escape')
+    protected onEscape(): void {
+        this.closeMenus();
+    }
 
-    private navigateToProfilePage(): void {
-        this.router.navigateByUrl(ROUTE_PATHS.USER.children.DETAIL.fullPath.replace(':id', this.userService.currentUser()?.id || ''));
+    protected toggleSettings(): void {
+        this.accountOpen.set(false);
+        this.settingsOpen.update(v => !v);
+    }
+
+    protected toggleAccount(): void {
+        this.settingsOpen.set(false);
+        this.accountOpen.update(v => !v);
+    }
+
+    protected openSettingsFromAccount(): void {
+        this.accountOpen.set(false);
+        this.settingsOpen.set(true);
+    }
+
+    protected closeMenus(): void {
+        this.settingsOpen.set(false);
+        this.accountOpen.set(false);
+    }
+
+
+    protected navigateToProfilePage(): void {
+        this.navigationService.goToUserDetail(this.userService.currentUser()?.id || '');
     }
 }

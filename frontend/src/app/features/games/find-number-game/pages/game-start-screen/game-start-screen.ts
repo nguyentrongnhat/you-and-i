@@ -1,6 +1,5 @@
 import { Component, computed, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { Router } from '@angular/router';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -10,12 +9,14 @@ import { ProgressBarModule } from 'primeng/progressbar';
 import { SpeedDialModule } from 'primeng/speeddial';
 import { TagModule } from 'primeng/tag';
 import { finalize, forkJoin } from 'rxjs';
-import { ROUTE_PATHS } from '../../../../../core/constants/route-paths';
-import { BUTTON_STYLE, GAME_DIFFICULTY_LEVEL } from '../../../../../core/enums';
+import { BUTTON_STYLE, GAME_DIFFICULTY_LEVEL, ROLE } from '../../../../../core/enums';
 import { FindNumberGameDTO } from '../../../../../core/interfaces/find-number-game.dto';
 import { LoaderService } from '../../../../../services/loader.service';
-import { GameHistories } from '../../components/game-histories/game-histories';
+import { NavigationService } from '../../../../../services/navigation.service';
 import { FindNumberGameService } from '../../services/findnumber.service';
+import { FormsModule } from '@angular/forms';
+import { GameOverview } from '../../components/game-overview/game-overview';
+import { UserService } from '../../../../user-management/services/user.service';
 
 @Component({
    selector: 'app-game-start-screen',
@@ -26,8 +27,9 @@ import { FindNumberGameService } from '../../services/findnumber.service';
       TagModule,
       MenuModule,
       SpeedDialModule,
-      GameHistories,
-      ConfirmDialogModule
+      GameOverview,
+      ConfirmDialogModule,
+      FormsModule,
    ],
    providers: [ConfirmationService],
    templateUrl: './game-start-screen.html',
@@ -44,19 +46,25 @@ export class GameStartScreen {
    
    private unfinishedGames = signal<FindNumberGameDTO | undefined>(undefined);
 
-   private confirmationService = inject(ConfirmationService);
-
-   private readonly router = inject(Router);
+   private readonly navigationService = inject(NavigationService);
    
    protected showGameHistories = signal<boolean>(false);
 
-   protected totalGames = computed(() => this.findNumberGameService.gameHistories().length);
+   protected continueOrNewGameDialogVisible = signal<boolean>(false);
+
+   protected totalGames = computed(() => this.findNumberGameService.gameHistories().totalGamesPlayed);
+
+   protected BUTTON_STYLE = BUTTON_STYLE;
+
+   protected userService = inject(UserService);
+
+   protected ROLE = ROLE;
 
 
    protected bestTime = computed<number | null>(() => {
       const histories = this.findNumberGameService.gameHistories();
-      if (!histories.length) return null;
-      return Math.min(...histories.map((h) => h.timeToFinish));
+      if (!histories.history.length) return null;
+      return Math.min(...histories.history.map((h) => h.completionTime));
    });
 
 
@@ -73,14 +81,17 @@ export class GameStartScreen {
 
    private getData() {
       this.loaderService.show();
-      forkJoin([this.findNumberGameService.getGameHistories(), this.findNumberGameService.getUnfinishedGame()])
+      forkJoin([
+         this.findNumberGameService.getGameHistories(), 
+         this.findNumberGameService.getBestRecordsRanking()
+      ])
       .pipe(
          takeUntilDestroyed(this.destroyRef),
          finalize(() => this.loaderService.hide())
       ).subscribe({
-         next: ([histories, unfinishedGames]) => {
-            if (unfinishedGames.length > 0) {
-               this.unfinishedGames.set(unfinishedGames[0]);
+         next: ([histories, bestRecords]) => {
+            if (histories.unfinishedGames.length > 0) {
+               this.unfinishedGames.set(histories.unfinishedGames[0]);
             }
          }
       })
@@ -93,11 +104,14 @@ export class GameStartScreen {
 
 
    protected startGame(event: Event): void {
+      this.findNumberGameService.currentSeclectedNumber.set(0);
+
       if(!this.unfinishedGames()) {
          this.createNewGame();
          return;
       }
-      this.confirmStartNewGameOrContinueUnfinishedGame(event);
+
+      this.continueOrNewGameDialogVisible.set(true);
    }
 
 
@@ -117,32 +131,6 @@ export class GameStartScreen {
    }
 
 
-   public confirmStartNewGameOrContinueUnfinishedGame(event: Event) {
-      this.confirmationService.confirm({
-         target: event.target as EventTarget,
-         message: '<p class="mb-0">Anh thấy em có game chơi chưa xong</p><p class="mb-0">Em muốn chơi tiếp hay bắt đầu ván mới nào?</p>',
-         header: 'Hô Hô',
-         icon: 'pi pi-info-circle',
-         rejectLabel: 'Chơi tiếp',
-         rejectButtonProps: {
-               label: 'Chơi tiếp',
-               severity: 'secondary',
-         },
-         acceptButtonProps: {
-               label: 'Chơi mới',
-               severity: BUTTON_STYLE.CONTRAST
-         },
-      
-         accept: () => {
-            this.createNewGame();
-         },
-         reject: () => {
-            this.loadUnfinishedGame();
-         }
-      });
-   }
-
-
    public loadUnfinishedGame() {
       this.loaderService.show();
       this.findNumberGameService.currentGameInfo.set(this.unfinishedGames() as FindNumberGameDTO);
@@ -151,13 +139,6 @@ export class GameStartScreen {
 
 
    private navigationToPlayGameScreen(gameId: string): void {
-      this.router.navigateByUrl(
-         ROUTE_PATHS
-            .GAME
-            .children
-            .FIND_NUMBER_GAME
-            .children
-            .PLAY_GAME_SCREEN.fullPath.replace(':gameId', gameId)
-      )
+      this.navigationService.goToFindNumberGamePlay(gameId);
    }
 }
