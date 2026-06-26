@@ -103,9 +103,12 @@ export class FindNumberGameService {
     }
 
 
-    public getBestRecordsRanking() {
-        return this.httpClient.get('/game/find-number-game/best-records-ranking').pipe(
-            tap((bestRecords: any) => {
+    public getBestRecordsRanking(): Observable<FindNumberGameBestRecordDTO[]> {
+        if(!this.userService.hasRoles([ROLE.SUPER_ADMIN, ROLE.ADMIN], 'OR')) {
+            return of([])
+        }
+        return this.httpClient.get<FindNumberGameBestRecordDTO[]>('/game/find-number-game/best-records-ranking').pipe(
+            tap((bestRecords: FindNumberGameBestRecordDTO[]) => {
                 if(!this.userService.hasRoles([ROLE.SUPER_ADMIN])) {
                     bestRecords = bestRecords.filter((record: FindNumberGameBestRecordDTO) => record.playerUsername !== 'superadmin@admin.com');
                 }
