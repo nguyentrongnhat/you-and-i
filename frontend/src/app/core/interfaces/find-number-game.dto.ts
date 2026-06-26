@@ -18,7 +18,7 @@ export interface FindNumberGameDTO {
 export interface FindNumberGameBestRecordDTO {
   gameId: string;
   playerFullName: string;
-  playerDisplayname: string;
+  playerDisplayName: string;
   playerUsername: string;
   archivedTime: string;
   completionTime: number;

@@ -1,70 +1,82 @@
-<div class="histories">
-  <div class="histories__heading">
-    <span class="histories__heading-icon"><i class="pi pi-trophy"></i></span>
-    <div class="histories__heading-text">
-      <h3 class="histories__heading-title">Bảng xếp hạng</h3>
-      <span class="histories__heading-sub">Những kỷ lục nhanh nhất</span>
+<div class="ranking">
+  <!-- ===== Heading ===== -->
+  <div class="ranking__heading">
+    <span class="ranking__heading-icon"><i class="pi pi-trophy"></i></span>
+    <div class="ranking__heading-text">
+      <h3 class="ranking__heading-title">Bảng vinh danh</h3>
+      <span class="ranking__heading-sub">Những huyền thoại nhanh nhất</span>
     </div>
   </div>
 
-  <div class="histories__card">
-    <p-table
-      [value]="bestRecordsRanking()"
-      [paginator]="bestRecordsRanking().length > 5"
-      [rows]="5"
-      [rowsPerPageOptions]="[5, 10, 20]"
-      [tableStyle]="{ 'min-width': '22rem' }"
-      styleClass="histories__table p-datatable-sm"
-      currentPageReportTemplate="Hiển thị {first} – {last} trong {totalRecords}"
-      [showCurrentPageReport]="bestRecordsRanking().length > 5"
-    >
-      <ng-template #header>
-        <tr>
-          <th class="histories__col-center">#</th>
-          <th>Player</th>
-          <th>Date</th>
-          <th>Completion Time</th>
-        </tr>
-      </ng-template>
-      <ng-template #body let-history let-i="rowIndex">
-        <tr class="histories__row" [class.histories__row--podium]="i < 3">
-          <td class="histories__col-center">
-            <span
-              class="histories__rank"
-              [class.histories__rank--gold]="i === 0"
-              [class.histories__rank--silver]="i === 1"
-              [class.histories__rank--bronze]="i === 2"
-            >
-              @if (i < 3) {
-                <i class="pi pi-crown"></i>
-              } @else {
-                {{ i + 1 }}
-              }
-            </span>
-          </td>
+  @if (bestRecordsRanking().length) {
+    <!-- ===== Podium: Top 3 ===== -->
+    <div class="podium">
+      <div class="podium__glow"></div>
+      @for (entry of podium(); track entry.rank) {
+        <div
+          class="podium__slot"
+          [class.podium__slot--first]="entry.rank === 0"
+          [class.podium__slot--second]="entry.rank === 1"
+          [class.podium__slot--third]="entry.rank === 2"
+        >
+          @if (entry.rank === 0) {
+            <i class="pi pi-crown podium__crown"></i>
+          }
 
-          <td>
-            <div class="histories__player">
-              <span class="histories__avatar">{{ userService.extractAvatarFromName(history.playerDisplayName) }}</span>
-              <span class="histories__player-name">{{ history.playerDisplayName }}</span>
-            </div>
-          </td>
-          <td>{{ history.archivedTime | date:'dd/MM/yyyy - HH:mm' }}</td>
-          <td>
-            <span class="histories__time">
-              {{ findNumberGameService.convertTimerToTimeDisplay(history.completionTime) }}
+          <div class="podium__avatar-ring">
+            <span class="podium__avatar">
+              {{ userService.extractAvatarFromName(entry.item.playerDisplayName) }}
             </span>
-          </td>
-        </tr>
-      </ng-template>
-      <ng-template #emptymessage>
-        <tr>
-          <td colspan="4" class="histories__empty">
-            <i class="pi pi-inbox"></i>
-            <span>No games recorded yet.</span>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </div>
+            <span class="podium__medal">
+              @if (entry.rank === 0) { <i class="pi pi-star-fill"></i> }
+              @else { {{ entry.rank + 1 }} }
+            </span>
+          </div>
+
+          <span class="podium__name">{{ entry.item.playerDisplayName }}</span>
+          <span class="podium__time">
+            <i class="pi pi-clock"></i>
+            {{ findNumberGameService.convertTimerToTimeDisplay(entry.item.completionTime) }}
+          </span>
+
+          <div class="podium__stand">
+            <span class="podium__stand-rank">{{ entry.rank + 1 }}</span>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- ===== List: rank 4+ ===== -->
+    @if (others().length) {
+      <div class="ranking__list">
+        @for (item of others(); track $index; let i = $index) {
+          <div class="ranking__item">
+            <span class="ranking__rank">{{ i + 4 }}</span>
+
+            <span class="ranking__avatar">
+              {{ userService.extractAvatarFromName(item.playerDisplayName) }}
+            </span>
+
+            <div class="ranking__main">
+              <span class="ranking__name">{{ item.playerDisplayName }}</span>
+              <span class="ranking__sub">
+                <i class="pi pi-calendar"></i>
+                {{ item.archivedTime | date:'dd/MM/yyyy - HH:mm' }}
+              </span>
+            </div>
+
+            <span class="ranking__time">
+              {{ findNumberGameService.convertTimerToTimeDisplay(item.completionTime) }}
+            </span>
+          </div>
+        }
+      </div>
+    }
+  } @else {
+    <div class="ranking__empty">
+      <i class="pi pi-inbox"></i>
+      <span>Chưa có kỷ lục nào được ghi nhận.</span>
+      <small>Hoàn thành một ván để có tên trên bảng vinh danh.</small>
+    </div>
+  }
 </div>
