@@ -65,7 +65,55 @@
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environments.ts",
+                  "with": "src/environments/environments.dev.ts"
+                }
+              ]
+            },
+            "qa": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "5MB",
+                  "maximumError": "10MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "5MB",
+                  "maximumError": "10MB"
+                }
+              ],
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environments.ts",
+                  "with": "src/environments/environments.qa.ts"
+                }
+              ]
+            },
+            "local": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "5MB",
+                  "maximumError": "10MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "5MB",
+                  "maximumError": "10MB"
+                }
+              ],
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environments.ts",
+                  "with": "src/environments/environments.local.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -73,14 +121,20 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "configurations": {
-            "production": {
-              "buildTarget": "you-and-i:build:production"
+            "local": {
+              "buildTarget": "you-and-i:build:local"
             },
             "development": {
               "buildTarget": "you-and-i:build:development"
+            },
+            "qa": {
+              "buildTarget": "you-and-i:build:qa"
+            },
+            "production": {
+              "buildTarget": "you-and-i:build:production"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "local"
         },
         "test": {
           "builder": "@angular/build:unit-test"

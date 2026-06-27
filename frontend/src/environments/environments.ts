@@ -1,5 +1,4 @@
 export const environment = {
-  production: false,
-  //apiBaseUrl: 'http://localhost:8080/api',
+  env: 'prod',
   apiBaseUrl: 'https://jar-of-messages-api.azurewebsites.net/api'
 };

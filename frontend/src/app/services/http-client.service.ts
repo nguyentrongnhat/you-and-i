@@ -1,7 +1,7 @@
 import { HttpClient } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { EMPTY, Observable } from "rxjs";
-import { environment } from "../../enviroments/environments";
+import { environment } from "../../environments/environments";
 import { ApiOptions, RequestDTO } from "../core/interfaces/request.dtos";
 import { PlatformService } from "./platform.service";
 
