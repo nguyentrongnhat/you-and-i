@@ -44,7 +44,9 @@ public class FilterChainConfig {
                         "http://localhost:4200",
                         "http://localhost:4201",
                         "https://jar-of-messages-5b9cd.web.app",
-                        "https://jar-of-messages.azurewebsites.net"
+                        "https://jar-of-messages.azurewebsites.net",
+                        "https://jar-of-messages-dev.azurewebsites.net",
+                        "https://jar-of-messages-qa.azurewebsites.net"
                 ));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
