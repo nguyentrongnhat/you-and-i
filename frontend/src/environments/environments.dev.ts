@@ -1,4 +1,4 @@
 export const environment = {
     env: 'dev',
-    apiBaseUrl: 'https://jar-of-messages-api.dev.azurewebsites.net/api'
+    apiBaseUrl: 'https://jar-of-messages-dev-api.azurewebsites.net/api'
 };
