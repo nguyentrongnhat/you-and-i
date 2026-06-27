@@ -34,7 +34,7 @@ jobs:
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
-          name: angular-app
+          name: angular-app-dev
           path: frontend/dist/you-and-i/browser
 
   deploy:
