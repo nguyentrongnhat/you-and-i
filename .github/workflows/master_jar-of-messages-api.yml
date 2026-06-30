@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: jar_of_messages - BE_PROD
+name: Build and deploy JAR app to Azure Web App - jar-of-messages-api
 
 on:
   push:
@@ -21,18 +21,17 @@ jobs:
       - name: Set up Java version
         uses: actions/setup-java@v4
         with:
-          java-version: '25'
+          java-version: 'java25'
           distribution: 'microsoft'
 
       - name: Build with Maven
-        working-directory: backend
-        run: mvn clean install -DskipTests
+        run: mvn clean install
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: java-app
-          path: backend/target/*.jar
+          path: '${{ github.workspace }}/target/*.jar'
 
   deploy:
     runs-on: ubuntu-latest
@@ -50,9 +49,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_719B4C4D27254F9AA8816E8CE15AF02C }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_A5D19128A4FC46A8BF71D358F01503BD }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_6E64310DD059406C997C3BAF0F967C3A }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_FF8E0947572B420DB7C6CFD3156B02B3 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_F4339A3B681C46BAA3C6AE45F231F4EC }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_60CC97DE1B6D499F8EEFE334DB6BD702 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
