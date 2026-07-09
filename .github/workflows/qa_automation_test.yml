@@ -1,0 +1,96 @@
+# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
+# More GitHub Actions for Azure: https://github.com/Azure/actions
+
+name: jar_of_messages - QA-TA
+
+on:
+  push:
+    branches:
+      - qa
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js version
+        uses: actions/setup-node@v3
+        with:
+          node-version: '24.x'
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm install
+
+      - name: Build Angular
+        working-directory: ./frontend
+        run: npm run build:qa
+
+      - name: Upload artifact for deployment job
+        uses: actions/upload-artifact@v4
+        with:
+          name: angular-app-qa
+          path: frontend/dist/you-and-i/browser
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: angular-app-qa
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_E5459DF082B940459E84933346811FD9 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_C5F13DF05B3E488C8B93E01D985C4D4A }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_A84C2E857F3E423E97F94AAB3F3ACFF1 }}
+
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'jar-of-messages-qa'
+          slot-name: 'Production'
+          package: .
+
+  automation-test:
+    runs-on: ubuntu-latest
+    needs: deploy
+    permissions:
+      contents: read
+
+    steps:
+      - name: Wait 5 minutes for deployment to stabilize
+        run: |
+          echo "Waiting 5 minutes for Azure Web App to fully start..."
+          sleep 300
+          echo "Done waiting. Starting automation tests."
+
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Google Chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: 'stable'
+
+      - name: Run Selenium Tests
+        working-directory: ./automationtest
+        run: mvn clean test
