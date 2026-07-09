@@ -26,4 +26,47 @@
 	    <version>5.12.0</version>
 	</dependency>
    </dependencies>
+
+
+	<build>
+		<!-- Khai báo thư mục chứa code Test -->
+		<testSourceDirectory>TestCases</testSourceDirectory>
+
+		<plugins>
+			<!-- Plugin giúp Maven nhận diện thêm nhiều thư mục code nguồn khác -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>3.5.0</version>
+				<executions>
+					<execution>
+						<id>add-source</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>add-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>Common</source>
+								<source>DataObjects</source>
+								<source>PageObjects</source>
+							</sources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<!-- Cấu hình Surefire để chạy file testng.xml ở thư mục gốc -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>3.5.4</version>
+				<configuration>
+					<suiteXmlFiles>
+						<suiteXmlFile>testng.xml</suiteXmlFile>
+					</suiteXmlFiles>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
