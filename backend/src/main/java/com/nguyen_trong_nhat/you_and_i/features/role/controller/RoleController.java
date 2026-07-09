@@ -1,7 +1,7 @@
 package com.nguyen_trong_nhat.you_and_i.features.role.controller;
 
 import com.nguyen_trong_nhat.you_and_i.features.role.service.RoleService;
-import com.nguyen_trong_nhat.you_and_i.features.user.entity.Role;
+import com.nguyen_trong_nhat.you_and_i.features.role.entity.Role;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

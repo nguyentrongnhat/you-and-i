@@ -1,0 +1,112 @@
+<article class="rel-card">
+  <!-- Card header -->
+  <div class="rel-card__top">
+    <span class="rel-card__type-icon">
+      <i [class]="typeIcon(relationship().type)"></i>
+    </span>
+    <div class="rel-card__title-block">
+      <span class="rel-card__type">{{ typeLabel(relationship().type) }}</span>
+      <p-tag
+        [value]="statusLabel(relationship().status)"
+        [severity]="statusSeverity(relationship().status)"
+        [rounded]="true"
+        styleClass="rel-card__status"
+      />
+    </div>
+    <div class="rel-card__actions">
+      <p-button
+        icon="pi pi-pencil"
+        severity="secondary"
+        [rounded]="true"
+        [text]="true"
+        size="small"
+        (onClick)="edit.emit()"
+      />
+      <p-button
+        icon="pi pi-trash"
+        severity="danger"
+        [rounded]="true"
+        [text]="true"
+        size="small"
+        (onClick)="remove.emit()"
+      />
+    </div>
+  </div>
+
+  @if (relationship().description) {
+  <p class="rel-card__desc">{{ relationship().description }}</p>
+  }
+
+  <!-- Members -->
+  <div class="rel-card__members">
+    <div class="rel-card__members-head">
+      <span class="rel-card__members-title">
+        <i class="pi pi-users"></i>
+        Thành viên ({{ relationship().members.length }})
+      </span>
+      <p-button
+        icon="pi pi-user-plus"
+        label="Thêm"
+        size="small"
+        [text]="true"
+        (onClick)="addMember.emit()"
+      />
+    </div>
+
+    <ul class="rel-member-list">
+      @for (member of relationship().members; track member.id) {
+      <li class="rel-member">
+        @if (member.avatarUrl) {
+        <p-avatar
+          [image]="member.avatarUrl"
+          shape="circle"
+          size="normal"
+          styleClass="rel-member__avatar"
+        />
+        } @else {
+        <p-avatar
+          [label]="memberInitials(member)"
+          shape="circle"
+          size="normal"
+          styleClass="rel-member__avatar rel-member__avatar--text"
+        />
+        }
+        <div class="rel-member__info">
+          <span class="rel-member__name">
+            {{ member.displayName || member.username }}
+          </span>
+          <span class="rel-member__username">&#64;{{ member.username }}</span>
+        </div>
+
+        @if (member.role === RELATIONSHIP_ROLE.OWNER) {
+        <p-tag
+          [value]="memberRoleLabel(member.role)"
+          [severity]="memberRoleSeverity(member.role)"
+          [rounded]="true"
+          styleClass="rel-member__role-tag"
+        />
+        } @else {
+        <p-select
+          [ngModel]="member.role"
+          (ngModelChange)="onChangeRole(member, $event)"
+          [options]="memberRoleOptions()"
+          optionLabel="label"
+          optionValue="value"
+          styleClass="rel-member__role-select"
+          appendTo="body"
+        />
+        <p-button
+          icon="pi pi-times"
+          severity="danger"
+          [rounded]="true"
+          [text]="true"
+          size="small"
+          styleClass="rel-member__remove"
+          (onClick)="removeMember.emit(member)"
+        />
+        }
+      </li>
+      }
+    </ul>
+  </div>
+</article>

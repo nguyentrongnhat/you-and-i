@@ -34,7 +34,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
             catch (Exception e) {
                 SecurityContextHolder.clearContext();
-                res.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
+                res.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
                 return;
             }
         }

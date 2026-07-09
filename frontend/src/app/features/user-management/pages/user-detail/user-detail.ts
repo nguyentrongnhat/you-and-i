@@ -23,6 +23,7 @@ import { UserDetails } from '../../../../core/interfaces/user.dtos';
 import { ToastService } from '../../../../services/toast.service';
 import { AuthService } from '../../../auth/services/auth.service';
 import { UserService } from '../../services/user.service';
+import { RelationshipPanel } from '../../components/relationship-panel/relationship-panel';
 import { finalize } from 'rxjs';
 import { LoaderService } from '../../../../services/loader.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -74,6 +75,7 @@ export const userProfileSchema = schema<UserProfileFormModel>((root) => {
 		SkeletonModule,
 		TagModule,
 		TextareaModule,
+		RelationshipPanel,
 	],
 	templateUrl: './user-detail.html',
 	styleUrl: './user-detail.scss',
@@ -149,6 +151,11 @@ export class UserDetail implements OnInit {
 			profile?.fullName || profile?.displayName || this.user()?.username || '';
 		return this.userService.extractAvatarFromName(source);
 	});
+
+	/** Only admins / super admins may manage relationships. */
+	protected readonly canManageRelationships = computed<boolean>(() =>
+		this.userService.hasRoles([ROLE.SUPER_ADMIN, ROLE.ADMIN], 'OR')
+	);
 
 	ngOnInit(): void {
 		this.getUserDetailsById(this.id());

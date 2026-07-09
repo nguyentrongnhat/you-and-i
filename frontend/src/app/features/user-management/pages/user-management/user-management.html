@@ -1,125 +1,140 @@
 <div class="user-management">
-  <!-- Header -->
-  <div class="user-management__header">
-    <div class="user-management__heading">
-      <h2 class="user-management__title">
-        <i class="pi pi-users"></i>
+  <!-- ======================= Header ======================= -->
+  <header class="um-header">
+    <div class="um-header__text">
+      <h2 class="um-header__title">
+        <span class="um-header__icon"><i class="pi pi-users"></i></span>
         Quản lý người dùng
       </h2>
-      <p class="user-management__subtitle">
-        Tổng <strong>{{ users().length }}</strong> người dùng ·
-        <strong>{{ enabledCount() }}</strong> đang hoạt động
+      <p class="um-header__subtitle">
+        Quản lý tài khoản, vai trò và trạng thái hoạt động của người dùng.
       </p>
     </div>
+  </header>
 
-    <p-iconfield iconPosition="left" class="user-management__search">
-      <p-inputicon styleClass="pi pi-search" />
-      <input
-        pInputText
-        type="text"
-        placeholder="Tìm theo tên hoặc username..."
-        [ngModel]="searchTerm()"
-        (ngModelChange)="onSearch($event)"
-        fluid
-      />
-    </p-iconfield>
-  </div>
+  <!-- ======================= Stats ======================= -->
+  <app-user-stats
+    [total]="users().length"
+    [active]="enabledCount()"
+    [verified]="verifiedCount()"
+    [admin]="adminCount()"
+  />
 
-  <!-- Table -->
-  <div class="user-management__card">
-    <p-table
-      [value]="filteredUsers()"
-      [paginator]="true"
-      [rows]="10"
-      [loading]="loaderService.isLoading()"
-      [rowsPerPageOptions]="[10, 20, 50]"
-      [tableStyle]="{ 'min-width': '20rem' }"
-      styleClass="user-management__table p-datatable-sm"
-      currentPageReportTemplate="Hiển thị {first} – {last} trong {totalRecords}"
-      [showCurrentPageReport]="true"
-    >
-      <ng-template #header>
-        <tr>
-          <th>Người dùng</th>
-          @if (!platformService.isSmallMobileDevice()) {
-          <th>Vai trò</th>
-          <th class="user-management__col-center">Xác thực</th>
+  <!-- ======================= Toolbar ======================= -->
+  <app-user-filters
+    [searchTerm]="searchTerm()"
+    [statusFilter]="statusFilter()"
+    [roleFilter]="roleFilter()"
+    [statusChips]="statusChips"
+    [roleChips]="roleChips"
+    [resultCount]="filteredUsers().length"
+    [total]="users().length"
+    [hasActiveFilters]="hasActiveFilters()"
+    (searchChange)="onSearch($event)"
+    (statusChange)="setStatusFilter($event)"
+    (roleChange)="setRoleFilter($event)"
+    (clear)="clearFilters()"
+  />
+
+  <!-- ======================= Table / Cards ======================= -->
+  <div class="um-card">
+    <!-- User list -->
+    <ul class="um-list">
+      @for (user of pagedUsers(); track user.id) {
+      <li class="um-item" (click)="navigateToUserDetail(user)">
+        <!-- Identity -->
+        <div class="um-user">
+          @if (user.profile.avatarUrl) {
+          <p-avatar
+            [image]="user.profile.avatarUrl"
+            shape="circle"
+            size="large"
+            styleClass="um-avatar"
+          />
+          } @else {
+          <p-avatar
+            [label]="initials(user)"
+            shape="circle"
+            size="large"
+            styleClass="um-avatar um-avatar--text"
+          />
           }
-          <th class="user-management__col-center">Hoạt động</th>
-        </tr>
-      </ng-template>
+          <div class="um-user__info">
+            <span class="um-user__name">{{ displayName(user) }}</span>
+            <span class="um-user__username">&#64;{{ user.username }}</span>
 
-      <ng-template #body let-user>
-        <tr class="user-management__row" (click)="navigateToUserDetail(user)">
-          <td>
-            <div class="user-management__user-cell">
-              @if (user.profile?.avatarUrl) {
-              <p-avatar
-                [image]="user.profile.avatarUrl"
-                shape="circle"
-                size="normal"
-                styleClass="user-management__avatar"
-              />
-              } @else {
-              <p-avatar
-                [label]="initials(user)"
-                shape="circle"
-                size="normal"
-                styleClass="user-management__avatar user-management__avatar--text"
-              />
-              }
-              <div class="user-management__user-info">
-                <span class="user-management__user-name">
-                  {{ displayName(user) }}
-                </span>
-                <span class="user-management__user-username">
-                  &#64;{{ user.username }}
-                </span>
-              </div>
-            </div>
-          </td>
-
-          @if (!platformService.isSmallMobileDevice()) {
-          <td>
-            <div class="user-management__roles">
+            <!-- Meta chips (roles + verified) -->
+            <div class="um-item__meta">
               @for (role of user.roles; track role) {
-              <p-tag [value]="role" severity="secondary" />
-              } @empty {
-              <span class="user-management__muted">—</span>
+              <p-tag
+                [value]="roleLabel(role)"
+                [severity]="roleSeverity(role)"
+                [rounded]="true"
+              />
               }
+              <p-tag
+                [value]="user.emailVerified ? 'Đã xác thực' : 'Chưa xác thực'"
+                [severity]="user.emailVerified ? 'success' : 'warn'"
+                [icon]="
+                  user.emailVerified
+                    ? 'pi pi-verified'
+                    : 'pi pi-exclamation-circle'
+                "
+                [rounded]="true"
+              />
             </div>
-          </td>
-          <td class="user-management__col-center">
-            <p-tag
-              [value]="user.emailVerified ? 'Đã xác thực' : 'Chưa'"
-              [severity]="user.emailVerified ? 'success' : 'warn'"
-              [icon]="
-                user.emailVerified ? 'pi pi-verified' : 'pi pi-exclamation-circle'
-              "
-            />
-          </td>
-          }
+          </div>
+        </div>
 
-          <td class="user-management__col-center">
+        <!-- Active toggle -->
+        <div class="um-item__actions">
+          <div class="um-toggle" (click)="$event.stopPropagation()">
             <p-toggleswitch
               [(ngModel)]="user.enabled"
               (click)="toggleActiveUserAccount(user); $event.stopPropagation()"
             />
-          </td>
-        </tr>
-      </ng-template>
+            <span
+              class="um-status-text"
+              [class.um-status-text--on]="user.enabled"
+            >
+              {{ user.enabled ? "Bật" : "Tắt" }}
+            </span>
+          </div>
+          <i class="pi pi-angle-right um-item__chevron"></i>
+        </div>
+      </li>
+      } @empty {
+      <li class="um-empty">
+        <div class="um-empty__inner">
+          <i class="pi pi-inbox"></i>
+          <span class="um-empty__title">Không có người dùng nào</span>
+          <span class="um-empty__hint">
+            @if (hasActiveFilters()) { Thử điều chỉnh bộ lọc hoặc từ khóa tìm
+            kiếm. } @else { Chưa có dữ liệu người dùng để hiển thị. }
+          </span>
+          @if (hasActiveFilters()) {
+          <button type="button" class="um-clear" (click)="clearFilters()">
+            <i class="pi pi-refresh"></i>
+            Đặt lại bộ lọc
+          </button>
+          }
+        </div>
+      </li>
+      }
+    </ul>
 
-      <ng-template #emptymessage>
-        <tr>
-          <td
-            [attr.colspan]="platformService.isSmallMobileDevice() ? 2 : 4"
-            class="user-management__empty"
-          >
-            <i class="pi pi-inbox"></i>
-            <span>Không tìm thấy người dùng nào.</span>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
+    <!-- Pagination -->
+    @if (filteredUsers().length > 0) {
+    <p-paginator
+      [first]="first()"
+      [rows]="rows()"
+      [totalRecords]="filteredUsers().length"
+      [rowsPerPageOptions]="rowsPerPageOptions"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="{first} – {last} trong {totalRecords}"
+      styleClass="um-paginator"
+      (onPageChange)="onPageChange($event)"
+    />
+    }
   </div>
 </div>

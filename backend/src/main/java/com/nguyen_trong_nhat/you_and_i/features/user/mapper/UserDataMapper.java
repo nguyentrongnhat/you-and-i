@@ -1,15 +1,17 @@
 package com.nguyen_trong_nhat.you_and_i.features.user.mapper;
 
 import com.nguyen_trong_nhat.you_and_i.features.role.repository.RoleRepository;
+import com.nguyen_trong_nhat.you_and_i.features.user.dto.UpdateUserRequest;
 import com.nguyen_trong_nhat.you_and_i.features.user.dto.UserDetailDTO;
 import com.nguyen_trong_nhat.you_and_i.features.user.dto.UserProfileDTO;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
-import com.nguyen_trong_nhat.you_and_i.features.user.entity.Role;
+import com.nguyen_trong_nhat.you_and_i.features.role.entity.Role;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.UserProfile;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,7 +36,7 @@ public class UserDataMapper {
         userDetailDTO.setEmailVerified(myUserDetail.isEmailVerified());
         userDetailDTO.setProfile(toUserProfileDTO(myUserDetail.getProfile()));
         userDetailDTO.setRoles(
-                myUserDetail.getRoles().stream()
+                myUserDetail.getRoles() == null ? Set.of() : myUserDetail.getRoles().stream()
                         .map(Role::getName)
                         .collect(Collectors.toSet())
         );
@@ -97,19 +99,10 @@ public class UserDataMapper {
     }
 
 
-    public MyUserDetail updateEntityFromDTO(UserDetailDTO userDetailDTO, MyUserDetail myUserDetail) {
-        if (userDetailDTO == null || myUserDetail == null) {
+    public MyUserDetail updateUserProfileFromRequest(UpdateUserRequest updateUserRequest, MyUserDetail myUserDetail) {
+        if (updateUserRequest == null || myUserDetail == null) {
             return myUserDetail;
         }
-
-        myUserDetail.setUsername(userDetailDTO.getUsername());
-
-        if(!myUserDetail.isEnabled() && userDetailDTO.isEnabled()) {
-            myUserDetail.setEnableAt(LocalDateTime.now());
-        }
-
-        myUserDetail.setEnabled(userDetailDTO.isEnabled());
-        myUserDetail.setEmailVerified(userDetailDTO.isEmailVerified());
 
         UserProfile profile = myUserDetail.getProfile();
         if (profile == null) {
@@ -117,15 +110,41 @@ public class UserDataMapper {
             profile.setUser(myUserDetail);
             myUserDetail.setProfile(profile);
         }
-        updateUserProfileFromDTO(userDetailDTO.getProfile(), profile);
+        updateUserProfileFromDTO(updateUserRequest.getProfile(), profile);
 
-        myUserDetail.setRoles(convertStringSetToRoleSet(userDetailDTO.getRoles()));
+        return myUserDetail;
+    }
+
+
+    public MyUserDetail applyAdminFields(UpdateUserRequest updateUserRequest, MyUserDetail myUserDetail) {
+        if (updateUserRequest == null || myUserDetail == null) {
+            return myUserDetail;
+        }
+
+        if (updateUserRequest.getEnabled() != null) {
+            if (!myUserDetail.isEnabled() && updateUserRequest.getEnabled()) {
+                myUserDetail.setEnableAt(LocalDateTime.now());
+            }
+            myUserDetail.setEnabled(updateUserRequest.getEnabled());
+        }
+
+        if (updateUserRequest.getEmailVerified() != null) {
+            myUserDetail.setEmailVerified(updateUserRequest.getEmailVerified());
+        }
+
+        if (updateUserRequest.getRoles() != null) {
+            myUserDetail.setRoles(convertStringSetToRoleSet(updateUserRequest.getRoles()));
+        }
 
         return myUserDetail;
     }
 
 
     public void updateUserProfileFromDTO(UserProfileDTO userProfileDTO, UserProfile userProfile) {
+        if (userProfileDTO == null || userProfile == null) {
+            return;
+        }
+
         userProfile.setFullName(userProfileDTO.getFullName());
         userProfile.setDisplayName(userProfileDTO.getDisplayName());
         userProfile.setAvatarUrl(userProfileDTO.getAvatarUrl());
@@ -142,6 +161,16 @@ public class UserDataMapper {
             return new HashSet<>();
         }
 
-        return roleRepository.findByNameIn(roleNames);
+        Set<String> normalizedRoleNames = roleNames.stream()
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(name -> !name.isBlank())
+                .collect(Collectors.toSet());
+
+        if (normalizedRoleNames.isEmpty()) {
+            return new HashSet<>();
+        }
+
+        return roleRepository.findByNameIn(normalizedRoleNames);
     }
 }

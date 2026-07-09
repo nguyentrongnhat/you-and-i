@@ -1,5 +1,6 @@
 import { computed, inject, Injectable, signal } from "@angular/core";
 import { Observable } from "rxjs";
+import { Page } from "../../../core/interfaces/request.dtos";
 import { UserDetails } from "../../../core/interfaces/user.dtos";
 import { HttpClientService } from "../../../services/http-client.service";
 import { ROLE } from "../../../core/enums";
@@ -20,8 +21,8 @@ export class UserService {
         return this.httpClientService.get(`/user/${id}`);
     }
 
-    public getAllUsers(): Observable<UserDetails[]> {
-        return this.httpClientService.get('/user/all');
+    public getAllUsers(page = 0, size = 10): Observable<Page<UserDetails>> {
+        return this.httpClientService.get('/user/all', { params: { page, size } });
     }
 
     public updateUserData(userData: any): Observable<UserDetails> {

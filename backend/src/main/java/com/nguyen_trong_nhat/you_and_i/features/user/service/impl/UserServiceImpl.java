@@ -7,9 +7,10 @@ import com.nguyen_trong_nhat.you_and_i.common.exception.NotFoundException;
 import com.nguyen_trong_nhat.you_and_i.common.security.util.SecurityUtils;
 import com.nguyen_trong_nhat.you_and_i.common.util.OtpGenerator;
 import com.nguyen_trong_nhat.you_and_i.features.role.repository.RoleRepository;
+import com.nguyen_trong_nhat.you_and_i.features.user.dto.UpdateUserRequest;
 import com.nguyen_trong_nhat.you_and_i.features.user.dto.UserDetailDTO;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
-import com.nguyen_trong_nhat.you_and_i.features.user.entity.Role;
+import com.nguyen_trong_nhat.you_and_i.features.role.entity.Role;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.UserProfile;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.UserVerification;
 import com.nguyen_trong_nhat.you_and_i.features.user.mapper.UserDataMapper;
@@ -19,6 +20,8 @@ import com.nguyen_trong_nhat.you_and_i.features.user.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +31,8 @@ import java.util.*;
 @RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
+
+    private static final int MAX_PAGE_SIZE = 100;
 
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -69,11 +74,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDetailDTO> getAllUser() {
-        List<MyUserDetail> allUserFromDB = userRepository.findAll();
-        return allUserFromDB.stream()
-                .map(userDataMapper::toUserDetailDTO)
-                .toList();
+    public Page<UserDetailDTO> getAllUser(int page, int size) {
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.min(Math.max(size, 1), MAX_PAGE_SIZE);
+
+        return userRepository.findAllBy(PageRequest.of(safePage, safeSize))
+                .map(userDataMapper::toUserDetailDTO);
     }
 
     @Override
@@ -105,7 +111,7 @@ public class UserServiceImpl implements UserService {
             existingAccount.getRoles().add(superAdminRole);
             userRepository.save(existingAccount);
             return;
-        };
+        }
 
         List<MyUserDetail> superAdminAccounts = userRepository.findAllByRoles_Name(superAdminRole.getName());
 
@@ -127,13 +133,33 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    @CacheEvict(value = "userDetails", key = "#userDetailDTO.username")
-    public UserDetailDTO updateUserData(UserDetailDTO userDetailDTO) {
+    @CacheEvict(value = "userDetails", key = "#updateUserRequest.username.toLowerCase()")
+    public UserDetailDTO updateUserData(UpdateUserRequest updateUserRequest) {
+        String requestedUsername = updateUserRequest.getUsername().trim().toLowerCase();
         MyUserDetail existingAccount
-                = userRepository.findByUsername(userDetailDTO.getUsername())
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+                = userRepository.findByUsernameIgnoreCase(requestedUsername)
+                    .orElseThrow(() -> new NotFoundException("User not found"));
 
-        existingAccount = userDataMapper.updateEntityFromDTO(userDetailDTO, existingAccount);
+        boolean isSuperAdmin = SecurityUtils.hasAuthorities(Constants.ROLE_SUPER_ADMIN);
+        boolean isAdmin = SecurityUtils.hasAuthorities(Constants.ROLE_ADMIN);
+        boolean isSelf = Objects.equals(SecurityUtils.getLoggedInUsername(), existingAccount.getUsername());
+
+        if (!isSelf && !isAdmin && !isSuperAdmin) {
+            throw new ForbidenException("You have no permission to update this user's data");
+        }
+
+        if ((updateUserRequest.getRoles() != null
+                || updateUserRequest.getEnabled() != null
+                || updateUserRequest.getEmailVerified() != null)
+                && !isAdmin && !isSuperAdmin) {
+            throw new ForbidenException("You have no permission to update sensitive user fields");
+        }
+
+        existingAccount = userDataMapper.updateUserProfileFromRequest(updateUserRequest, existingAccount);
+
+        if (isAdmin || isSuperAdmin) {
+            existingAccount = userDataMapper.applyAdminFields(updateUserRequest, existingAccount);
+        }
 
         userRepository.save(existingAccount);
 
@@ -143,7 +169,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDetailDTO getUserDetailsById(String id) {
         UUID userId = UUID.fromString(id);
-        MyUserDetail user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("User not found"));
+        MyUserDetail user = userRepository.findDetailedById(userId).orElseThrow(() -> new NotFoundException("User not found"));
 
         if(!Objects.equals(SecurityUtils.getLoggedInUsername(), user.getUsername())
                 && !SecurityUtils.hasAuthorities(Constants.ROLE_SUPER_ADMIN)

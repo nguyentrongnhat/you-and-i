@@ -9,6 +9,16 @@ This project is an Angular 21+ standalone SSR application using:
 
 ---
 
+# 0. Execution Workflow Rule (HARD RULE — applies to EVERY request)
+
+- Always break work into small, sequential steps so that each request to the AI server completes in **under 30 seconds**.
+- Prefer many small file edits over one large edit. Never attempt a single massive change.
+- After each step, validate (check errors) before moving on.
+- If a step fails or errors out, split that failing step into smaller sub-steps and continue.
+- Keep going step-by-step until the task is fully complete — do not stop midway.
+
+---
+
 # 1. Architecture Principles
 
 - Strict layered architecture:

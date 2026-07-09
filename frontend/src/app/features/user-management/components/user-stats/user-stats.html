@@ -1,0 +1,33 @@
+<section class="um-stats" aria-label="Thống kê người dùng">
+  <div class="um-stat um-stat--total">
+    <span class="um-stat__icon"><i class="pi pi-users"></i></span>
+    <div class="um-stat__body">
+      <span class="um-stat__value">{{ total() }}</span>
+      <span class="um-stat__label">Tổng người dùng</span>
+    </div>
+  </div>
+
+  <div class="um-stat um-stat--active">
+    <span class="um-stat__icon"><i class="pi pi-check-circle"></i></span>
+    <div class="um-stat__body">
+      <span class="um-stat__value">{{ active() }}</span>
+      <span class="um-stat__label">Đang hoạt động</span>
+    </div>
+  </div>
+
+  <div class="um-stat um-stat--verified">
+    <span class="um-stat__icon"><i class="pi pi-verified"></i></span>
+    <div class="um-stat__body">
+      <span class="um-stat__value">{{ verified() }}</span>
+      <span class="um-stat__label">Đã xác thực</span>
+    </div>
+  </div>
+
+  <div class="um-stat um-stat--admin">
+    <span class="um-stat__icon"><i class="pi pi-shield"></i></span>
+    <div class="um-stat__body">
+      <span class="um-stat__value">{{ admin() }}</span>
+      <span class="um-stat__label">Quản trị viên</span>
+    </div>
+  </div>
+</section>

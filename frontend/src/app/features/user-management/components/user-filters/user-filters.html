@@ -1,0 +1,57 @@
+<section class="um-toolbar">
+  <p-iconfield iconPosition="left" class="um-toolbar__search">
+    <p-inputicon styleClass="pi pi-search" />
+    <input
+      pInputText
+      type="text"
+      placeholder="Tìm theo tên hoặc username..."
+      [ngModel]="searchTerm()"
+      (ngModelChange)="searchChange.emit($event)"
+      fluid
+    />
+  </p-iconfield>
+
+  <div class="um-toolbar__filters">
+    <!-- Status filter -->
+    <div class="um-chips" role="group" aria-label="Lọc theo trạng thái">
+      @for (chip of statusChips(); track chip.value) {
+      <button
+        type="button"
+        class="um-chip"
+        [class.um-chip--active]="statusFilter() === chip.value"
+        (click)="statusChange.emit(chip.value)"
+      >
+        @if (chip.icon) {
+        <i [class]="chip.icon"></i>
+        }
+        {{ chip.label }}
+      </button>
+      }
+    </div>
+
+    <!-- Role filter -->
+    <div class="um-chips" role="group" aria-label="Lọc theo vai trò">
+      @for (chip of roleChips(); track chip.value) {
+      <button
+        type="button"
+        class="um-chip"
+        [class.um-chip--active]="roleFilter() === chip.value"
+        (click)="roleChange.emit(chip.value)"
+      >
+        {{ chip.label }}
+      </button>
+      }
+    </div>
+
+    @if (hasActiveFilters()) {
+    <button type="button" class="um-clear" (click)="clear.emit()">
+      <i class="pi pi-times"></i>
+      Xóa lọc
+    </button>
+    }
+  </div>
+
+  <p class="um-toolbar__result">
+    Hiển thị <strong>{{ resultCount() }}</strong> / {{ total() }} người dùng
+  </p>
+</section>

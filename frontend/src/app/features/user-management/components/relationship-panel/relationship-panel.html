@@ -1,0 +1,219 @@
+<section class="user-detail__card user-detail__panel rel">
+  <header class="user-detail__panel-head rel__head">
+    <i class="pi pi-share-alt user-detail__panel-icon"></i>
+    <div class="user-detail__panel-heading">
+      <h3 class="user-detail__panel-title">Mối quan hệ</h3>
+      <p class="user-detail__panel-sub">
+        Quản lý các mối quan hệ và thành viên của người dùng này.
+      </p>
+    </div>
+    <p-button
+      icon="pi pi-plus"
+      label="Tạo mới"
+      size="small"
+      styleClass="rel__add-btn"
+      (onClick)="openCreateRelationship()"
+    />
+  </header>
+
+  @if (loading()) {
+  <div class="rel__loading">
+    @for (s of [1,2]; track s) {
+    <p-skeleton width="100%" height="7rem" borderRadius="14px" />
+    }
+  </div>
+  } @else if (relationships().length === 0) {
+  <div class="rel__empty">
+    <i class="pi pi-inbox"></i>
+    <span class="rel__empty-title">Chưa có mối quan hệ nào</span>
+    <span class="rel__empty-hint">
+      Nhấn "Tạo mới" để thiết lập mối quan hệ cho người dùng này.
+    </span>
+  </div>
+  } @else {
+  <div class="rel__list">
+    @for (rel of relationships(); track rel.id) {
+    <app-relationship-card
+      [relationship]="rel"
+      [memberRoleOptions]="memberRoleOptions"
+      [typeOptions]="typeOptions"
+      [statusOptions]="statusOptions"
+      (edit)="openEditRelationship(rel)"
+      (remove)="requestDeleteRelationship(rel)"
+      (addMember)="openAddMember(rel)"
+      (changeRole)="changeMemberRole(rel, $event)"
+      (removeMember)="removeMember(rel, $event)"
+    />
+    }
+  </div>
+  }
+</section>
+
+<!-- ===================== Dialogs ===================== -->
+<!-- Create / edit relationship -->
+<p-dialog
+  [visible]="showRelDialog()"
+  (visibleChange)="$event ? null : closeRelationshipDialog()"
+  [modal]="true"
+  [draggable]="false"
+  [dismissableMask]="true"
+  [header]="editingRelId() ? 'Chỉnh sửa mối quan hệ' : 'Tạo mối quan hệ'"
+  styleClass="rel-dialog"
+>
+  <div class="rel-dialog__body">
+    <div class="rel-field">
+      <label for="relType">Loại quan hệ</label>
+      <p-select
+        inputId="relType"
+        [ngModel]="relType()"
+        (ngModelChange)="relType.set($event)"
+        [options]="typeOptions"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        fluid
+      />
+    </div>
+
+    @if (editingRelId()) {
+    <div class="rel-field">
+      <label for="relStatus">Trạng thái</label>
+      <p-select
+        inputId="relStatus"
+        [ngModel]="relStatus()"
+        (ngModelChange)="relStatus.set($event)"
+        [options]="statusOptions"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        fluid
+      />
+    </div>
+    }
+
+    <div class="rel-field">
+      <label for="relStartAt">Ngày bắt đầu</label>
+      <p-datepicker
+        inputId="relStartAt"
+        [ngModel]="relStartAt()"
+        (ngModelChange)="relStartAt.set($event)"
+        dateFormat="yy-mm-dd"
+        [showIcon]="true"
+        appendTo="body"
+        fluid
+      />
+    </div>
+
+    <div class="rel-field">
+      <label for="relDesc">Mô tả</label>
+      <textarea
+        pTextarea
+        id="relDesc"
+        [ngModel]="relDescription()"
+        (ngModelChange)="relDescription.set($event)"
+        rows="3"
+        [autoResize]="true"
+        fluid
+      ></textarea>
+    </div>
+  </div>
+
+  <ng-template #footer>
+    <p-button
+      label="Huỷ"
+      severity="secondary"
+      [text]="true"
+      (onClick)="closeRelationshipDialog()"
+    />
+    <p-button
+      [label]="editingRelId() ? 'Cập nhật' : 'Tạo'"
+      icon="pi pi-check"
+      [loading]="saving()"
+      (onClick)="saveRelationship()"
+    />
+  </ng-template>
+</p-dialog>
+
+<!-- Add member -->
+<p-dialog
+  [visible]="showMemberDialog()"
+  (visibleChange)="$event ? null : closeMemberDialog()"
+  [modal]="true"
+  [draggable]="false"
+  [dismissableMask]="true"
+  header="Thêm thành viên"
+  styleClass="rel-dialog"
+>
+  <div class="rel-dialog__body">
+    <div class="rel-field">
+      <label for="memberUserId">ID người dùng</label>
+      <input
+        pInputText
+        id="memberUserId"
+        [ngModel]="memberUserId()"
+        (ngModelChange)="memberUserId.set($event)"
+        placeholder="Nhập UUID người dùng"
+        fluid
+      />
+    </div>
+
+    <div class="rel-field">
+      <label for="memberRole">Vai trò</label>
+      <p-select
+        inputId="memberRole"
+        [ngModel]="memberRole()"
+        (ngModelChange)="memberRole.set($event)"
+        [options]="memberRoleOptions"
+        optionLabel="label"
+        optionValue="value"
+        appendTo="body"
+        fluid
+      />
+    </div>
+  </div>
+
+  <ng-template #footer>
+    <p-button
+      label="Huỷ"
+      severity="secondary"
+      [text]="true"
+      (onClick)="closeMemberDialog()"
+    />
+    <p-button
+      label="Thêm"
+      icon="pi pi-user-plus"
+      [loading]="saving()"
+      (onClick)="addMember()"
+    />
+  </ng-template>
+</p-dialog>
+
+<!-- Delete confirmation -->
+<p-dialog
+  [visible]="!!confirmDeleteRelId()"
+  (visibleChange)="$event ? null : cancelDeleteRelationship()"
+  [modal]="true"
+  [draggable]="false"
+  [dismissableMask]="true"
+  header="Xoá mối quan hệ"
+  styleClass="rel-dialog rel-dialog--confirm"
+>
+  <p class="rel-dialog__confirm-text">
+    Bạn có chắc muốn xoá mối quan hệ này? Hành động này không thể hoàn tác.
+  </p>
+
+  <ng-template #footer>
+    <p-button
+      label="Huỷ"
+      severity="secondary"
+      [text]="true"
+      (onClick)="cancelDeleteRelationship()"
+    />
+    <p-button
+      label="Xoá"
+      icon="pi pi-trash"
+      severity="danger"
+      (onClick)="confirmDeleteRelationship()"
+    />
+  </ng-template>
+</p-dialog>

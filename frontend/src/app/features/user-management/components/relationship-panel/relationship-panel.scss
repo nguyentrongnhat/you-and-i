@@ -1,0 +1,150 @@
+@use "variables" as v;
+
+:host {
+	display: block;
+}
+
+/* Card surface (self-contained so the panel is reusable anywhere) */
+.user-detail__card {
+	background: var(--p-content-background, #fff);
+	border: 1px solid var(--p-content-border-color, #e5e7eb);
+	border-radius: 18px;
+	box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04),
+		0 1px 3px rgba(16, 24, 40, 0.05);
+}
+
+.user-detail__panel {
+	padding: 1.25rem;
+
+	@media (max-width: v.$breakpoint-xs) {
+		padding: 1rem 0.85rem;
+	}
+}
+
+.user-detail__panel-head {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.75rem;
+	margin-bottom: 1rem;
+}
+
+.user-detail__panel-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+	width: 2.4rem;
+	height: 2.4rem;
+	border-radius: 12px;
+	background: color-mix(in srgb, var(--p-primary-color, #6366f1) 14%, transparent);
+	color: var(--p-primary-color, #6366f1);
+	font-size: 1.1rem;
+}
+
+.user-detail__panel-heading {
+	min-width: 0;
+}
+
+.user-detail__panel-title {
+	margin: 0;
+	font-size: 1.05rem;
+	font-weight: 700;
+	color: var(--p-text-color, #111827);
+}
+
+.user-detail__panel-sub {
+	margin: 0.2rem 0 0;
+	font-size: 0.82rem;
+	color: var(--p-text-muted-color, #6b7280);
+}
+
+/* Relationship list / states */
+.rel {
+	&__head {
+		align-items: flex-start;
+	}
+
+	&__add-btn {
+		margin-left: auto;
+		flex: 0 0 auto;
+	}
+
+	&__loading {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	&__empty {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 0.4rem;
+		text-align: center;
+		padding: 2.25rem 1rem;
+		color: var(--p-text-muted-color, #6b7280);
+
+		i {
+			font-size: 2.5rem;
+			color: var(--p-text-muted-color, #cbd5e1);
+			margin-bottom: 0.25rem;
+		}
+	}
+
+	&__empty-title {
+		font-weight: 600;
+		color: var(--p-text-color, #374151);
+	}
+
+	&__empty-hint {
+		font-size: 0.85rem;
+		max-width: 300px;
+	}
+
+	&__list {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+}
+
+@media (max-width: v.$breakpoint-xs) {
+	.rel__head {
+		flex-wrap: wrap;
+	}
+
+	.rel__add-btn {
+		width: 100%;
+		margin-left: 0;
+		margin-top: 0.25rem;
+	}
+}
+
+/* Dialog fields */
+.rel-field {
+	display: flex;
+	flex-direction: column;
+	gap: 0.4rem;
+
+	label {
+		font-size: 0.82rem;
+		font-weight: 600;
+		color: var(--p-text-color, #374151);
+	}
+}
+
+:host ::ng-deep .rel-dialog {
+	width: min(94vw, 480px);
+
+	.rel-dialog__body {
+		display: flex;
+		flex-direction: column;
+		gap: 0.9rem;
+	}
+
+	.rel-dialog__confirm-text {
+		margin: 0;
+		color: var(--p-text-muted-color, #6b7280);
+		line-height: 1.55;
+	}
+}

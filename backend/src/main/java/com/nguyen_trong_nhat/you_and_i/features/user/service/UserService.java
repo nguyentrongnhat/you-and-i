@@ -1,24 +1,24 @@
 package com.nguyen_trong_nhat.you_and_i.features.user.service;
 
+import com.nguyen_trong_nhat.you_and_i.features.user.dto.UpdateUserRequest;
 import com.nguyen_trong_nhat.you_and_i.features.user.dto.UserDetailDTO;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.UserProfile;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.UserVerification;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface UserService {
     MyUserDetail createUserWithUsernameAndPassword(String username, String password);
 
     UserVerification createUserVerificationCode(MyUserDetail user);
 
-    List<UserDetailDTO> getAllUser();
+    Page<UserDetailDTO> getAllUser(int page, int size);
 
     UserProfile createUserProfile(MyUserDetail user);
 
     void initSuperAdminAccount(String username, String password);
 
-    UserDetailDTO updateUserData(UserDetailDTO userDetailDTO);
+    UserDetailDTO updateUserData(UpdateUserRequest updateUserRequest);
 
     UserDetailDTO getUserDetailsById(String id);
 }

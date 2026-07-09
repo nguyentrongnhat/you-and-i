@@ -3,6 +3,8 @@ package com.nguyen_trong_nhat.you_and_i.features.user.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.nguyen_trong_nhat.you_and_i.common.entity.BaseEntity;
+import com.nguyen_trong_nhat.you_and_i.features.relationship.entity.RelationshipMember;
+import com.nguyen_trong_nhat.you_and_i.features.role.entity.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,10 +17,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Getter
@@ -28,6 +27,7 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "users")
 public class MyUserDetail extends BaseEntity implements UserDetails {
+
     @Id
     @GeneratedValue
     @UuidGenerator(style = UuidGenerator.Style.TIME)
@@ -64,12 +64,19 @@ public class MyUserDetail extends BaseEntity implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserVerification> verifications = new HashSet<>();
 
+    /**
+     * Navigate relationships through the join entity RelationshipMember.
+     * This is the single source of truth — avoids the redundant @ManyToMany to Relationship.
+     */
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<RelationshipMember> relationshipMemberships = new HashSet<>();
+
     @Override
     @NullMarked
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return
-                this.roles.stream()
-                        .map(role -> new SimpleGrantedAuthority(role.getName()))
-                        .collect(Collectors.toSet());
+        return this.roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .collect(Collectors.toSet());
     }
 }

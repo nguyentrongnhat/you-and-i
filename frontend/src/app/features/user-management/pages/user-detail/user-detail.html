@@ -135,6 +135,11 @@
   </section>
   }
 
+  <!-- Relationship management (admins only) -->
+  @if (canManageRelationships()) {
+  <app-relationship-panel [userId]="u.id" />
+  }
+
   <!-- Profile details -->
   <section class="user-detail__card user-detail__panel">
     <header class="user-detail__panel-head">
@@ -240,3 +245,4 @@
   }
   }
 </div>
+
