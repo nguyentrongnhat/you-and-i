@@ -1,6 +1,8 @@
 package com.nguyen_trong_nhat.you_and_i.common.security.config;
 
 import com.nguyen_trong_nhat.you_and_i.common.security.filter.JwtAuthenticationFilter;
+import com.nguyen_trong_nhat.you_and_i.common.security.handler.RestAccessDeniedHandler;
+import com.nguyen_trong_nhat.you_and_i.common.security.handler.RestAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +22,8 @@ import java.util.List;
 public class FilterChainConfig {
 
     private final JwtAuthenticationFilter jwtFilter;
+    private final RestAuthenticationEntryPoint authenticationEntryPoint;
+    private final RestAccessDeniedHandler accessDeniedHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -31,6 +35,10 @@ public class FilterChainConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api").permitAll()
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(ex -> ex
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
                 )
                 .addFilterBefore(jwtFilter, BasicAuthenticationFilter.class)
                 .build();

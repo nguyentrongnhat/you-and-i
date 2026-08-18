@@ -1,17 +1,21 @@
 package com.nguyen_trong_nhat.you_and_i.common.exception;
 
 import com.nguyen_trong_nhat.you_and_i.common.dto.ErrorResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorResponse> handleBadRequest(BadRequestException ex) {
+        log.error("BadRequestException: ", ex);
         ErrorResponse error = new ErrorResponse(
             HttpStatus.BAD_REQUEST.value(),
             HttpStatus.BAD_REQUEST.name(),
@@ -22,6 +26,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFound(NotFoundException ex) {
+        log.error("NotFoundException: ", ex);
         ErrorResponse error = new ErrorResponse(
             HttpStatus.NOT_FOUND.value(),
             HttpStatus.NOT_FOUND.name(),
@@ -32,6 +37,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<ErrorResponse> handleUnauthorized(UnauthorizedException ex) {
+        log.error("UnauthorizedException: ", ex);
         ErrorResponse error = new ErrorResponse(
             HttpStatus.UNAUTHORIZED.value(),
             HttpStatus.UNAUTHORIZED.name(),
@@ -42,6 +48,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ForbidenException.class)
     public ResponseEntity<ErrorResponse> handleForbiden(ForbidenException ex) {
+        log.error("ForbidenException: ", ex);
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.FORBIDDEN.value(),
                 HttpStatus.FORBIDDEN.name(),
@@ -57,6 +64,8 @@ public class GlobalExceptionHandler {
                 .findFirst()
                 .orElse(ex.getMessage());
 
+        log.error("Validation failed: ", ex);
+
         ErrorResponse error = new ErrorResponse(
             HttpStatus.BAD_REQUEST.value(),
             HttpStatus.BAD_REQUEST.name(),
@@ -65,8 +74,20 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(error);
     }
 
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException ex) {
+        log.error("AuthenticationException: ", ex);
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.UNAUTHORIZED.value(),
+                HttpStatus.UNAUTHORIZED.name(),
+                ex.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneric(Exception ex) {
+        log.error("Unhandled exception occurred: ", ex);
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 HttpStatus.INTERNAL_SERVER_ERROR.name(),

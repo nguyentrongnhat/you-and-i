@@ -41,7 +41,7 @@ public class FindNumberGameController {
 
         FindNumberGame game = findNumberGameService.getGameById(gameId);
 
-        if (SecurityUtils.getLoggedInUsername() != game.getPlayer().getUsername()
+        if (SecurityUtils.getLoggedInUsername().equals(game.getPlayer().getUsername())
                 && SecurityUtils.hasAuthorities(Constants.ROLE_SUPER_ADMIN)
                 && SecurityUtils.hasAuthorities(Constants.ROLE_ADMIN)) {
             throw new UnauthorizedException("You have no Permission to access this data");

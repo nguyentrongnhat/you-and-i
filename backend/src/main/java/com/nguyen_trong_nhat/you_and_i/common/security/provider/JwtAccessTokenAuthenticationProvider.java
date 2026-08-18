@@ -5,6 +5,7 @@ import com.nguyen_trong_nhat.you_and_i.common.security.authentication.JwtAccessT
 import com.nguyen_trong_nhat.you_and_i.common.security.service.impl.JwtServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -26,9 +27,7 @@ public class JwtAccessTokenAuthenticationProvider implements AuthenticationProvi
 
         String token = (String) authentication.getCredentials();
 
-        if (!jwtService.isTokenValid(token, Constants.TOKEN_TYPE_ACCESS_TOKEN)) {
-            return null;
-        }
+        jwtService.isTokenValid(token, Constants.TOKEN_TYPE_ACCESS_TOKEN);
 
         String username = jwtService.extractUsername(token);
 
