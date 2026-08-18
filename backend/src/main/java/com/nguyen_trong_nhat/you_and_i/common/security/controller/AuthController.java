@@ -4,7 +4,6 @@ import com.nguyen_trong_nhat.you_and_i.common.config.Constants;
 import com.nguyen_trong_nhat.you_and_i.common.dto.*;
 import com.nguyen_trong_nhat.you_and_i.common.security.service.impl.AuthServiceImpl;
 import jakarta.validation.Valid;
-import lombok.NonNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -34,7 +33,7 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<@NonNull LoginResponse> Login(@RequestBody UsernamePasswordLoginRequest req) {
+    public ResponseEntity<LoginResponse> login(@RequestBody @Valid UsernamePasswordLoginRequest req) {
 
         LoginResponse loginResponse = authService.usernamePasswordAuthenticate(req.getUsername(), req.getPassword());
 
@@ -53,28 +52,28 @@ public class AuthController {
 
 
     @PostMapping("/signup")
-    public ResponseEntity<@NonNull LoginResponse> Signup(@RequestBody @Valid UsernamePasswordSignupRequest signupRequest) {
+    public ResponseEntity<Void> signup(@RequestBody @Valid UsernamePasswordSignupRequest signupRequest) {
         authService.signup(signupRequest);
-        return ResponseEntity.ok().body(null);
+        return ResponseEntity.noContent().build();
     }
 
 
     @PostMapping("/verification-code")
-    public ResponseEntity<@NonNull LoginResponse> createAndSendNotificationCode(@RequestBody @Valid VerificationCodeRequest verificationCodeRequest) {
+    public ResponseEntity<Void> createAndSendNotificationCode(@RequestBody @Valid VerificationCodeRequest verificationCodeRequest) {
         authService.createAndSendVerificationCodeForAccount(verificationCodeRequest.getEmail());
-        return ResponseEntity.ok().body(null);
+        return ResponseEntity.noContent().build();
     }
 
 
     @PostMapping("/verify-account")
-    public ResponseEntity<@NonNull LoginResponse> verifyAccount(@RequestBody @Valid EmailVerificationRequest emailVerificationRequest) {
+    public ResponseEntity<Void> verifyAccount(@RequestBody @Valid EmailVerificationRequest emailVerificationRequest) {
         authService.verifyAccount(emailVerificationRequest);
-        return ResponseEntity.ok().body(null);
+        return ResponseEntity.noContent().build();
     }
 
 
     @PostMapping("/refresh")
-    public ResponseEntity<@NonNull LoginResponse> refreshToken(@CookieValue(name = "refresh_token", required = false) String refreshToken) {
+    public ResponseEntity<LoginResponse> refreshToken(@CookieValue(name = "refresh_token", required = false) String refreshToken) {
 
         if (refreshToken == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -97,7 +96,7 @@ public class AuthController {
 
 
     @PostMapping("/refresh-mobile")
-    public ResponseEntity<@NonNull LoginResponse> refreshTokenForMobile(@RequestBody RefreshTokenRequest refreshTokenRequest) {
+    public ResponseEntity<LoginResponse> refreshTokenForMobile(@RequestBody RefreshTokenRequest refreshTokenRequest) {
 
         if (refreshTokenRequest.getRefreshToken() == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

@@ -8,6 +8,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -50,14 +51,15 @@ public class JwtServiceImpl implements JwtService {
                 .compact();
     }
 
-    public boolean isTokenValid(String token, String tokenType) {
+    public void isTokenValid(String token, String tokenType) {
         try {
             Claims tokenClaims = extractAllClaims(token);
-            Date expiration = tokenClaims.getExpiration();
             String type = tokenClaims.get("type", String.class);
-            return expiration != null && expiration.after(Date.from(Instant.now())) && tokenType.equals(type);
+            if (!tokenType.equals(type)) {
+                throw new BadCredentialsException("Invalid token type");
+            }
         } catch (Exception e) {
-            return false;
+            throw new BadCredentialsException(e.getMessage());
         }
     }
 

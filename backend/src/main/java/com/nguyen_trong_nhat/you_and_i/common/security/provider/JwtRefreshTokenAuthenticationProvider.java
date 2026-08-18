@@ -23,9 +23,7 @@ public class JwtRefreshTokenAuthenticationProvider implements AuthenticationProv
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         String token = (String) authentication.getCredentials();
 
-        if (!jwtService.isTokenValid(token, Constants.TOKEN_TYPE_REFRESH_TOKEN)) {
-            return null;
-        }
+        jwtService.isTokenValid(token, Constants.TOKEN_TYPE_REFRESH_TOKEN);
 
         String username = jwtService.extractUsername(token);
 
