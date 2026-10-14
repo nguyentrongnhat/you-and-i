@@ -1,4 +1,4 @@
-<div class="ranking">
+<div class="ranking" [attr.aria-busy]="isLoading()">
   <!-- ===== Heading ===== -->
   <div class="ranking__heading">
     <span class="ranking__heading-icon"><i class="pi pi-trophy"></i></span>
@@ -8,7 +8,34 @@
     </div>
   </div>
 
-  @if (bestRecordsRanking().length) {
+  @if (isLoading()) {
+    <div class="ranking__skeleton" role="status" aria-label="Đang tải bảng vinh danh">
+      <div class="ranking__skeleton-podium" aria-hidden="true">
+        @for (placeholder of [1, 2, 3]; track placeholder) {
+          <div class="ranking__skeleton-player">
+            <p-skeleton shape="circle" size="3.5rem" />
+            <p-skeleton width="70%" height="0.9rem" />
+            <p-skeleton width="50%" height="0.75rem" />
+            <p-skeleton width="100%" height="3.5rem" />
+          </div>
+        }
+      </div>
+
+      <div class="ranking__skeleton-list" aria-hidden="true">
+        @for (placeholder of [1, 2, 3]; track placeholder) {
+          <div class="ranking__skeleton-item">
+            <p-skeleton shape="circle" size="1.9rem" />
+            <p-skeleton shape="circle" size="2.5rem" />
+            <div class="ranking__skeleton-info">
+              <p-skeleton width="65%" height="0.9rem" />
+              <p-skeleton width="45%" height="0.75rem" />
+            </div>
+            <p-skeleton width="4.5rem" height="1.8rem" />
+          </div>
+        }
+      </div>
+    </div>
+  } @else if (bestRecordsRanking().length) {
     <!-- ===== Podium: Top 3 ===== -->
     <div class="podium">
       <div class="podium__glow"></div>

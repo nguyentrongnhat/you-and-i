@@ -81,15 +81,13 @@ export class GameStartScreen {
 
    private getData() {
       this.loaderService.show();
-      forkJoin([
-         this.findNumberGameService.getGameHistories(), 
-         this.findNumberGameService.getBestRecordsRanking()
-      ])
+      
+      this.findNumberGameService.getGameHistories()
       .pipe(
          takeUntilDestroyed(this.destroyRef),
          finalize(() => this.loaderService.hide())
       ).subscribe({
-         next: ([histories, bestRecords]) => {
+         next: (histories) => {
             if (histories.unfinishedGames.length > 0) {
                this.unfinishedGames.set(histories.unfinishedGames[0]);
             }

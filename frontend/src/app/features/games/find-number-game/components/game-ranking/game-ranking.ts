@@ -1,16 +1,27 @@
 import { DatePipe } from '@angular/common';
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { SkeletonModule } from 'primeng/skeleton';
+import { finalize } from 'rxjs';
 import { FindNumberGameBestRecordDTO } from '../../../../../core/interfaces/find-number-game.dto';
 import { UserService } from '../../../../user-management/services/user.service';
 import { FindNumberGameService } from '../../services/findnumber.service';
 
 @Component({
   selector: 'app-game-ranking',
-  imports: [DatePipe],
+  imports: [DatePipe, SkeletonModule],
   templateUrl: './game-ranking.html',
   styleUrl: './game-ranking.scss',
 })
-export class GameRanking {
+export class GameRanking implements OnInit {
+
+  protected readonly isLoading = signal(true);
+
+  ngOnInit(): void {
+    this.findNumberGameService.getBestRecordsRanking()
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe();
+  }
+
   protected readonly findNumberGameService = inject(FindNumberGameService);
 
   protected readonly bestRecordsRanking = computed<FindNumberGameBestRecordDTO[]>(() => this.findNumberGameService.bestRecordsRanking());
