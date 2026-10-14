@@ -9,6 +9,7 @@ import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.Fi
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGameStats;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.mapper.FindNumberGameDataMapper;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.service.FindNumberGameBestRecordService;
+import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.service.FindNumberGameCacheService;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.service.FindNumberGameService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import java.util.List;
 @AllArgsConstructor
 public class FindNumberGameController {
     private final FindNumberGameService findNumberGameService;
+    private final FindNumberGameCacheService findNumberGameCacheService;
 
     private final FindNumberGameBestRecordService findNumberGameBestRecordService;
 
@@ -54,7 +56,7 @@ public class FindNumberGameController {
     @GetMapping("/unfinish-games")
     public ResponseEntity<List<FindNumberGameDTO>> getUnfinishedGames() {
         String userName = SecurityUtils.getLoggedInUsername();
-        return ResponseEntity.ok().body(findNumberGameService.getUnfinishedGamesByPlayerUsername(userName));
+        return ResponseEntity.ok().body(findNumberGameCacheService.getUnfinishedGamesByPlayerUsername(userName));
     }
 
     @PostMapping("/finish-game")

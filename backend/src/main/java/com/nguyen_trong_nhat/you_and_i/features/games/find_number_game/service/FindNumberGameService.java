@@ -28,10 +28,10 @@ import java.util.*;
 public class FindNumberGameService {
     private final FindNumberGameRepository findNumberGameRepository;
     private final FindNumberGameBestRecordService findNumberGameBestRecordService;
+    private final FindNumberGameCacheService findNumberGameCacheService;
     private final UserRepository userRepository;
 
     @Transactional
-    @CacheEvict(value = Constants.CACHE_FIND_NUMBER_GAME_HISTORY, key = "#username")
     public FindNumberGame createNewGame(String username, CreateNewFindNumberGameRequest gameInfo) {
         MyUserDetail player = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("User not found"));
         int deletedColumn = this.deleteUnfinishedGamesByUsername(username);
@@ -45,6 +45,8 @@ public class FindNumberGameService {
         newGame = findNumberGameRepository.save(newGame);
         log.info("Created new game with id {} for user {}", newGame.getId(), username);
 
+        findNumberGameCacheService.evictGameHistoryCache(username);
+
         return newGame;
     }
 
@@ -55,7 +57,6 @@ public class FindNumberGameService {
                 .findById(gameId)
                 .orElseThrow(() -> new NotFoundException("Game not found"));
     }
-
 
     public FindNumberGame updateGame(FindNumberGameDTO gameDTO) {
         if(gameDTO == null) {
@@ -77,12 +78,13 @@ public class FindNumberGameService {
 
         findNumberGameRepository.save(gameEntity);
 
+        findNumberGameCacheService.evictGameHistoryCache(gameEntity.getPlayer().getUsername());
+
         return gameEntity;
     }
 
 
     @Transactional
-    @CacheEvict(value = Constants.CACHE_FIND_NUMBER_GAME_HISTORY, key = "#userName")
     public FindNumberGame finishGame(String userName, FinishFindNumberGameRequest gameInfo) {
 
         FindNumberGame game = findNumberGameRepository.findById(gameInfo.getGameId())
@@ -105,48 +107,19 @@ public class FindNumberGameService {
         log.info("Finished game {} for user {} | evict cache '{}' key='{}'",
                 savedGame.getId(), userName, Constants.CACHE_FIND_NUMBER_GAME_HISTORY, userName);
 
+        findNumberGameCacheService.evictGameHistoryCache(userName);
+
         return savedGame;
     }
 
 
-    @Cacheable(value = Constants.CACHE_FIND_NUMBER_GAME_HISTORY, key = "#username")
     public FindNumberGameHistory getGameHistory(String username) {
-
-        log.info("Cache MISS '{}' key='{}' -> get game history from DB",
-                Constants.CACHE_FIND_NUMBER_GAME_HISTORY, username);
-
-        List<FindNumberGameHistoryItem> gameFinished
-                = findNumberGameRepository
-                    .findByPlayerUsernameAndEndTimeIsNotNull(username)
-                    .stream().map(game ->
-                        new FindNumberGameHistoryItem(
-                            game.getStartTime(),
-                            game.getEndTime(),
-                            game.getCompletionTime(),
-                            game.getBonusTime()
-                        )
-                    ).toList();
-
-        List<FindNumberGameDTO> unfinishedGames = this.getUnfinishedGamesByPlayerUsername(username);
-
-        FindNumberGameStats gameStats = findNumberGameBestRecordService.getGameStatsByPlayerUsername(username);
-
-        return new FindNumberGameHistory(
-                gameFinished,
-                FindNumberGameDataMapper.toBestRecordDTO(gameStats),
-                unfinishedGames,
-                gameStats == null ? 0 : gameStats.getTotalGamesPlayed()
-        );
+        return findNumberGameCacheService.getGameHistory(username);
     }
 
-
-    public List<FindNumberGameDTO> getUnfinishedGamesByPlayerUsername(String username) {
-        return findNumberGameRepository.findByPlayerUsernameAndEndTimeIsNull(username).stream().map(FindNumberGameDataMapper::toDTO).toList();
-    }
 
     @Transactional
     @Async
-    @CacheEvict(value = Constants.CACHE_FIND_NUMBER_GAME_HISTORY, key = "#username")
     public void cleanupOldGames(String username, int keepCount, FindNumberGameStats gameStats) {
 
         UUID bestGameId = gameStats.getBestRecordGame().getId();
@@ -170,6 +143,8 @@ public class FindNumberGameService {
                 username,
                 keepIds
         );
+
+        findNumberGameCacheService.evictGameHistoryCache(username);
     }
 
     @Transactional
