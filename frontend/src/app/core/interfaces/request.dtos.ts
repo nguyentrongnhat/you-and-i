@@ -1,9 +1,15 @@
 import { HttpContext, HttpHeaders, HttpParams } from "@angular/common/http";
 
+export interface BasicAuth {
+    username: string;
+    password: string;
+}
+
 export interface ApiOptions {
     headers?: HttpHeaders | { [header: string]: string | string[] };
     params?: HttpParams | { [param: string]: string | number | boolean };
     responseType?: any;
+    basicAuth?: BasicAuth;
 }
 
 export enum HTTP_METHOD {

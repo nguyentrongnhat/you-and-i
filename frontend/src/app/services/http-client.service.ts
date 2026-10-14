@@ -1,4 +1,4 @@
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { inject, Injectable } from "@angular/core";
 import { EMPTY, Observable } from "rxjs";
 import { environment } from "../../environments/environments";
@@ -14,8 +14,24 @@ export class HttpClientService {
     private readonly BASE_URL = environment.apiBaseUrl;
 
     private buildOptions(options?: ApiOptions) {
+        const { basicAuth, headers, ...requestOptions } = options ?? {};
+
+        if (!basicAuth) {
+            return {
+                ...requestOptions,
+                headers,
+                withCredentials: true
+            };
+        }
+
+        const authorization = `Basic ${btoa(`${basicAuth.username}:${basicAuth.password}`)}`;
+        const requestHeaders = headers instanceof HttpHeaders
+            ? headers.set('Authorization', authorization)
+            : { ...headers, Authorization: authorization };
+
         return {
-            ...options,
+            ...requestOptions,
+            headers: requestHeaders,
             withCredentials: true
         };
     }
