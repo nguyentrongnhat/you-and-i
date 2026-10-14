@@ -13,41 +13,34 @@ import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
 import com.nguyen_trong_nhat.you_and_i.features.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class FindNumberGameService {
     private final FindNumberGameRepository findNumberGameRepository;
     private final FindNumberGameBestRecordService findNumberGameBestRecordService;
     private final UserRepository userRepository;
 
+    @Transactional
     public FindNumberGame createNewGame(String username, CreateNewFindNumberGameRequest gameInfo) {
-
-        Optional<MyUserDetail> playerOpt = userRepository.findByUsername(username);
-
-        if(playerOpt.isEmpty()) throw new BadRequestException("");
-
-        MyUserDetail player = playerOpt.get();
-
-        var gamesAreNotFinish = findNumberGameRepository.findByPlayerUsernameAndEndTimeIsNull(username);
-
-        findNumberGameRepository.deleteAll(gamesAreNotFinish);
+        MyUserDetail player = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("User not found"));
+        int deletedColumn = this.deleteUnfinishedGamesByUsername(username);
+        log.info("deleted {} unfinished games for user {}", deletedColumn, username);
 
         var newGame = new FindNumberGame();
-
         newGame.setBonusTime(0);
-
         newGame.setGameStatus(GameStatus.NEW);
-
         newGame.setDifficultyLevel(gameInfo.getDifficultyLevel());
-
         newGame.setPlayer(player);
-
         newGame = findNumberGameRepository.save(newGame);
+        log.info("Created new game with id {} for user {}", newGame.getId(), username);
 
         return newGame;
     }
@@ -67,14 +60,14 @@ public class FindNumberGameService {
         }
 
         if(gameDTO.getId() == null) {
-            throw new BadRequestException("Game id is null");
+            throw new BadRequestException("Can not identify the game to update.");
         }
 
         FindNumberGame gameEntity = findNumberGameRepository.findById(gameDTO.getId())
                 .orElseThrow(() -> new NotFoundException("Game not Found!"));
 
         if(gameEntity.getGameStatus().equals(GameStatus.DONE)){
-            throw new BadRequestException("This game already finished. Can not update the game already finished");
+            throw new BadRequestException("Can not update the game already finished");
         }
 
         FindNumberGameDataMapper.updateEntity(gameEntity, gameDTO);
@@ -106,15 +99,7 @@ public class FindNumberGameService {
 
         game.setGameStatus(GameStatus.DONE);
 
-        game = findNumberGameRepository.save(game);
-
-        FindNumberGameStats gameStats = findNumberGameBestRecordService.updateGameStatsForUser(game.getPlayer(), game, true);
-
-        int numberOfGameToKeep = 10;
-
-        this.cleanupOldGames(userName, numberOfGameToKeep, gameStats);
-
-        return game;
+        return findNumberGameRepository.save(game);
     }
 
 
@@ -151,6 +136,7 @@ public class FindNumberGameService {
     }
 
     @Transactional
+    @Async
     public void cleanupOldGames(String username, int keepCount, FindNumberGameStats gameStats) {
 
         UUID bestGameId = gameStats.getBestRecordGame().getId();
@@ -174,5 +160,10 @@ public class FindNumberGameService {
                 username,
                 keepIds
         );
+    }
+
+    @Transactional
+    public int deleteUnfinishedGamesByUsername(String username) {
+        return findNumberGameRepository.deleteUnfinishedGamesByUsername(username);
     }
 }

@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NullMarked;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,7 +25,7 @@ public class CustomUsernamePasswordAuthenticationProvider implements Authenticat
     private final PasswordEncoder encoder;
 
     @Override
-    public Authentication authenticate(Authentication auth) {
+    public Authentication authenticate(Authentication auth) throws AuthenticationServiceException {
         String username = auth.getName();
         String password = Objects.requireNonNull(auth.getCredentials()).toString();
 

@@ -22,8 +22,6 @@ export class Number implements AfterViewInit {
 
   public data = input<NumberData>();
 
-  public onSelected = output<number>();
-
   private readonly userService = inject(UserService);
 
   private readonly platformService = inject(PlatformService);

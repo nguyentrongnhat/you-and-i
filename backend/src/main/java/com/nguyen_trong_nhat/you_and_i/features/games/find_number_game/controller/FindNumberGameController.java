@@ -6,6 +6,7 @@ import com.nguyen_trong_nhat.you_and_i.common.exception.UnauthorizedException;
 import com.nguyen_trong_nhat.you_and_i.common.security.util.SecurityUtils;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.dto.*;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGame;
+import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGameStats;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.mapper.FindNumberGameDataMapper;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.service.FindNumberGameBestRecordService;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.service.FindNumberGameService;
@@ -60,6 +61,9 @@ public class FindNumberGameController {
     public ResponseEntity<FindNumberGameDTO> finishGame(@RequestBody FinishFindNumberGameRequest gameInfo) {
         String userName = SecurityUtils.getLoggedInUsername();
         var gameFinished = findNumberGameService.finishGame(userName, gameInfo);
+        FindNumberGameStats gameStats = findNumberGameBestRecordService.updateGameStatsForUser(gameFinished.getPlayer(), gameFinished, true);
+        int numberOfGameToKeep = 10;
+        findNumberGameService.cleanupOldGames(userName, numberOfGameToKeep, gameStats);
         return ResponseEntity.ok().body(FindNumberGameDataMapper.toDTO(gameFinished));
     }
 

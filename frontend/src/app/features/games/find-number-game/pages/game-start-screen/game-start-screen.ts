@@ -118,7 +118,10 @@ export class GameStartScreen {
    public createNewGame() {
       this.loaderService.show();
       this.findNumberGameService.createNewGame(this.TOTAL_NUMBERS, GAME_DIFFICULTY_LEVEL.NORMAL)
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(
+         takeUntilDestroyed(this.destroyRef),
+         finalize(() => this.loaderService.hide())
+      )
       .subscribe({
          next: (newGame: FindNumberGameDTO) => {
             this.findNumberGameService.currentGameInfo.set(newGame);

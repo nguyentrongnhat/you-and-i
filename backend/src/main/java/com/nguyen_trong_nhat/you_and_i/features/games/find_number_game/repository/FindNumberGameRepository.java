@@ -57,4 +57,11 @@ public interface FindNumberGameRepository extends JpaRepository<FindNumberGame, 
             @Param("username") String username,
             @Param("ids") Collection<UUID> ids
     );
+
+    @Modifying
+    @Query("""
+    DELETE FROM FindNumberGame g
+    WHERE g.player.username = :username AND g.endTime IS NULL
+    """)
+    int deleteUnfinishedGamesByUsername(@Param("username") String username);
 }
