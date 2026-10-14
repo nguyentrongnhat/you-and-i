@@ -31,6 +31,7 @@ public class FindNumberGameService {
     private final UserRepository userRepository;
 
     @Transactional
+    @CacheEvict(value = Constants.CACHE_FIND_NUMBER_GAME_HISTORY, key = "#username")
     public FindNumberGame createNewGame(String username, CreateNewFindNumberGameRequest gameInfo) {
         MyUserDetail player = userRepository.findByUsername(username).orElseThrow(() -> new NotFoundException("User not found"));
         int deletedColumn = this.deleteUnfinishedGamesByUsername(username);
