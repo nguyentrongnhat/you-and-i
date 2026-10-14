@@ -14,13 +14,22 @@ public class CacheConfig {
     @Bean
     public CacheManager cacheManager() {
 
-        CaffeineCacheManager cacheManager = new CaffeineCacheManager("userDetails");
+        CaffeineCacheManager cacheManager = new CaffeineCacheManager(Constants.CACHE_USER_DETAILS);
 
         cacheManager.setCaffeine(
                 Caffeine.newBuilder()
-                        .maximumSize(1000) // giới hạn số entry
-                        .expireAfterWrite(Duration.ofMinutes(30)) // TTL
-                        .recordStats() // debug hit/miss
+                        .maximumSize(1000)
+                        .expireAfterWrite(Duration.ofMinutes(30))
+                        .recordStats()
+        );
+
+        cacheManager.registerCustomCache(
+                Constants.CACHE_FIND_NUMBER_GAME_HISTORY,
+                Caffeine.newBuilder()
+                        .maximumSize(500)
+                        .expireAfterWrite(Duration.ofMinutes(10))
+                        .recordStats()
+                        .build()
         );
 
         return cacheManager;

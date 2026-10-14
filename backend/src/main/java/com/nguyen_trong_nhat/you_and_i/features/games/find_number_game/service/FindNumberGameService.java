@@ -2,8 +2,8 @@ package com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.service;
 
 import com.nguyen_trong_nhat.you_and_i.common.exception.BadRequestException;
 import com.nguyen_trong_nhat.you_and_i.common.exception.NotFoundException;
-import com.nguyen_trong_nhat.you_and_i.common.exception.UnauthorizedException;
-import com.nguyen_trong_nhat.you_and_i.common.security.util.SecurityUtils;
+import com.nguyen_trong_nhat.you_and_i.common.exception.ForbidenException;
+import com.nguyen_trong_nhat.you_and_i.common.config.Constants;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.dto.*;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGame;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGameStats;
@@ -14,6 +14,8 @@ import com.nguyen_trong_nhat.you_and_i.features.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -79,16 +81,14 @@ public class FindNumberGameService {
 
 
     @Transactional
+    @CacheEvict(value = Constants.CACHE_FIND_NUMBER_GAME_HISTORY, key = "#userName")
     public FindNumberGame finishGame(String userName, FinishFindNumberGameRequest gameInfo) {
 
-        Optional<FindNumberGame> gameOpt = findNumberGameRepository.findById(gameInfo.getGameId());
+        FindNumberGame game = findNumberGameRepository.findById(gameInfo.getGameId())
+                .orElseThrow(() -> new NotFoundException("Game not found: " + gameInfo.getGameId()));
 
-        if(gameOpt.isEmpty()) throw new BadRequestException("");
-
-        FindNumberGame game = gameOpt.get();
-
-        if(!game.getPlayer().getUsername().equals(userName)) {
-            throw new UnauthorizedException("You are not player, so you can not finish the game!!!");
+        if (!game.getPlayer().getUsername().equals(userName)) {
+            throw new ForbidenException("You are not player, so you can not finish the game!!!");
         }
 
         game.setCompletionTime(gameInfo.getCompletionTime());
@@ -99,11 +99,20 @@ public class FindNumberGameService {
 
         game.setGameStatus(GameStatus.DONE);
 
-        return findNumberGameRepository.save(game);
+        FindNumberGame savedGame = findNumberGameRepository.save(game);
+
+        log.info("Finished game {} for user {} | evict cache '{}' key='{}'",
+                savedGame.getId(), userName, Constants.CACHE_FIND_NUMBER_GAME_HISTORY, userName);
+
+        return savedGame;
     }
 
 
+    @Cacheable(value = Constants.CACHE_FIND_NUMBER_GAME_HISTORY, key = "#username")
     public FindNumberGameHistory getGameHistory(String username) {
+
+        log.debug("Cache MISS '{}' key='{}' -> get game history from DB",
+                Constants.CACHE_FIND_NUMBER_GAME_HISTORY, username);
 
         List<FindNumberGameHistoryItem> gameFinished
                 = findNumberGameRepository
@@ -121,7 +130,6 @@ public class FindNumberGameService {
 
         FindNumberGameStats gameStats = findNumberGameBestRecordService.getGameStatsByPlayerUsername(username);
 
-
         return new FindNumberGameHistory(
                 gameFinished,
                 FindNumberGameDataMapper.toBestRecordDTO(gameStats),
@@ -137,6 +145,7 @@ public class FindNumberGameService {
 
     @Transactional
     @Async
+    @CacheEvict(value = Constants.CACHE_FIND_NUMBER_GAME_HISTORY, key = "#username")
     public void cleanupOldGames(String username, int keepCount, FindNumberGameStats gameStats) {
 
         UUID bestGameId = gameStats.getBestRecordGame().getId();

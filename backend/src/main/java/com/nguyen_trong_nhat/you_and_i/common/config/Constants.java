@@ -16,4 +16,8 @@ public class Constants {
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
     public static final String ROLE_USER = "ROLE_USER";
     public static final String ROLE_GUEST = "ROLE_GUEST";
+
+    // Cache Const
+    public static final String CACHE_USER_DETAILS = "userDetails";
+    public static final String CACHE_FIND_NUMBER_GAME_HISTORY = "findNumberGameHistory";
 }
