@@ -111,7 +111,7 @@ public class FindNumberGameService {
     @Cacheable(value = Constants.CACHE_FIND_NUMBER_GAME_HISTORY, key = "#username")
     public FindNumberGameHistory getGameHistory(String username) {
 
-        log.debug("Cache MISS '{}' key='{}' -> get game history from DB",
+        log.info("Cache MISS '{}' key='{}' -> get game history from DB",
                 Constants.CACHE_FIND_NUMBER_GAME_HISTORY, username);
 
         List<FindNumberGameHistoryItem> gameFinished

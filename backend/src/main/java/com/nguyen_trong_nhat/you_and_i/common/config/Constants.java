@@ -20,4 +20,5 @@ public class Constants {
     // Cache Const
     public static final String CACHE_USER_DETAILS = "userDetails";
     public static final String CACHE_FIND_NUMBER_GAME_HISTORY = "findNumberGameHistory";
+    public static final String CACHE_FIND_NUMBER_BEST_RECORD_RANKING = "findNumberBestRecordRanking";
 }

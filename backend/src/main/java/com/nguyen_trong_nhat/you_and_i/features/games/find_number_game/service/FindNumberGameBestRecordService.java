@@ -16,8 +16,8 @@ import java.util.Optional;
 @AllArgsConstructor
 public class FindNumberGameBestRecordService {
     private final FindNumberGameStatsRepository findNumberGameStatsRepository;
-
     private final FindNumberGameRepository findNumberGameRepository;
+    private final FindNumberGameBestRecordCacheService findNumberGameBestRecordCacheService;
 
     private void migrateFindNumberGameBestRecord() {
         List<FindNumberGame> bestRecords = findNumberGameRepository.findBestGamesForRanking();
@@ -36,6 +36,7 @@ public class FindNumberGameBestRecordService {
             newRecord.setBestRecordGame(game);
             newRecord.setBestCompletionTime(game.getCompletionTime());
             newRecord.setPlayer(user);
+            findNumberGameBestRecordCacheService.evictBestRecordRankingCache();
             return findNumberGameStatsRepository.save(newRecord);
         }
 
@@ -51,12 +52,12 @@ public class FindNumberGameBestRecordService {
 
         existingRecord.setBestRecordGame(game);
         existingRecord.setBestCompletionTime(game.getCompletionTime());
-
+        findNumberGameBestRecordCacheService.evictBestRecordRankingCache();
         return findNumberGameStatsRepository.save(existingRecord);
     }
 
     public List<FindNumberGameStats> getBestRecordRanking() {
-        return findNumberGameStatsRepository.findAll();
+        return findNumberGameBestRecordCacheService.getBestRecordRanking();
     }
 
     public FindNumberGameStats getGameStatsByPlayerUsername(String playerUsername) {

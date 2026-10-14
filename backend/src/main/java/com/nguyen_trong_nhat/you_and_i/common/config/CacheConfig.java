@@ -27,7 +27,16 @@ public class CacheConfig {
                 Constants.CACHE_FIND_NUMBER_GAME_HISTORY,
                 Caffeine.newBuilder()
                         .maximumSize(500)
-                        .expireAfterWrite(Duration.ofMinutes(10))
+                        .expireAfterWrite(Duration.ofHours(24))
+                        .recordStats()
+                        .build()
+        );
+
+        cacheManager.registerCustomCache(
+                Constants.CACHE_FIND_NUMBER_BEST_RECORD_RANKING,
+                Caffeine.newBuilder()
+                        .maximumSize(200)
+                        .expireAfterWrite(Duration.ofHours(240))
                         .recordStats()
                         .build()
         );
