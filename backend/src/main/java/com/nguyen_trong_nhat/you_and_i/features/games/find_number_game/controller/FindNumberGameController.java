@@ -42,7 +42,7 @@ public class FindNumberGameController {
             throw new BadRequestException("Game id is required");
         }
 
-        FindNumberGame game = findNumberGameService.getGameById(gameId);
+        FindNumberGame game = findNumberGameService.findGameById(gameId);
 
         if (SecurityUtils.getLoggedInUsername().equals(game.getPlayer().getUsername())
                 && SecurityUtils.hasAuthorities(Constants.ROLE_SUPER_ADMIN)

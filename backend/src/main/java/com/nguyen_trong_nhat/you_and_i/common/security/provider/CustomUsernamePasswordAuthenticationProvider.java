@@ -29,8 +29,13 @@ public class CustomUsernamePasswordAuthenticationProvider implements Authenticat
         String username = auth.getName();
         String password = Objects.requireNonNull(auth.getCredentials()).toString();
 
+        MyUserDetail user;
 
-        MyUserDetail user = (MyUserDetail) userService.loadUserByUsername(username);
+        try {
+            user = (MyUserDetail) userService.loadUserByUsername(username);
+        } catch (Exception e) {
+            throw new BadCredentialsException("Invalid username");
+        }
 
         if (!user.isEmailVerified()) {
             throw new AccessDeniedException("The email for this account has not been verified yet. Please go to the sign-up page to verify your account.");

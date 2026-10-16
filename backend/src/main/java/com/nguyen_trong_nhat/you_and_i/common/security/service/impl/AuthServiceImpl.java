@@ -93,6 +93,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Transactional
     public void verifyAccount(EmailVerificationRequest emailVerificationRequest) {
+
         MyUserDetail userNeedToVerify = userRepository.findByUsername(emailVerificationRequest.getEmail())
                 .orElseThrow(() -> new BadRequestException(ErrorConstant.USER_NOT_REGISTERED));
 
@@ -103,12 +104,13 @@ public class AuthServiceImpl implements AuthService {
         List<UserVerification> userVerificationList = userVerificationRepository.findUserVerificationByUser(userNeedToVerify);
 
         if(userVerificationList.isEmpty()) {
-            throw new RuntimeException("Not found any verification code for this account. Please get your verification code first!");
+            throw new BadRequestException("Not found any verification code for this account. Please get your verification code first!");
         }
 
         UserVerification userVerification = userVerificationList.stream()
-                .filter(item -> item.getVerificationCode().equals(emailVerificationRequest.getVerificationCode())
-                ).findFirst().orElseThrow(() -> new BadRequestException("Verification code is not correct"));
+                .filter(item -> item.getVerificationCode().equals(emailVerificationRequest.getVerificationCode()))
+                .findFirst()
+                .orElseThrow(() -> new BadRequestException("Verification code is not correct"));
 
         if(userVerification.getExpiry().isBefore(LocalDateTime.now())) {
             throw new BadRequestException(ErrorConstant.VERIFICATION_CODE_EXPIRED);

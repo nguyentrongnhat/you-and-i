@@ -24,10 +24,19 @@ public class CacheConfig {
         );
 
         cacheManager.registerCustomCache(
+                Constants.CACHE_FIND_NUMBER_GAME,
+                Caffeine.newBuilder()
+                        .maximumSize(1000)
+                        .expireAfterWrite(Duration.ofMinutes(30))
+                        .recordStats()
+                        .build()
+        );
+
+        cacheManager.registerCustomCache(
                 Constants.CACHE_FIND_NUMBER_GAME_HISTORY,
                 Caffeine.newBuilder()
                         .maximumSize(500)
-                        .expireAfterWrite(Duration.ofHours(24))
+                        .expireAfterWrite(Duration.ofHours(12))
                         .recordStats()
                         .build()
         );

@@ -1,9 +1,13 @@
 package com.nguyen_trong_nhat.you_and_i.common.exception;
 
 import com.nguyen_trong_nhat.you_and_i.common.dto.ErrorResponse;
+import com.nguyen_trong_nhat.you_and_i.common.security.handler.RestAuthenticationEntryPoint;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -11,7 +15,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
 @RestControllerAdvice
+@AllArgsConstructor
 public class GlobalExceptionHandler {
+
+    private final RestAuthenticationEntryPoint authenticationEntryPoint;
 
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorResponse> handleBadRequest(BadRequestException ex) {
@@ -46,8 +53,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
 
-    @ExceptionHandler(ForbidenException.class)
-    public ResponseEntity<ErrorResponse> handleForbiden(ForbidenException ex) {
+    @ExceptionHandler({ForbidenException.class, AccessDeniedException.class})
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(ForbidenException ex) {
         log.error("ForbidenException: ", ex);
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.FORBIDDEN.value(),
@@ -74,9 +81,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(error);
     }
 
+
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException ex) {
         log.error("AuthenticationException: ", ex);
+
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.UNAUTHORIZED.value(),
                 HttpStatus.UNAUTHORIZED.name(),
@@ -85,13 +94,27 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
+
+        log.error("Request body could not be read: ", ex);
+
+        ErrorResponse error = new ErrorResponse(
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.name(),
+                "Invalid request body."
+        );
+
+        return ResponseEntity.badRequest().body(error);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneric(Exception ex) {
         log.error("Unhandled exception occurred: ", ex);
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 HttpStatus.INTERNAL_SERVER_ERROR.name(),
-                ex.getMessage()
+                "Unhandled exception occurred"
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
