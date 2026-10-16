@@ -3,6 +3,7 @@ package com.nguyen_trong_nhat.you_and_i.features.user.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.nguyen_trong_nhat.you_and_i.common.entity.BaseEntity;
+import com.nguyen_trong_nhat.you_and_i.features.role.entity.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

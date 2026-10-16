@@ -13,9 +13,7 @@ import com.nguyen_trong_nhat.you_and_i.features.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -28,14 +26,14 @@ import java.util.*;
 @Slf4j
 public class FindNumberGameService {
     private final FindNumberGameRepository findNumberGameRepository;
-    private final FindNumberGameBestRecordService findNumberGameBestRecordService;
     private final FindNumberGameCacheService findNumberGameCacheService;
     private final UserRepository userRepository;
 
     @Transactional
     @CachePut(value = Constants.CACHE_FIND_NUMBER_GAME, key = "#result.id.toString()")
     public FindNumberGame createNewGame(String username, CreateNewFindNumberGameRequest gameInfo) {
-        MyUserDetail player = userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        MyUserDetail player = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         int deletedColumn = this.deleteUnfinishedGamesByUsername(username);
         log.info("deleted {} unfinished games for user {}", deletedColumn, username);
@@ -59,20 +57,13 @@ public class FindNumberGameService {
 
     @CachePut(value = Constants.CACHE_FIND_NUMBER_GAME, key = "#result.id.toString()")
     public FindNumberGame updateGame(FindNumberGameDTO gameDTO) {
-        if (gameDTO == null) {
-            throw new BadRequestException("GameDTO is null");
+        if (gameDTO == null || gameDTO.getId() == null) {
+            throw new BadRequestException("Invalid game data provided for update.");
         }
-
-        if (gameDTO.getId() == null) {
-            throw new BadRequestException("Can not identify the game to update.");
-        }
-
         FindNumberGame gameEntity = this.findGameById(gameDTO.getId().toString());
-
         if (gameEntity.getGameStatus().equals(GameStatus.DONE)) {
             throw new BadRequestException("Can not update the game already finished");
         }
-
         FindNumberGameDataMapper.updateEntity(gameEntity, gameDTO);
         findNumberGameRepository.save(gameEntity);
         findNumberGameCacheService.evictGameHistoryCache(gameEntity.getPlayer().getUsername());

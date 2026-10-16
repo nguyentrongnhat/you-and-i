@@ -9,7 +9,7 @@ import com.nguyen_trong_nhat.you_and_i.common.util.OtpGenerator;
 import com.nguyen_trong_nhat.you_and_i.features.role.repository.RoleRepository;
 import com.nguyen_trong_nhat.you_and_i.features.user.dto.UserDetailDTO;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
-import com.nguyen_trong_nhat.you_and_i.features.user.entity.Role;
+import com.nguyen_trong_nhat.you_and_i.features.role.entity.Role;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.UserProfile;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.UserVerification;
 import com.nguyen_trong_nhat.you_and_i.features.user.mapper.UserDataMapper;

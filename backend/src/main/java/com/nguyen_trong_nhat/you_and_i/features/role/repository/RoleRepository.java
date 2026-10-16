@@ -1,6 +1,6 @@
 package com.nguyen_trong_nhat.you_and_i.features.role.repository;
 
-import com.nguyen_trong_nhat.you_and_i.features.user.entity.Role;
+import com.nguyen_trong_nhat.you_and_i.features.role.entity.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Collection;
