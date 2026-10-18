@@ -30,6 +30,9 @@ public class Relationship {
     @Column(nullable = false)
     private RelationshipType type;
 
+    @Column(name = "name", nullable = false)
+    private String name;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private RelationshipStatus status;

@@ -1,0 +1,1 @@
+ALTER TABLE relationships ADD COLUMN name VARCHAR(255);
