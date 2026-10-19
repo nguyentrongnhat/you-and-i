@@ -50,6 +50,24 @@ public class CacheConfig {
                         .build()
         );
 
+        cacheManager.registerCustomCache(
+                Constants.CACHE_RELATIONSHIP_LIST,
+                Caffeine.newBuilder()
+                        .maximumSize(100)
+                        .expireAfterWrite(Duration.ofMinutes(10))
+                        .recordStats()
+                        .build()
+        );
+
+        cacheManager.registerCustomCache(
+                Constants.CACHE_RELATIONSHIP_BY_USER,
+                Caffeine.newBuilder()
+                        .maximumSize(1000)
+                        .expireAfterWrite(Duration.ofMinutes(10))
+                        .recordStats()
+                        .build()
+        );
+
         return cacheManager;
     }
 }

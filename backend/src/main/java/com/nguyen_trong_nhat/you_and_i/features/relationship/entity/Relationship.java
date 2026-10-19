@@ -41,6 +41,7 @@ public class Relationship {
     private LocalDateTime startAt;
 
     @OneToMany(
+            fetch = FetchType.EAGER,
             mappedBy = "relationship",
             cascade = CascadeType.ALL,
             orphanRemoval = true

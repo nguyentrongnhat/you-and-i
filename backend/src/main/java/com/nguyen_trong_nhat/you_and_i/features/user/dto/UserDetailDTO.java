@@ -14,6 +14,6 @@ public class UserDetailDTO {
     private String username;
     private UserProfileDTO profile;
     private Set<String> roles;
-    private boolean enabled;
-    private boolean emailVerified;
+    private Boolean enabled;
+    private Boolean emailVerified;
 }

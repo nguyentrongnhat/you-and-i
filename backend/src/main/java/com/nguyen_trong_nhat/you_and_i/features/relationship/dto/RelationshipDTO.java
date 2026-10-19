@@ -26,5 +26,5 @@ public class RelationshipDTO {
 
     private LocalDateTime startAt;
 
-    private Set<UUID> members = new HashSet<>();
+    private Set<RelationshipMemberDTO> members = new HashSet<>();
 }

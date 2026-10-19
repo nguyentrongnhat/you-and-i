@@ -6,16 +6,18 @@ import com.nguyen_trong_nhat.you_and_i.features.relationship.mapper.Relationship
 import com.nguyen_trong_nhat.you_and_i.features.relationship.service.RelationshipCacheService;
 import com.nguyen_trong_nhat.you_and_i.features.relationship.service.RelationshipService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("api/relationship")
 @AllArgsConstructor
 public class RelationshipController {
     private final RelationshipService relationshipService;
+    private final RelationshipCacheService relationshipCacheService;
     private final RelationshipMapper relationshipMapper;
 
     @GetMapping("")
@@ -25,14 +27,29 @@ public class RelationshipController {
                 .toList();
     }
 
-    @GetMapping("/user")
-    public String getRelationshipByUser() {
-        return "Get relationship by user";
+    @GetMapping("/user/{username}")
+    public List<RelationshipDTO> getRelationshipByUser(@PathVariable String username) {
+        return relationshipCacheService.getRelationshipsByUsername(username).stream()
+                .map(relationshipMapper::toRelationshipDTO)
+                .toList();
     }
 
     @PostMapping("/create")
     public RelationshipDTO createRelationship(@RequestBody RelationshipDTO relationshipData) {
         Relationship relationship = relationshipService.createRelationship(relationshipData);
         return relationshipMapper.toRelationshipDTO(relationship);
+    }
+
+    @PutMapping("/update/{relationshipId}")
+    public RelationshipDTO updateRelationship(@PathVariable UUID relationshipId,
+                                              @RequestBody RelationshipDTO relationshipData) {
+        Relationship relationship = relationshipService.updateRelationship(relationshipId, relationshipData);
+        return relationshipMapper.toRelationshipDTO(relationship);
+    }
+
+    @DeleteMapping("/delete/{relationshipId}")
+    public ResponseEntity<Void> deleteRelationship(@PathVariable UUID relationshipId) {
+        relationshipService.deleteRelationship(relationshipId);
+        return ResponseEntity.noContent().build();
     }
 }

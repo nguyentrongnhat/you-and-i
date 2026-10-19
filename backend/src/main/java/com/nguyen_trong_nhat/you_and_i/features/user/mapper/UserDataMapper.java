@@ -88,8 +88,8 @@ public class UserDataMapper {
 
         MyUserDetail myUserDetail = new MyUserDetail();
         myUserDetail.setUsername(userDetailDTO.getUsername());
-        myUserDetail.setEnabled(userDetailDTO.isEnabled());
-        myUserDetail.setEmailVerified(userDetailDTO.isEmailVerified());
+        myUserDetail.setEnabled(userDetailDTO.getEnabled());
+        myUserDetail.setEmailVerified(userDetailDTO.getEmailVerified());
         myUserDetail.setProfile(toUserProfile(userDetailDTO.getProfile()));
         myUserDetail.setRoles(convertStringSetToRoleSet(userDetailDTO.getRoles()));
 
@@ -104,12 +104,12 @@ public class UserDataMapper {
 
         myUserDetail.setUsername(userDetailDTO.getUsername());
 
-        if(!myUserDetail.isEnabled() && userDetailDTO.isEnabled()) {
+        if(!myUserDetail.isEnabled() && userDetailDTO.getEnabled()) {
             myUserDetail.setEnableAt(LocalDateTime.now());
         }
 
-        myUserDetail.setEnabled(userDetailDTO.isEnabled());
-        myUserDetail.setEmailVerified(userDetailDTO.isEmailVerified());
+        myUserDetail.setEnabled(userDetailDTO.getEnabled());
+        myUserDetail.setEmailVerified(userDetailDTO.getEmailVerified());
 
         UserProfile profile = myUserDetail.getProfile();
         if (profile == null) {

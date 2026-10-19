@@ -2,10 +2,20 @@ package com.nguyen_trong_nhat.you_and_i.features.relationship.repository;
 
 import com.nguyen_trong_nhat.you_and_i.features.relationship.entity.RelationshipMember;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
 @Repository
 public interface RelationshipMemberRepository extends JpaRepository<RelationshipMember, UUID> {
+
+    /**
+     * Deletes all members of a relationship without loading them first.
+     */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("delete from RelationshipMember m where m.relationship.id = :relationshipId")
+    int deleteByRelationshipId(@Param("relationshipId") UUID relationshipId);
 }
