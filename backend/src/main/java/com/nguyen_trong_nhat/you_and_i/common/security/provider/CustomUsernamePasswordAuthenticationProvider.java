@@ -10,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -25,7 +26,7 @@ public class CustomUsernamePasswordAuthenticationProvider implements Authenticat
     private final PasswordEncoder encoder;
 
     @Override
-    public Authentication authenticate(Authentication auth) throws AuthenticationServiceException {
+    public Authentication authenticate(Authentication auth) throws AuthenticationException, AccessDeniedException {
         String username = auth.getName();
         String password = Objects.requireNonNull(auth.getCredentials()).toString();
 
@@ -37,16 +38,16 @@ public class CustomUsernamePasswordAuthenticationProvider implements Authenticat
             throw new BadCredentialsException("Invalid username");
         }
 
+        if (!encoder.matches(password, user.getPassword())) {
+            throw new BadCredentialsException("Invalid password");
+        }
+
         if (!user.isEmailVerified()) {
             throw new AccessDeniedException("The email for this account has not been verified yet. Please go to the sign-up page to verify your account.");
         }
 
         if (!user.isEnabled()) {
             throw new AccessDeniedException("This account has not been activated yet. Please wait for the system to activate your account.");
-        }
-
-        if (!encoder.matches(password, user.getPassword())) {
-            throw new BadCredentialsException("Invalid password");
         }
 
         return new UsernamePasswordAuthenticationToken(

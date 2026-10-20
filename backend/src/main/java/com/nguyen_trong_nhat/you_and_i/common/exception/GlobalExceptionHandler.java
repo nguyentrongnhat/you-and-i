@@ -54,7 +54,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({ForbidenException.class, AccessDeniedException.class})
-    public ResponseEntity<ErrorResponse> handleAccessDeniedException(ForbidenException ex) {
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(Exception ex) {
         log.error("ForbidenException: ", ex);
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.FORBIDDEN.value(),
