@@ -1,5 +1,8 @@
 package com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.service;
 
+import com.nguyen_trong_nhat.you_and_i.common.config.Constants;
+import com.nguyen_trong_nhat.you_and_i.common.exception.UnauthorizedException;
+import com.nguyen_trong_nhat.you_and_i.common.security.util.SecurityUtils;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGame;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGameStats;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.repository.FindNumberGameRepository;
@@ -57,7 +60,10 @@ public class FindNumberGameBestRecordService {
     }
 
     public List<FindNumberGameStats> getBestRecordRanking() {
-        return findNumberGameBestRecordCacheService.getBestRecordRanking();
+        if (SecurityUtils.hasAuthorities(Constants.ROLE_SUPER_ADMIN)) {
+            return findNumberGameBestRecordCacheService.getAllBestRecordRanking();
+        }
+        return findNumberGameBestRecordCacheService.getBestRecordRankingByUsername(SecurityUtils.getLoggedInUsername());
     }
 
     public FindNumberGameStats getGameStatsByPlayerUsername(String playerUsername) {

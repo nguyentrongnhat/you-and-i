@@ -22,6 +22,7 @@ public class Constants {
     public static final String CACHE_FIND_NUMBER_GAME = "findNumberGame";
     public static final String CACHE_FIND_NUMBER_GAME_HISTORY = "findNumberGameHistory";
     public static final String CACHE_FIND_NUMBER_BEST_RECORD_RANKING = "findNumberBestRecordRanking";
+    public static final String CACHE_FIND_NUMBER_BEST_RECORD_RANKING_BY_USERNAME = "findNumberBestRecordRankingByUsername";
     public static final String CACHE_RELATIONSHIP_LIST = "relationshipList";
     public static final String CACHE_RELATIONSHIP_LIST_KEY = "'all'";
     public static final String CACHE_RELATIONSHIP_BY_USER = "relationshipByUser";

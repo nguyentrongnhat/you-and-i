@@ -51,6 +51,15 @@ public class CacheConfig {
         );
 
         cacheManager.registerCustomCache(
+                Constants.CACHE_FIND_NUMBER_BEST_RECORD_RANKING_BY_USERNAME,
+                Caffeine.newBuilder()
+                        .maximumSize(200)
+                        .expireAfterWrite(Duration.ofHours(240))
+                        .recordStats()
+                        .build()
+        );
+
+        cacheManager.registerCustomCache(
                 Constants.CACHE_RELATIONSHIP_LIST,
                 Caffeine.newBuilder()
                         .maximumSize(100)
