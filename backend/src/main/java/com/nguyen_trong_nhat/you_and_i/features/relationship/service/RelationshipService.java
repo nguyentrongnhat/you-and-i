@@ -1,6 +1,7 @@
 package com.nguyen_trong_nhat.you_and_i.features.relationship.service;
 
 import com.nguyen_trong_nhat.you_and_i.common.exception.NotFoundException;
+import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.service.FindNumberGameBestRecordCacheService;
 import com.nguyen_trong_nhat.you_and_i.features.relationship.dto.RelationshipDTO;
 import com.nguyen_trong_nhat.you_and_i.features.relationship.dto.RelationshipMemberDTO;
 import com.nguyen_trong_nhat.you_and_i.features.relationship.entity.Relationship;
@@ -31,6 +32,7 @@ public class RelationshipService {
     private final UserRepository myUserDetailRepository;
     private final RelationshipMapper relationshipMapper;
     private final RelationshipCacheService relationshipCacheService;
+    private final FindNumberGameBestRecordCacheService findNumberGameBestRecordCacheService;
 
     @Transactional
     public Relationship createRelationship(RelationshipDTO relationshipData) {
@@ -66,11 +68,13 @@ public class RelationshipService {
                     buildRelationshipMembers(existingRelationship, relationshipData.getMembers());
 
             existingRelationship.getMembers().clear();
+            relationshipRepository.flush();
             existingRelationship.getMembers().addAll(updatedMembers);
         }
 
         log.info("Updated relationship: {}", existingRelationship);
         relationshipCacheService.evictAllRelationshipCaches();
+        findNumberGameBestRecordCacheService.evictBestRecordRankingCache();
         return existingRelationship;
     }
 
