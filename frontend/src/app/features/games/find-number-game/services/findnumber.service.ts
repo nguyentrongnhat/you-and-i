@@ -104,7 +104,7 @@ export class FindNumberGameService {
 
 
     public getBestRecordsRanking(): Observable<FindNumberGameBestRecordDTO[]> {
-        if(!this.userService.hasRoles([ROLE.SUPER_ADMIN, ROLE.ADMIN, ROLE.GUEST], 'OR')) {
+        if(!this.userService.hasRoles([ROLE.SUPER_ADMIN, ROLE.ADMIN, ROLE.USER, ROLE.GUEST], 'OR')) {
             return of([])
         }
         return this.httpClient.get<FindNumberGameBestRecordDTO[]>('/game/find-number-game/best-records-ranking').pipe(

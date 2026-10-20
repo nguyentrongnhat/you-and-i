@@ -20,7 +20,7 @@ export class GameOverview {
 
 	/** Chỉ admin / super admin mới xem được bảng xếp hạng toàn hệ thống */
 	protected readonly canViewRanking = computed<boolean>(() =>
-		this.userService.hasRoles([ROLE.ADMIN, ROLE.SUPER_ADMIN, ROLE.GUEST], 'OR')
+		this.userService.hasRoles([ROLE.ADMIN, ROLE.SUPER_ADMIN, ROLE.USER, ROLE.GUEST], 'OR')
 	);
 
 	protected setTab(tab: OverviewTab): void {
