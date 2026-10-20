@@ -53,6 +53,7 @@ public class RelationshipService {
 
         log.info("New relationship created: {}", savedRelationship);
         relationshipCacheService.evictAllRelationshipCaches();
+        findNumberGameBestRecordCacheService.evictBestRecordRankingCache();
         return savedRelationship;
     }
 
@@ -85,6 +86,7 @@ public class RelationshipService {
         relationshipRepository.delete(needToDelete);
         log.info("Deleted relationship: {}", relationshipId);
         relationshipCacheService.evictAllRelationshipCaches();
+        findNumberGameBestRecordCacheService.evictBestRecordRankingCache();
     }
 
     private Set<RelationshipMember> buildRelationshipMembers(Relationship relationship,
