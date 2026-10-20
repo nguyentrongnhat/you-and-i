@@ -280,13 +280,26 @@
 /* ============================================================
    Podium — Top 3 hall of fame
    ============================================================ */
+.podium-for-1 {
+  grid-template-columns: 1fr;
+  padding: 1.25rem 35% 0;
+}
+
+.podium-for-2 {
+  grid-template-columns: 1.2fr 1fr;
+  padding: 1.25rem 17% 0;
+}
+
+.podium-for-3 {
+  grid-template-columns: 1fr 1.2fr 1fr;
+  padding: 1.25rem 0.75rem 0;
+}
+
 .podium {
   position: relative;
   display: grid;
-  grid-template-columns: 1fr 1.2fr 1fr;
   align-items: end;
   gap: 0.6rem;
-  padding: 1.25rem 0.75rem 0;
   border-radius: 20px;
   overflow: hidden;
   background:

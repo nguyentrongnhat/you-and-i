@@ -1,4 +1,4 @@
-import { DatePipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { SkeletonModule } from 'primeng/skeleton';
 import { finalize } from 'rxjs';
@@ -8,7 +8,7 @@ import { FindNumberGameService } from '../../services/findnumber.service';
 
 @Component({
   selector: 'app-game-ranking',
-  imports: [DatePipe, SkeletonModule],
+  imports: [DatePipe, SkeletonModule, CommonModule],
   templateUrl: './game-ranking.html',
   styleUrl: './game-ranking.scss',
 })
@@ -29,7 +29,16 @@ export class GameRanking implements OnInit {
   /** Top 3 reordered for the podium display: [2nd, 1st, 3rd] */
   protected readonly podium = computed(() => {
     const top = this.bestRecordsRanking().slice(0, 3);
-    const order = [1, 0, 2];
+    let order: number[] = [];
+    if (top.length === 1){
+      order = [0];
+    }
+    if (top.length === 2){
+      order = [0, 1];
+    }
+    if (top.length === 3){
+      order = [1, 0, 2];
+    }
     return order
       .map((rankIndex) => (top[rankIndex] ? { item: top[rankIndex], rank: rankIndex } : null))
       .filter((entry): entry is { item: FindNumberGameBestRecordDTO; rank: number } => entry !== null);

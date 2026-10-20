@@ -37,7 +37,12 @@
     </div>
   } @else if (bestRecordsRanking().length) {
     <!-- ===== Podium: Top 3 ===== -->
-    <div class="podium">
+    <div class="podium" 
+        [ngClass]="{
+          'podium-for-1': podium().length === 1, 
+          'podium-for-2': podium().length === 2, 
+          'podium-for-3': podium().length === 3}"
+    >
       <div class="podium__glow"></div>
       @for (entry of podium(); track entry.rank) {
         <div
