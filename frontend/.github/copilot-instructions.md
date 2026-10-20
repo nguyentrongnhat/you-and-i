@@ -164,56 +164,21 @@ All new tables MUST follow this standard so the app stays visually consistent.
   `v.$breakpoint-xs` etc. for responsive rules.
 
 
-## 15.2 Table styling (via `::ng-deep` scoped by a table styleClass)
-- Give the table a unique class (e.g. `styleClass="feature__table p-datatable-sm"`)
-  and scope deep styles as `:host ::ng-deep .feature__table { ... }`.
-- Header `th`: muted uppercase labels —
-  `font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em;
-  text-transform: uppercase;` with `background: var(--p-content-hover-background)`.
-  Round top corners on first/last `th` (16px) to match the card.
-- Body `td`: `padding: 0.75rem 1rem`, thin row divider
-  `border-bottom: 1px solid var(--p-content-border-color, #f1f3f5)`,
-  `vertical-align: middle`. Remove the divider on the last row.
-- Clickable rows use a `&__row` class with `cursor: pointer` and a hover
-  background `var(--p-content-hover-background)`.
-
-## 15.3 Pagination (MANDATORY look)
-- Scope under the table class: `:host ::ng-deep .feature__table .p-paginator`.
-- The paginator is a full-width row: `display: flex; width: 100%; flex-wrap: nowrap`.
-  Spread items evenly — current-page report on the left (`margin-right: auto`),
-  page buttons in the middle, rows-per-page select on the right (`margin-left: auto`).
-- Page / nav buttons: `min-width/height: 2.1rem; border-radius: 9px;` muted color,
-  hover background, active `transform: scale(0.93)`.
-- Selected page: `background: var(--p-primary-color)`,
-  `color: var(--p-primary-contrast-color, #fff)`, `font-weight: 600`,
-  subtle shadow `0 1px 2px rgba(99,102,241,0.35)`.
-- Rows-per-page select: `height: 2.1rem; min-width: 4.5rem; border-radius: 9px`.
-- ALWAYS add this rule so all options are visible:
-  `:host ::ng-deep .p-select-overlay .p-select-list-container { max-height: 16rem; }`
-- Enable the report: `currentPageReportTemplate="Hiển thị {first} – {last} trong {totalRecords}"`
-  with `[showCurrentPageReport]="true"`.
-- Only wrap + center the items as a fallback at `v.$breakpoint-xs`.
-
-## 15.4 User / entity cells
+## 15.2 User / entity cells
 - Show an avatar + 2-line info (name + muted `@username` / secondary line).
 - Avatar fallback uses initials with `background: var(--p-primary-color)` and a
   white ring; truncate long text with ellipsis.
 
-## 15.5 Empty state
+## 15.3 Empty state
 - Use `#emptymessage` with a centered block: large muted `pi` icon + short text,
   generous padding (~2.75rem). Class `&__empty`.
 
-## 15.6 Responsiveness
+## 15.4 Responsiveness
 - Hide non-essential columns on small mobile via `PlatformService.isSmallMobileDevice()`
   (never via raw `window` checks).
 - Keep the same column-hiding pattern in both header and body templates, and update
   the empty `colspan` accordingly.
 
-## 15.7 Reference implementations
-- `features/user-management/pages/user-management` (full pattern)
-- `features/games/find-number-game/components/game-histories` (compact pattern)
-
----
 
 # 16. Workflow & AI Execution Rules
 
