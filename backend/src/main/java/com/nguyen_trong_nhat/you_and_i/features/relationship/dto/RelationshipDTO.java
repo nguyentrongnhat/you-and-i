@@ -18,6 +18,8 @@ public class RelationshipDTO {
 
     private UUID id;
 
+    private boolean active;
+
     private RelationshipType type;
 
     private String name;

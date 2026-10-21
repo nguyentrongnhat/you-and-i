@@ -22,6 +22,9 @@ public class RelationshipMember {
     @UuidGenerator(style = UuidGenerator.Style.TIME)
     private UUID id;
 
+    @Column(name = "active", nullable = false)
+    private boolean active;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "relationship_id", nullable = false)
     private Relationship relationship;

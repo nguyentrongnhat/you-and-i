@@ -17,7 +17,13 @@ public class RelationshipMemberService {
 
     public List<RelationshipMember> getRelativeRelationshipMembersByUsername(String username) {
         var result = relationshipCacheService.getRelationshipsByUsername(username);
-        return result.stream().map(Relationship::getMembers)
+        return result.stream()
+                .filter(Relationship::isActive)
+                .map(Relationship::getMembers)
+                .filter(members -> members.stream()
+                        .anyMatch(member
+                                -> member.isActive() && member.getUser().getUsername().equals(username))
+                )
                 .flatMap(Collection::stream)
                 .filter(member -> !member.getUser().getUsername().equals(username))
                 .toList();

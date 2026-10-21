@@ -14,5 +14,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class RelationshipMemberDTO {
     private UUID id;
+    private boolean active;
     private UserDetailDTO user;
 }

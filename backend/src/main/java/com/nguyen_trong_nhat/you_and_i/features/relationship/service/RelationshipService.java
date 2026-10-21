@@ -17,10 +17,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -98,6 +96,10 @@ public class RelationshipService {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
+        Map<UUID, RelationshipMemberDTO> memberDTOMap = memberDTOs.stream()
+                .filter(dto -> dto.getUser() != null && dto.getUser().getId() != null)
+                .collect(Collectors.toMap(dto -> dto.getUser().getId(), Function.identity()));
+
         if (memberIds.isEmpty()) {
             return Set.of();
         }
@@ -106,6 +108,7 @@ public class RelationshipService {
         return users.stream().map(user -> {
             RelationshipMember relationshipMember = new RelationshipMember();
             relationshipMember.setRelationship(relationship);
+            relationshipMember.setActive(memberDTOMap.get(user.getId()).isActive());
             relationshipMember.setUser(user);
             return relationshipMember;
         }).collect(Collectors.toSet());

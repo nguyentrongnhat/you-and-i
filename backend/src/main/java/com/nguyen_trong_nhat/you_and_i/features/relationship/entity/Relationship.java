@@ -26,6 +26,9 @@ public class Relationship {
     @UuidGenerator(style = UuidGenerator.Style.TIME)
     private UUID id;
 
+    @Column(name = "active", nullable = false)
+    private boolean active;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private RelationshipType type;

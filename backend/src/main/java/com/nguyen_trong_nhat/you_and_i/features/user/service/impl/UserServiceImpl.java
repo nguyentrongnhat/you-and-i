@@ -6,6 +6,8 @@ import com.nguyen_trong_nhat.you_and_i.common.exception.ForbidenException;
 import com.nguyen_trong_nhat.you_and_i.common.exception.NotFoundException;
 import com.nguyen_trong_nhat.you_and_i.common.security.util.SecurityUtils;
 import com.nguyen_trong_nhat.you_and_i.common.util.OtpGenerator;
+import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.service.FindNumberGameBestRecordCacheService;
+import com.nguyen_trong_nhat.you_and_i.features.relationship.service.RelationshipCacheService;
 import com.nguyen_trong_nhat.you_and_i.features.role.repository.RoleRepository;
 import com.nguyen_trong_nhat.you_and_i.features.user.dto.UserDetailDTO;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
@@ -34,6 +36,8 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final UserProfileRepository userProfileRepository;
     private final UserDataMapper userDataMapper;
+    private final RelationshipCacheService relationshipCacheService;
+    private final FindNumberGameBestRecordCacheService findNumberGameBestRecordCacheService;
 
     @Override
     @CacheEvict(value = "userDetails", key = "#username.toLowerCase()")
@@ -136,6 +140,9 @@ public class UserServiceImpl implements UserService {
         existingAccount = userDataMapper.updateEntityFromDTO(userDetailDTO, existingAccount);
 
         userRepository.save(existingAccount);
+
+        this.findNumberGameBestRecordCacheService.evictBestRecordRankingCache();
+        this.relationshipCacheService.evictAllRelationshipCaches();
 
         return userDataMapper.toUserDetailDTO(existingAccount);
     }
