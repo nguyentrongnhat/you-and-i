@@ -5,7 +5,7 @@ import { Toast } from 'primeng/toast';
 import { filter } from 'rxjs';
 import { LAYOUT } from './core/enums';
 import { AuthService } from './features/auth/services/auth.service';
-import { UserService } from './features/user-management/services/user.service';
+import { UserService } from './features/admin/services/user.service';
 import { EmptyLayout } from './shared/layouts/components/empty-layout/empty-layout';
 import { Layout1 } from './shared/layouts/components/layout1/layout1';
 import { Layout2 } from './shared/layouts/components/layout2/layout2';

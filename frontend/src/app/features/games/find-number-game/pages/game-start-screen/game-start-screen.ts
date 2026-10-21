@@ -16,7 +16,7 @@ import { NavigationService } from '../../../../../services/navigation.service';
 import { FindNumberGameService } from '../../services/findnumber.service';
 import { FormsModule } from '@angular/forms';
 import { GameOverview } from '../../components/game-overview/game-overview';
-import { UserService } from '../../../../user-management/services/user.service';
+import { UserService } from '../../../../admin/services/user.service';
 
 @Component({
    selector: 'app-game-start-screen',

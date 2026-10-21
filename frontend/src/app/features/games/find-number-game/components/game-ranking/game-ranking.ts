@@ -3,7 +3,7 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { SkeletonModule } from 'primeng/skeleton';
 import { finalize } from 'rxjs';
 import { FindNumberGameBestRecordDTO } from '../../../../../core/interfaces/find-number-game.dto';
-import { UserService } from '../../../../user-management/services/user.service';
+import { UserService } from '../../../../admin/services/user.service';
 import { FindNumberGameService } from '../../services/findnumber.service';
 
 @Component({

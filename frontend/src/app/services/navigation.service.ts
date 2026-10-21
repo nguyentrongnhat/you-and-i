@@ -63,16 +63,14 @@ export class NavigationService {
   }
 
   /** Navigate to the user management page. */
-  goToUserManagement(extras?: NavigationExtras): Promise<boolean> {
-    return this.navigate(ROUTE_PATHS.USER.children.MANAGEMENT.fullPath, extras);
+  goToManagement(extras?: NavigationExtras): Promise<boolean> {
+    return this.navigate(ROUTE_PATHS.MANAGEMENT.fullPath, extras);
   }
 
   /** Navigate to the user detail page for a given user. */
   goToUserDetail(id: string, extras?: NavigationExtras): Promise<boolean> {
-    return this.navigateByCommands(
-      [ROUTE_PATHS.USER.path, 'details', id],
-      extras
-    );
+    const url = ROUTE_PATHS.MANAGEMENT.children.USER_DETAIL.fullPath.replace(':id', id);
+    return this.router.navigate(['/', ...url.split('/')], extras);
   }
 
   /** Navigate to an absolute URL string. */
@@ -82,6 +80,7 @@ export class NavigationService {
 
   /** Navigate using a router command array (for parameterized routes). */
   navigateByCommands(commands: unknown[], extras?: NavigationExtras): Promise<boolean> {
+    console.log('Navigating with commands:', commands.join('/'));
     return this.router.navigate(commands, extras);
   }
 }

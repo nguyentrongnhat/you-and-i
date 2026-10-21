@@ -1,0 +1,208 @@
+
+<div class="relationship-detail">
+  <!-- Relationship information -->
+  <section class="relationship-detail__section">
+    <header class="relationship-detail__header">
+      <div class="relationship-detail__heading">
+        <div class="relationship-detail__icon">
+          <i class="pi pi-heart"></i>
+        </div>
+
+        <div class="relationship-detail__heading-content">
+          <h2 class="relationship-detail__title">Relationship Details</h2>
+          <p class="relationship-detail__description">
+            Manage your relationship information and settings.
+          </p>
+        </div>
+      </div>
+
+      <p-tag
+        [value]="relationshipForm.controls.status.value"
+        [severity]="
+          relationshipForm.controls.status.value === 'ACTIVE'
+            ? 'success'
+            : 'secondary'
+        "
+      />
+    </header>
+
+    <div class="relationship-detail__body">
+      <form
+        [formGroup]="relationshipForm"
+        (ngSubmit)="saveRelationship()"
+      >
+        <div class="relationship-detail__form-grid">
+          <div class="relationship-detail__field">
+            <label for="relationship-name">Relationship name</label>
+            <input
+              id="relationship-name"
+              pInputText
+              formControlName="name"
+              placeholder="Enter relationship name"
+            />
+
+            @if (
+              relationshipForm.controls.name.invalid &&
+              relationshipForm.controls.name.touched
+            ) {
+              <small class="relationship-detail__error">
+                Relationship name is required.
+              </small>
+            }
+          </div>
+
+          <div class="relationship-detail__field">
+            <label for="relationship-type">Relationship type</label>
+            <p-select
+              inputId="relationship-type"
+              formControlName="type"
+              [options]="relationshipTypes"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Select type"
+              fluid
+            />
+          </div>
+
+          <div class="relationship-detail__field">
+            <label for="relationship-status">Status</label>
+            <p-select
+              inputId="relationship-status"
+              formControlName="status"
+              [options]="relationshipStatuses"
+              optionLabel="label"
+              optionValue="value"
+              placeholder="Select status"
+              fluid
+            />
+          </div>
+
+          <div class="relationship-detail__field">
+            <label for="relationship-start-date">Start date</label>
+            <p-datepicker
+              inputId="relationship-start-date"
+              formControlName="startAt"
+              dateFormat="dd/mm/yy"
+              [showIcon]="true"
+              [showButtonBar]="true"
+              fluid
+            />
+          </div>
+        </div>
+
+        <div class="relationship-detail__footer">
+          <p-button
+            type="button"
+            label="Cancel"
+            severity="secondary"
+            variant="outlined"
+            (onClick)="cancel()"
+          />
+
+          <p-button
+            type="submit"
+            label="Save changes"
+            icon="pi pi-check"
+          />
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- Members -->
+  <section class="relationship-detail__section">
+    <header class="relationship-detail__header relationship-detail__header--members">
+      <div class="relationship-detail__heading">
+        <div class="relationship-detail__icon">
+          <i class="pi pi-users"></i>
+        </div>
+
+        <div class="relationship-detail__heading-content">
+          <h2 class="relationship-detail__title">Members</h2>
+          <p class="relationship-detail__description">
+            {{ members.length }} members in this relationship.
+          </p>
+        </div>
+      </div>
+
+      <p-button
+        label="Add member"
+        icon="pi pi-user-plus"
+        (onClick)="showAddMemberDialog = true"
+      />
+    </header>
+
+    <div class="relationship-detail__members">
+      @for (
+        member of members;
+        track member.id;
+        let first = $first
+      ) {
+        <article
+          class="relationship-detail__member"
+          [class.relationship-detail__member--first]="first"
+        >
+          <div class="relationship-detail__member-info">
+            <p-avatar
+              [image]="member.user.profile.avatarUrl"
+              [label]="getMemberInitial(member)"
+              shape="circle"
+              size="large"
+              styleClass="relationship-detail__avatar"
+            />
+
+            <div class="relationship-detail__member-identity">
+              <span class="relationship-detail__member-name">
+                {{ getMemberName(member) }}
+              </span>
+
+              <span class="relationship-detail__username">
+                &#64;{{ member.user.username }}
+              </span>
+            </div>
+          </div>
+
+          <div class="relationship-detail__member-actions">
+
+            <div class="relationship-detail__toggle">
+              <p-toggleSwitch
+                [ngModel]="member.active"
+                [ngModelOptions]="{ standalone: true }"
+                (ngModelChange)="toggleMember(member)"
+                [disabled]="!member.id"
+              />
+            </div>
+
+            <p-button
+              icon="pi pi-trash"
+              severity="danger"
+              variant="text"
+              [rounded]="true"
+              [ariaLabel]="'Remove ' + getMemberName(member)"
+              (onClick)="removeMember(member)"
+            />
+          </div>
+        </article>
+      } @empty {
+        <div class="relationship-detail__empty">
+          <div class="relationship-detail__empty-icon">
+            <i class="pi pi-users"></i>
+          </div>
+
+          <h3>No members yet</h3>
+
+          <p>
+            Add members to start building this relationship.
+          </p>
+
+          <p-button
+            label="Add member"
+            icon="pi pi-user-plus"
+            variant="outlined"
+            (onClick)="showAddMemberDialog = true"
+          />
+        </div>
+      }
+    </div>
+  </section>
+</div>

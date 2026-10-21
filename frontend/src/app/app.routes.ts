@@ -85,23 +85,23 @@ export const routes: Routes = [
     ]
   },
   {
-    path: ROUTE_PATHS.USER.path,
+    path: ROUTE_PATHS.MANAGEMENT.path,
     canActivate: [authGuard, roleGuard],
     data: {
-      roles: NON_GUEST_ROLES
+      roles: NON_GUEST_ROLES,
     },
     children: [
         {
-          path: ROUTE_PATHS.USER.children.MANAGEMENT.path,
-          loadComponent: () => import('./features/user-management/pages/user-management/user-management').then(c => c.UserManagement),
+          path: '',
+          loadComponent: () => import('./features/admin/pages/management/management').then(c => c.Management),
           data: {
-            animation: 'SignUpPage',
+            animation: 'UserManagementPage',
             layout: LAYOUT.LAYOUT_1
           }
         },
         {
-          path: ROUTE_PATHS.USER.children.DETAIL.path,
-          loadComponent: () => import('./features/user-management/pages/user-detail/user-detail').then(c => c.UserDetail),
+          path: ROUTE_PATHS.MANAGEMENT.children.USER_DETAIL.path,
+          loadComponent: () => import('./features/admin/pages/user-detail/user-detail').then(c => c.UserDetail),
           data: {
             animation: 'UserDetailsPage',
             layout: LAYOUT.LAYOUT_1

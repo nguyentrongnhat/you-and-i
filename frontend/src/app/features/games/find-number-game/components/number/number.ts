@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, input, output, signal, ViewChild } from '@angular/core';
 import { PlatformService } from '../../../../../services/platform.service';
-import { UserService } from '../../../../user-management/services/user.service';
+import { UserService } from '../../../../admin/services/user.service';
 import { ROLE } from '../../../../../core/enums';
 import { NumberData } from '../../../../../core/type';
 import { FindNumberGameService } from '../../services/findnumber.service';

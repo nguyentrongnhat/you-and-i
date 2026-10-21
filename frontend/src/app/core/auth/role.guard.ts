@@ -3,7 +3,7 @@ import { CanActivateFn, Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { ROLE } from '../enums';
 import { resolveHomeRouteForRoles } from '../constants/access-control';
-import { UserService } from '../../features/user-management/services/user.service';
+import { UserService } from '../../features/admin/services/user.service';
 import { AuthService } from '../../features/auth/services/auth.service';
 import { PlatformService } from '../../services/platform.service';
 import { LoaderService } from '../../services/loader.service';

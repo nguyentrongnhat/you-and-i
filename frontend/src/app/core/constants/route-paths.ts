@@ -27,12 +27,11 @@ export const ROUTE_PATHS = {
             }
         }
     },
-    USER: {
-        path: 'user',
-        fullPath: 'user',
+    MANAGEMENT: {
+        path: 'management',
+        fullPath: 'management',
         children: {
-            MANAGEMENT: { path: 'management', fullPath: 'user/management' },
-            DETAIL: { path: 'details/:id', fullPath: 'user/details/:id' }
+            USER_DETAIL: { path: 'user/details/:id', fullPath: 'management/user/details/:id' }
         }
     }
 } as const;

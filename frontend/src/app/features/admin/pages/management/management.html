@@ -1,0 +1,16 @@
+<div class="wrapper content max-w-[1200px] mx-auto" animate.enter="enter-animation">
+    <p-tabs [value]="0">
+        <p-tablist>
+            @for (tab of tabs; track tab.value) {
+                <p-tab [value]="tab.value">{{ tab.title }}</p-tab>
+            }
+        </p-tablist>
+        <p-tabpanels>
+            @for (tab of tabs; track tab.value) {
+                <p-tabpanel [value]="tab.value">
+                    <ng-container *ngComponentOutlet="tab.component"/>
+                </p-tabpanel>
+            }
+        </p-tabpanels>
+    </p-tabs>
+</div>

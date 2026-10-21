@@ -8,7 +8,7 @@ import { PanelModule } from 'primeng/panel';
 import { TableModule } from 'primeng/table';
 import { PhotoService } from '../../services/photo.service';
 import { NavigationService } from '../../services/navigation.service';
-import { UserService } from '../user-management/services/user.service';
+import { UserService } from '../admin/services/user.service';
 import { LoaderService } from '../../services/loader.service';
 import { PlatformService } from '../../services/platform.service';
 

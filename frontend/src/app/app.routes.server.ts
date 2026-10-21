@@ -3,7 +3,7 @@ import { ROUTE_PATHS } from './core/constants/route-paths';
 
 export const serverRoutes: ServerRoute[] = [
   {
-    path: ROUTE_PATHS.USER.children.DETAIL.fullPath,
+    path: ROUTE_PATHS.MANAGEMENT.children.USER_DETAIL.fullPath,
     renderMode: RenderMode.Server
   },
   {

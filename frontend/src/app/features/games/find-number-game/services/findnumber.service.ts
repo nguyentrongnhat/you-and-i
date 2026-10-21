@@ -4,7 +4,7 @@ import { catchError, Observable, of, Subject, tap, throwError } from "rxjs";
 import { GAME_DIFFICULTY_LEVEL, MESSAGE_TYPE, ROLE } from "../../../../core/enums";
 import { FindNumberGameBestRecordDTO, FindNumberGameDTO, FindNumberGameHistory } from "../../../../core/interfaces/find-number-game.dto";
 import { ToastService } from "../../../../services/toast.service";
-import { UserService } from "../../../user-management/services/user.service";
+import { UserService } from "../../../admin/services/user.service";
 
 @Injectable({
     providedIn: 'root'

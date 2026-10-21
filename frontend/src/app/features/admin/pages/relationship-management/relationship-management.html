@@ -1,0 +1,78 @@
+@if(allRelationships().length > 0) {
+  <div class="card">
+    <p-dataview [value]="allRelationships()" [rows]="5" [paginator]="true">
+      <ng-template #list let-items>
+        <div class="grid grid-cols-12 gap-4 grid-nogutter">
+          <div *ngFor="let item of items; let first = first" class="col-span-12">
+            <div
+              class="flex flex-col sm:flex-row sm:items-center p-6 gap-4"
+              [ngClass]="{
+                'border-t border-surface-200 dark:border-surface-700': !first,
+              }"
+              (click)="showGameHistoriesDialog()"
+            >
+              <div class="md:w-40 relative">
+                <img
+                  class="block xl:block mx-auto rounded-border w-full"
+                  src="https://primefaces.org/cdn/primeng/images/demo/product/bamboo-watch.jpg"
+                  [alt]="item.name ?? ''"
+                />
+  
+                <p-tag
+                  [value]="item.status"
+                  severity="contrast"
+                  class="absolute"
+                  styleClass="dark:!bg-surface-900"
+                  [style.left.px]="4"
+                  [style.top.px]="4"
+                />
+              </div>
+  
+              <div class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-6">
+                <div class="flex flex-row md:flex-col justify-between items-start gap-2">
+                  <div>
+                    <span class="font-medium text-secondary text-sm">
+                      {{ item.type }}
+                    </span>
+  
+                    <div class="text-lg font-medium text-surface-900 dark:text-surface-0 mt-2">
+                      {{ item?.name ?? '' }}
+                    </div>
+                  </div>
+                </div>
+  
+                <div class="flex flex-col md:items-end gap-8">
+                  <span class="text-xl font-semibold text-surface-900 dark:text-surface-0">
+                    {{ item.members.length }} members
+                  </span>
+  
+                  <div class="flex flex-row-reverse md:flex-row gap-2">
+                    <p-button icon="pi pi-pencil" [outlined]="true" />
+  
+                    <p-button icon="pi pi-trash" severity="danger" [outlined]="true" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+    </p-dataview>
+  </div>
+  
+  
+  <p-dialog [modal]="true" [(visible)]="showGameHistories" [draggable]="false" [dismissableMask]="true"
+     [style]="{ width: '52rem' }" [breakpoints]="{ '991px': '80vw', '575px': '94vw' }"
+     styleClass="history-dialog">
+     <ng-template #header>
+        <div class="history-dialog__head">
+           <span class="history-dialog__head-icon"><i class="pi pi-chart-bar"></i></span>
+           <div class="history-dialog__head-text">
+              <h3 class="history-dialog__head-title">Thành tích</h3>
+              <span class="history-dialog__head-sub">Lịch sử &amp; bảng xếp hạng</span>
+           </div>
+        </div>
+     </ng-template>
+     <app-relationship-detail [relationship]="allRelationships()[0]" />
+  </p-dialog>
+}

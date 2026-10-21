@@ -5,7 +5,7 @@ import { API_ENDPOINTS } from "../../../core/constants/api-endpoints";
 import { UsernamePasswordLoginResponse } from "../../../core/interfaces/user.dtos";
 import { HttpClientService } from "../../../services/http-client.service";
 import { SignupModel } from "../signup/signup";
-import { UserService } from "../../user-management/services/user.service";
+import { UserService } from "../../admin/services/user.service";
 import { LoaderService } from "../../../services/loader.service";
 import { PlatformService } from "../../../services/platform.service";
 import { SessionStorageService } from "../../../services/session-storage.service";

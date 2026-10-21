@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 
 import { ROLE } from '../../../../../core/enums';
-import { UserService } from '../../../../user-management/services/user.service';
+import { UserService } from '../../../../admin/services/user.service';
 import { GameHistories } from '../game-histories/game-histories';
 import { GameRanking } from '../game-ranking/game-ranking';
 

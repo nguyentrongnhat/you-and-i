@@ -9,7 +9,7 @@ import { NavigationService } from '../../../../services/navigation.service';
 import { filter } from 'rxjs';
 import { AuthService } from '../../../../features/auth/services/auth.service';
 import { ROLE } from '../../../../core/enums';
-import { UserService } from '../../../../features/user-management/services/user.service';
+import { UserService } from '../../../../features/admin/services/user.service';
 import { SessionStorageService } from '../../../../services/session-storage.service';
 
 type AppLanguageCode = 'vi' | 'en';
@@ -136,8 +136,8 @@ export class Layout1 implements OnInit {
             },
             {
                 name: 'Users Management',
-                icon: 'pi-users',
-                url: this.ROUTE_PATHS.USER.children.MANAGEMENT.fullPath,
+                icon: 'pi-th-large',
+                url: this.ROUTE_PATHS.MANAGEMENT.fullPath,
                 active: false,
                 requiredRoles: [ROLE.SUPER_ADMIN]
             },
