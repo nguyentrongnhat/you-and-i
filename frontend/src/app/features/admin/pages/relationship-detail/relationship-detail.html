@@ -9,9 +9,12 @@
         </div>
 
         <div class="relationship-detail__heading-content">
-          <h2 class="relationship-detail__title">Relationship Details</h2>
+          <span class="relationship-detail__eyebrow">
+            RELATIONSHIP SETTINGS
+          </span>
+          <h2 class="relationship-detail__title">Relationship details</h2>
           <p class="relationship-detail__description">
-            Manage your relationship information and settings.
+            Configure the name, type and current status.
           </p>
         </div>
       </div>
@@ -33,12 +36,17 @@
       >
         <div class="relationship-detail__form-grid">
           <div class="relationship-detail__field">
-            <label for="relationship-name">Relationship name</label>
+            <label for="relationship-name">
+              Relationship name
+              <span class="relationship-detail__required">*</span>
+            </label>
+
             <input
               id="relationship-name"
               pInputText
               formControlName="name"
-              placeholder="Enter relationship name"
+              placeholder="e.g. My relationship"
+              autocomplete="off"
             />
 
             @if (
@@ -48,37 +56,44 @@
               <small class="relationship-detail__error">
                 Relationship name is required.
               </small>
+            } @else {
+              <small class="relationship-detail__hint">
+                Choose a name that is easy to recognize.
+              </small>
             }
           </div>
 
           <div class="relationship-detail__field">
             <label for="relationship-type">Relationship type</label>
+
             <p-select
               inputId="relationship-type"
               formControlName="type"
               [options]="relationshipTypes"
               optionLabel="label"
               optionValue="value"
-              placeholder="Select type"
+              placeholder="Select a type"
               fluid
             />
           </div>
 
           <div class="relationship-detail__field">
-            <label for="relationship-status">Status</label>
+            <label for="relationship-status">Relationship status</label>
+
             <p-select
               inputId="relationship-status"
               formControlName="status"
               [options]="relationshipStatuses"
               optionLabel="label"
               optionValue="value"
-              placeholder="Select status"
+              placeholder="Select a status"
               fluid
             />
           </div>
 
           <div class="relationship-detail__field">
             <label for="relationship-start-date">Start date</label>
+
             <p-datepicker
               inputId="relationship-start-date"
               formControlName="startAt"
@@ -91,19 +106,26 @@
         </div>
 
         <div class="relationship-detail__footer">
-          <p-button
-            type="button"
-            label="Cancel"
-            severity="secondary"
-            variant="outlined"
-            (onClick)="cancel()"
-          />
+          <span class="relationship-detail__footer-note">
+            <i class="pi pi-info-circle"></i>
+            Changes are applied when you save.
+          </span>
 
-          <p-button
-            type="submit"
-            label="Save changes"
-            icon="pi pi-check"
-          />
+          <div class="relationship-detail__footer-actions">
+            <p-button
+              type="button"
+              label="Cancel"
+              severity="secondary"
+              variant="outlined"
+              (onClick)="cancel()"
+            />
+
+            <p-button
+              type="submit"
+              label="Save changes"
+              icon="pi pi-check"
+            />
+          </div>
         </div>
       </form>
     </div>
@@ -111,18 +133,32 @@
 
   <!-- Members -->
   <section class="relationship-detail__section">
-    <header class="relationship-detail__header relationship-detail__header--members">
+    <header
+      class="relationship-detail__header relationship-detail__header--members"
+    >
       <div class="relationship-detail__heading">
         <div class="relationship-detail__icon">
           <i class="pi pi-users"></i>
         </div>
 
         <div class="relationship-detail__heading-content">
+          <span class="relationship-detail__eyebrow">
+            PEOPLE
+          </span>
           <h2 class="relationship-detail__title">Members</h2>
           <p class="relationship-detail__description">
-            {{ members.length }} members in this relationship.
+            Manage the people in this relationship.
           </p>
         </div>
+      </div>
+
+      <div class="relationship-detail__member-count">
+        <span class="relationship-detail__count-number">
+          {{ members.length }}
+        </span>
+        <span class="relationship-detail__count-label">
+          {{ members.length === 1 ? 'member' : 'members' }}
+        </span>
       </div>
 
       <p-button
@@ -157,14 +193,23 @@
               </span>
 
               <span class="relationship-detail__username">
-                &#64;{{ member.user.username }}
+                <i class="pi pi-at"></i>
+                {{ member.user.username }}
               </span>
             </div>
           </div>
 
           <div class="relationship-detail__member-actions">
+            <p-tag
+              [value]="member.active ? 'Active' : 'Inactive'"
+              [severity]="member.active ? 'success' : 'secondary'"
+            />
 
             <div class="relationship-detail__toggle">
+              <span class="relationship-detail__toggle-label">
+                {{ member.active ? 'Enabled' : 'Disabled' }}
+              </span>
+
               <p-toggleSwitch
                 [ngModel]="member.active"
                 [ngModelOptions]="{ standalone: true }"
@@ -172,6 +217,8 @@
                 [disabled]="!member.id"
               />
             </div>
+
+            <span class="relationship-detail__action-divider"></span>
 
             <p-button
               icon="pi pi-trash"
@@ -192,11 +239,11 @@
           <h3>No members yet</h3>
 
           <p>
-            Add members to start building this relationship.
+            Add someone to get started with this relationship.
           </p>
 
           <p-button
-            label="Add member"
+            label="Add your first member"
             icon="pi pi-user-plus"
             variant="outlined"
             (onClick)="showAddMemberDialog = true"
