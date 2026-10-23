@@ -27,6 +27,13 @@ public class RelationshipController {
                 .toList();
     }
 
+    @GetMapping("/{relationshipId}")
+    public RelationshipDTO getRelationshipById(@PathVariable UUID relationshipId) {
+        Relationship relationship = relationshipService.getRelationshipById(relationshipId);
+
+        return relationshipMapper.toRelationshipDTO(relationship);
+    }
+
     @GetMapping("/user/{username}")
     public List<RelationshipDTO> getRelationshipByUser(@PathVariable String username) {
         return relationshipCacheService.getRelationshipsByUsername(username).stream()

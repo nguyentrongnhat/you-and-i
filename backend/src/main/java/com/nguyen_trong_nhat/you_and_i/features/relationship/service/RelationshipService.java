@@ -117,4 +117,11 @@ public class RelationshipService {
     public List<Relationship> getAllRelationships() {
         return relationshipCacheService.getAllRelationships();
     }
+
+    public Relationship getRelationshipById(UUID relationshipId) {
+        return relationshipRepository.findById(relationshipId)
+                .orElseThrow(() -> new NotFoundException(
+                        "Relationship not found with id: " + relationshipId
+                ));
+    }
 }
