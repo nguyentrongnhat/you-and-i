@@ -16,7 +16,6 @@ export const authGuard: CanActivateFn = async (route, state) => {
     const sessionStorageService = inject(SessionStorageService);
     
     loaderService.show();
-    console.log('Loader shown');
     
     if (!platformService.isBrowser()) {
         return true; // Allow access on the server side

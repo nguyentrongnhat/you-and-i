@@ -6,7 +6,7 @@ export interface Relationship {
   type: RelationshipType;
   name: string;
   status: RelationshipStatus;
-  startAt: string;
+  startAt: string | null;
   members: RelationshipMember[];
 }
 

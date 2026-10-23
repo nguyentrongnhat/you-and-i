@@ -31,7 +31,9 @@ export const ROUTE_PATHS = {
         path: 'management',
         fullPath: 'management',
         children: {
-            USER_DETAIL: { path: 'user/details/:id', fullPath: 'management/user/details/:id' }
+            USER_DETAIL: { path: 'user/details/:id', fullPath: 'management/user/details/:id' },
+            RELATIONSHIP_DETAIL: { path: 'relationship/details/:id', fullPath: 'management/relationship/details/:id' },
+            CREATE_RELATIONSHIP: { path: 'relationship/create', fullPath: 'management/relationship/create' }
         }
     }
 } as const;

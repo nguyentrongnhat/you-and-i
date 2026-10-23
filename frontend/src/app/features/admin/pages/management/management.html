@@ -1,16 +1,34 @@
-<div class="wrapper content max-w-[1200px] mx-auto" animate.enter="enter-animation">
-    <p-tabs [value]="0">
-        <p-tablist>
-            @for (tab of tabs; track tab.value) {
-                <p-tab [value]="tab.value">{{ tab.title }}</p-tab>
-            }
-        </p-tablist>
-        <p-tabpanels>
-            @for (tab of tabs; track tab.value) {
-                <p-tabpanel [value]="tab.value">
-                    <ng-container *ngComponentOutlet="tab.component"/>
-                </p-tabpanel>
-            }
-        </p-tabpanels>
-    </p-tabs>
+<div class="mg wrapper content">
+  <header class="mg-head">
+    <h1 class="mg-head__title">Management</h1>
+
+    @for (tab of [activeTabConfig()]; track tab.value) {
+      <p class="mg-head__text" animate.enter="mg-text-in">
+        {{ tab.description }}
+      </p>
+    }
+  </header>
+
+  <p-tabs
+    class="mg-tabs"
+    [value]="activeTab()"
+    (valueChange)="onTabChange($event)"
+  >
+    <p-tablist>
+      @for (tab of tabs; track tab.value) {
+        <p-tab [value]="tab.value">
+          <i [class]="tab.icon" aria-hidden="true"></i>
+          <span>{{ tab.title }}</span>
+        </p-tab>
+      }
+    </p-tablist>
+
+    <p-tabpanels>
+      @for (tab of tabs; track tab.value) {
+        <p-tabpanel [value]="tab.value">
+          <ng-container [ngComponentOutlet]="tab.component" />
+        </p-tabpanel>
+      }
+    </p-tabpanels>
+  </p-tabs>
 </div>

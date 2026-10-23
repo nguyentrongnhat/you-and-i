@@ -7,6 +7,10 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Server
   },
   {
+    path: ROUTE_PATHS.MANAGEMENT.children.RELATIONSHIP_DETAIL.fullPath,
+    renderMode: RenderMode.Server
+  },
+  {
     path: ROUTE_PATHS.GAME.children.FIND_NUMBER_GAME.children.PLAY_GAME_SCREEN.fullPath,
     renderMode: RenderMode.Server
   },

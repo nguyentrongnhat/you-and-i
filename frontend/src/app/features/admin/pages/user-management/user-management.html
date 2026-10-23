@@ -1,125 +1,222 @@
-<div class="user-management">
+<section class="um">
   <!-- Header -->
-  <div class="user-management__header">
-    <div class="user-management__heading">
-      <h2 class="user-management__title">
-        <i class="pi pi-users"></i>
-        Quản lý người dùng
-      </h2>
-      <p class="user-management__subtitle">
-        Tổng <strong>{{ users().length }}</strong> người dùng ·
-        <strong>{{ enabledCount() }}</strong> đang hoạt động
-      </p>
+  <header class="um-head">
+    <div class="um-head__text">
+      <h2 class="um-head__title">Quản lý người dùng</h2>
+
+      @if (isLoading()) {
+        <p-skeleton width="11rem" height="1rem" />
+      } @else {
+        <p class="um-head__summary">
+          <strong>{{ enabledCount() }}</strong> / {{ counts().all }} tài khoản
+          đang hoạt động
+        </p>
+      }
     </div>
 
-    <p-iconfield iconPosition="left" class="user-management__search">
-      <p-inputicon styleClass="pi pi-search" />
+    <div
+      class="um-meter"
+      role="img"
+      [attr.aria-label]="activeRatio() + '% tài khoản đang hoạt động'"
+    >
+      <span class="um-meter__fill" [style.width.%]="activeRatio()"></span>
+    </div>
+  </header>
+
+  <!-- Toolbar -->
+  <div class="um-toolbar">
+    <div class="um-search">
+      <i class="pi pi-search um-search__icon" aria-hidden="true"></i>
+
       <input
         pInputText
+        class="um-search__input"
         type="text"
-        placeholder="Tìm theo tên hoặc username..."
+        inputmode="search"
+        autocomplete="off"
+        placeholder="Tìm theo tên hoặc username"
+        aria-label="Tìm người dùng"
         [ngModel]="searchTerm()"
         (ngModelChange)="onSearch($event)"
+        [disabled]="isLoading()"
         fluid
       />
-    </p-iconfield>
+
+      @if (searchTerm()) {
+        <button
+          type="button"
+          class="um-search__clear"
+          aria-label="Xoá tìm kiếm"
+          (click)="onSearch('')"
+        >
+          <i class="pi pi-times" aria-hidden="true"></i>
+        </button>
+      }
+    </div>
+
+    <div class="um-filters" role="group" aria-label="Lọc theo trạng thái">
+      @for (option of filterOptions(); track option.value) {
+        <button
+          type="button"
+          class="um-filter"
+          [class.is-active]="statusFilter() === option.value"
+          [attr.aria-pressed]="statusFilter() === option.value"
+          [disabled]="isLoading()"
+          (click)="setStatusFilter(option.value)"
+        >
+          {{ option.label }}
+          <span class="um-filter__count">{{ option.count }}</span>
+        </button>
+      }
+    </div>
   </div>
 
-  <!-- Table -->
-  <div class="user-management__card">
-    <p-table
-      [value]="filteredUsers()"
-      [paginator]="true"
-      [rows]="10"
-      [loading]="loaderService.isLoading()"
-      [rowsPerPageOptions]="[10, 20, 50]"
-      [tableStyle]="{ 'min-width': '20rem' }"
-      styleClass="user-management__table p-datatable-sm"
-      currentPageReportTemplate="Hiển thị {first} – {last} trong {totalRecords}"
-      [showCurrentPageReport]="true"
-    >
-      <ng-template #header>
-        <tr>
-          <th>Người dùng</th>
-          @if (!platformService.isSmallMobileDevice()) {
-          <th>Vai trò</th>
-          <th class="user-management__col-center">Xác thực</th>
-          }
-          <th class="user-management__col-center">Hoạt động</th>
-        </tr>
-      </ng-template>
+  <div #listTop class="um-anchor"></div>
 
-      <ng-template #body let-user>
-        <tr class="user-management__row" (click)="navigateToUserDetail(user)">
-          <td>
-            <div class="user-management__user-cell">
-              @if (user.profile?.avatarUrl) {
-              <p-avatar
-                [image]="user.profile.avatarUrl"
-                shape="circle"
-                size="normal"
-                styleClass="user-management__avatar"
-              />
-              } @else {
-              <p-avatar
-                [label]="initials(user)"
-                shape="circle"
-                size="normal"
-                styleClass="user-management__avatar user-management__avatar--text"
-              />
-              }
-              <div class="user-management__user-info">
-                <span class="user-management__user-name">
-                  {{ displayName(user) }}
-                </span>
-                <span class="user-management__user-username">
-                  &#64;{{ user.username }}
-                </span>
-              </div>
-            </div>
-          </td>
+  <!-- Content -->
+  @if (isLoading()) {
+    <ul class="um-list" aria-busy="true" aria-label="Đang tải danh sách">
+      @for (row of skeletonRows; track row) {
+        <li class="um-row um-row--skeleton">
+          <p-skeleton shape="circle" size="2.75rem" />
 
-          @if (!platformService.isSmallMobileDevice()) {
-          <td>
-            <div class="user-management__roles">
-              @for (role of user.roles; track role) {
-              <p-tag [value]="role" severity="secondary" />
-              } @empty {
-              <span class="user-management__muted">—</span>
-              }
-            </div>
-          </td>
-          <td class="user-management__col-center">
-            <p-tag
-              [value]="user.emailVerified ? 'Đã xác thực' : 'Chưa'"
-              [severity]="user.emailVerified ? 'success' : 'warn'"
-              [icon]="
-                user.emailVerified ? 'pi pi-verified' : 'pi pi-exclamation-circle'
-              "
-            />
-          </td>
-          }
+          <div class="um-row__skeleton-text">
+            <p-skeleton width="9rem" height="0.9rem" />
+            <p-skeleton width="6rem" height="0.75rem" />
+          </div>
+        </li>
+      }
+    </ul>
+  } @else if (loadError()) {
+    <div class="um-state" role="alert" animate.enter="um-fade-in">
+      <span class="um-state__icon um-state__icon--error" aria-hidden="true">
+        <i class="pi pi-exclamation-triangle"></i>
+      </span>
 
-          <td class="user-management__col-center">
-            <p-toggleswitch
-              [(ngModel)]="user.enabled"
-              (click)="toggleActiveUserAccount(user); $event.stopPropagation()"
-            />
-          </td>
-        </tr>
-      </ng-template>
+      <h3 class="um-state__title">Không tải được danh sách</h3>
 
-      <ng-template #emptymessage>
-        <tr>
-          <td
-            [attr.colspan]="platformService.isSmallMobileDevice() ? 2 : 4"
-            class="user-management__empty"
+      <p class="um-state__text">
+        Đã có lỗi khi lấy dữ liệu. Hãy kiểm tra kết nối và thử lại.
+      </p>
+
+      <p-button
+        label="Thử lại"
+        icon="pi pi-refresh"
+        size="small"
+        (onClick)="loadUsers()"
+      />
+    </div>
+  } @else if (pagedUsers().length) {
+    @if (hasActiveFilters()) {
+      <p class="um-result" aria-live="polite">
+        {{ filteredUsers().length }} kết quả
+      </p>
+    }
+
+    <ul class="um-list">
+      @for (user of pagedUsers(); track user.id; let i = $index) {
+        <li
+          class="um-row"
+          [class.is-disabled]="!user.enabled"
+          [class.is-busy]="isPending(user)"
+          [style.--um-i]="i"
+          animate.enter="um-row-enter"
+        >
+          <button
+            type="button"
+            class="um-row__main"
+            (click)="navigateToUserDetail(user)"
           >
-            <i class="pi pi-inbox"></i>
-            <span>Không tìm thấy người dùng nào.</span>
-          </td>
-        </tr>
-      </ng-template>
-    </p-table>
-  </div>
-</div>
+            <p-avatar
+              class="um-avatar"
+              [style.--um-hue]="avatarHue(user)"
+              [image]="user.profile?.avatarUrl ?? undefined"
+              [label]="initials(user)"
+              shape="circle"
+              size="large"
+            />
+
+            <span class="um-row__id">
+              <span class="um-row__name">{{ displayName(user) }}</span>
+              <span class="um-row__username">&#64;{{ user.username }}</span>
+            </span>
+
+            <span class="um-row__chips">
+              @for (role of user.roles; track role) {
+                <p-tag [value]="role" severity="secondary" [rounded]="true" />
+              }
+
+              <p-tag
+                [value]="user.emailVerified ? 'Đã xác thực' : 'Chưa xác thực'"
+                [severity]="user.emailVerified ? 'success' : 'warn'"
+                [icon]="
+                  user.emailVerified
+                    ? 'pi pi-verified'
+                    : 'pi pi-exclamation-circle'
+                "
+                [rounded]="true"
+              />
+            </span>
+
+            <i class="pi pi-angle-right um-row__chevron" aria-hidden="true"></i>
+          </button>
+
+          <span class="um-row__switch">
+            <span class="um-row__switch-label">
+              {{ user.enabled ? 'Hoạt động' : 'Đã tắt' }}
+            </span>
+
+            <p-toggleswitch
+              [ngModel]="user.enabled"
+              [disabled]="isPending(user)"
+              (onChange)="toggleActiveUserAccount(user, $event.checked)"
+              [ariaLabel]="'Bật hoặc tắt tài khoản ' + displayName(user)"
+            />
+          </span>
+        </li>
+      }
+    </ul>
+
+    @if (filteredUsers().length > 10) {
+      <p-paginator
+        class="um-paginator"
+        [first]="currentFirst()"
+        [rows]="rows()"
+        [totalRecords]="filteredUsers().length"
+        [rowsPerPageOptions]="[10, 20, 50]"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="{first} – {last} / {totalRecords}"
+        (onPageChange)="onPageChange($event)"
+      />
+    }
+  } @else {
+    <div class="um-state" animate.enter="um-fade-in">
+      <span class="um-state__icon" aria-hidden="true">
+        <i [class]="hasActiveFilters() ? 'pi pi-search' : 'pi pi-users'"></i>
+      </span>
+
+      @if (hasActiveFilters()) {
+        <h3 class="um-state__title">Không tìm thấy người dùng phù hợp</h3>
+
+        <p class="um-state__text">
+          Thử đổi từ khoá hoặc bỏ bộ lọc trạng thái.
+        </p>
+
+        <p-button
+          label="Xoá bộ lọc"
+          icon="pi pi-filter-slash"
+          severity="secondary"
+          variant="outlined"
+          size="small"
+          (onClick)="clearFilters()"
+        />
+      } @else {
+        <h3 class="um-state__title">Chưa có người dùng nào</h3>
+
+        <p class="um-state__text">
+          Người dùng mới sẽ xuất hiện ở đây sau khi đăng ký.
+        </p>
+      }
+    </div>
+  }
+</section>

@@ -1,0 +1,45 @@
+// Dialogs
+
+.rd-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+
+    label {
+      font-size: 0.84rem;
+      font-weight: 600;
+    }
+  }
+
+  &__text {
+    margin: 0 0 1.25rem;
+    line-height: 1.6;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 0.4rem;
+  }
+}
+
+.rd-option {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+
+  &__name {
+    font-weight: 600;
+  }
+
+  &__sub {
+    color: var(--p-text-muted-color, #71717a);
+  }
+}

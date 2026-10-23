@@ -106,6 +106,24 @@ export const routes: Routes = [
             animation: 'UserDetailsPage',
             layout: LAYOUT.LAYOUT_1
           }
+        },
+        {
+          path: ROUTE_PATHS.MANAGEMENT.children.RELATIONSHIP_DETAIL.path,
+          loadComponent: () => import('./features/admin/pages/relationship-detail/relationship-detail').then(c => c.RelationshipDetail),
+          data: {
+            animation: 'UserDetailsPage',
+            layout: LAYOUT.LAYOUT_1,
+            mode: 'edit'
+          }
+        },
+        {
+          path: ROUTE_PATHS.MANAGEMENT.children.CREATE_RELATIONSHIP.path,
+          loadComponent: () => import('./features/admin/pages/relationship-detail/relationship-detail').then(c => c.RelationshipDetail),
+          data: {
+            animation: 'UserDetailsPage',
+            layout: LAYOUT.LAYOUT_1,
+            mode: 'create'
+          }
         }
     ]
   },

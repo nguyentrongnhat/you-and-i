@@ -1,299 +1,566 @@
-@use "variables" as v;
+// CSS only: no window checks and no device detection, so the server HTML and
+// the hydrated HTML are identical. The host is the query container, so the
+// layout follows the space the component really has (tab panel, sidebar...).
 
 :host {
   display: block;
+  width: 100%;
+  min-width: 0;
+  container: um / inline-size;
 }
 
-.user-management {
-  max-width: 980px;
-  margin: 1.25rem auto 0;
-  padding: 0.5rem 0.75rem 60px;
+.um {
+  --um-line: var(--p-content-border-color, #e4e4e7);
+  --um-surface: var(--p-content-background, #ffffff);
+  --um-hover: var(--p-content-hover-background, #f4f4f5);
+  --um-text: var(--p-text-color, #18181b);
+  --um-muted: var(--p-text-muted-color, #71717a);
+  --um-accent: var(--p-primary-color, #6366f1);
+  --um-ok: var(--p-green-500, #22c55e);
+  --um-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
+  min-width: 0;
+  color: var(--um-text);
+}
 
-  /* ---------- Header ---------- */
-  &__header {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 1rem 1.5rem;
-    flex-wrap: nowrap;
+// Header
 
-    @media (max-width: v.$breakpoint-xs) {
-      flex-wrap: wrap;
-    }
-  }
+.um-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 0;
 
-  &__heading {
+  &__text {
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
-    flex: 0 0 auto;
+    gap: 0.35rem;
+    min-width: 0;
   }
 
   &__title {
-    display: flex;
-    align-items: center;
-    gap: 0.55rem;
     margin: 0;
-    font-size: 1.45rem;
+    font-size: 1.2rem;
     font-weight: 700;
-    letter-spacing: -0.01em;
-    color: var(--p-text-color, #111827);
-
-    i {
-      font-size: 1.3rem;
-      color: var(--p-primary-color, #6366f1);
-    }
-  }
-
-  &__subtitle {
-    margin: 0;
-    font-size: 0.85rem;
-    color: var(--p-text-muted-color, #6b7280);
-
-    strong {
-      color: var(--p-text-color, #111827);
-      font-weight: 600;
-    }
-  }
-
-  &__search {
-    flex: 1 1 auto;
-    min-width: 0;
-    max-width: 380px;
-
-    @media (max-width: v.$breakpoint-xs) {
-      flex-basis: 100%;
-      max-width: 100%;
-    }
-  }
-
-  /* ---------- Card ---------- */
-  &__card {
-    background: var(--p-content-background, #fff);
-    border: 1px solid var(--p-content-border-color, #e5e7eb);
-    border-radius: 16px;
-    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04),
-      0 1px 3px rgba(16, 24, 40, 0.06);
-    /* No overflow:hidden here so the rows-per-page dropdown is not clipped */
-  }
-
-  /* ---------- Row ---------- */
-  &__row {
-    cursor: pointer;
-    transition: background-color 0.15s ease;
-
-    &:hover {
-      background: var(--p-content-hover-background, #f9fafb);
-    }
-  }
-
-  &__col-center {
-    text-align: center;
-  }
-
-  /* ---------- User cell ---------- */
-  &__user-cell {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    min-width: 0;
-  }
-
-  &__avatar {
-    flex: 0 0 auto;
-    box-shadow: 0 0 0 2px var(--p-content-background, #fff),
-      0 0 0 3px var(--p-content-border-color, #e5e7eb);
-
-    &--text {
-      background: var(--p-primary-color, #6366f1);
-      color: var(--p-primary-contrast-color, #fff);
-      font-weight: 600;
-    }
-  }
-
-  &__user-info {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
+    letter-spacing: -0.02em;
     line-height: 1.3;
   }
 
-  &__user-name {
-    font-weight: 600;
-    color: var(--p-text-color, #111827);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  &__user-username {
-    font-size: 0.78rem;
-    color: var(--p-text-muted-color, #6b7280);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  /* ---------- Roles ---------- */
-  &__roles {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.35rem;
-  }
-
-  &__muted {
-    color: var(--p-text-muted-color, #9ca3af);
-  }
-
-  /* ---------- Empty ---------- */
-  &__empty {
-    text-align: center;
-    padding: 3.5rem 1rem;
-    color: var(--p-text-muted-color, #6b7280);
-
-    i {
-      display: block;
-      font-size: 2.75rem;
-      margin-bottom: 0.85rem;
-      color: var(--p-text-muted-color, #9ca3af);
-    }
-  }
-}
-
-/* ============================================================
-   PrimeNG table deep styling
-   ============================================================ */
-:host ::ng-deep .user-management__table {
-  /* Header */
-  .p-datatable-thead > tr > th {
-    background: var(--p-content-hover-background, #f9fafb);
-    color: var(--p-text-muted-color, #6b7280);
-    font-size: 0.72rem;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    padding: 0.85rem 1rem;
-    border-bottom: 1px solid var(--p-content-border-color, #e5e7eb);
-
-    &:first-child {
-      border-top-left-radius: 16px;
-    }
-    &:last-child {
-      border-top-right-radius: 16px;
-    }
-  }
-
-  /* Body cells */
-  .p-datatable-tbody > tr > td {
-    padding: 0.75rem 1rem;
-    border-bottom: 1px solid var(--p-content-border-color, #f1f3f5);
-    vertical-align: middle;
-  }
-
-  /* Remove the last row divider so it meets the paginator cleanly */
-  .p-datatable-tbody > tr:last-child > td {
-    border-bottom: none;
-  }
-}
-
-/* ============================================================
-   Refined pagination
-   ============================================================ */
-:host ::ng-deep .user-management__table .p-paginator {
-  display: flex;
-  width: 100%;
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.85rem 1rem;
-  background: transparent;
-  border-top: 1px solid var(--p-content-border-color, #e5e7eb);
-  border-bottom-left-radius: 16px;
-  border-bottom-right-radius: 16px;
-
-  .p-paginator-current {
-    margin-right: auto;
-    font-size: 0.8rem;
-    color: var(--p-text-muted-color, #6b7280);
-  }
-
-  .p-paginator-rpp-dropdown,
-  .p-select {
-    margin-left: auto;
-  }
-
-  .p-paginator-pages {
-    display: flex;
-    gap: 0.25rem;
-  }
-
-  .p-paginator-page,
-  .p-paginator-first,
-  .p-paginator-prev,
-  .p-paginator-next,
-  .p-paginator-last {
-    min-width: 2.1rem;
-    height: 2.1rem;
+  &__summary {
     margin: 0;
-    border-radius: 9px;
-    color: var(--p-text-muted-color, #6b7280);
-    transition: background-color 0.15s ease, color 0.15s ease,
-      transform 0.12s ease;
+    color: var(--um-muted);
+    font-size: 0.88rem;
+    font-variant-numeric: tabular-nums;
 
-    &:not(.p-disabled):hover {
-      background: var(--p-content-hover-background, #f3f4f6);
-      color: var(--p-text-color, #111827);
-    }
-
-    &:not(.p-disabled):active {
-      transform: scale(0.93);
+    strong {
+      color: var(--um-text);
+      font-weight: 650;
     }
   }
+}
 
-  .p-paginator-page.p-paginator-page-selected,
-  .p-paginator-page[aria-current="page"] {
-    background: var(--p-primary-color, #6366f1);
-    color: var(--p-primary-contrast-color, #fff);
-    font-weight: 600;
-    box-shadow: 0 1px 2px rgba(99, 102, 241, 0.35);
+// Ratio of active accounts, the one expressive element of the list
+.um-meter {
+  width: 100%;
+  height: 0.4rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--um-hover);
+
+  &__fill {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--um-ok);
+    transition: width 0.7s var(--um-ease);
+  }
+}
+
+// Toolbar
+
+.um-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.um-search {
+  position: relative;
+  min-width: 0;
+
+  &__input {
+    padding-inline: 2.5rem 2.4rem;
+  }
+
+  &__icon {
+    position: absolute;
+    top: 50%;
+    left: 0.9rem;
+    z-index: 1;
+    color: var(--um-muted);
+    font-size: 0.9rem;
+    pointer-events: none;
+    transform: translateY(-50%);
+  }
+
+  &__clear {
+    position: absolute;
+    top: 50%;
+    right: 0.4rem;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--um-muted);
+    cursor: pointer;
+    transform: translateY(-50%);
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+    animation: um-pop 0.25s var(--um-ease) both;
 
     &:hover {
-      background: var(--p-primary-color, #6366f1);
-      color: var(--p-primary-contrast-color, #fff);
-    }
-  }
-
-  /* Rows-per-page select */
-  .p-paginator-rpp-dropdown,
-  .p-select {
-    height: 2.1rem;
-    min-width: 4.5rem;
-    border-radius: 9px;
-    align-items: center;
-  }
-
-  @media (max-width: v.$breakpoint-xs) {
-    flex-wrap: wrap;
-    justify-content: center;
-
-    .p-paginator-current {
-      width: 100%;
-      margin-right: 0;
-      text-align: center;
-      order: 2;
+      background: var(--um-hover);
+      color: var(--um-text);
     }
 
-    .p-paginator-rpp-dropdown,
-    .p-select {
-      margin-left: 0;
+    &:focus-visible {
+      outline: 2px solid var(--um-accent);
+      outline-offset: 1px;
+    }
+
+    i {
+      font-size: 0.75rem;
     }
   }
 }
 
-/* Ensure the rows-per-page overlay shows all options (not clipped/short) */
-:host ::ng-deep .p-select-overlay .p-select-list-container {
-  max-height: 16rem;
+.um-filters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border: 1px solid var(--um-line);
+  border-radius: 999px;
+  background: var(--um-hover);
+}
+
+.um-filter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-width: 0;
+  padding: 0.45rem 0.6rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--um-muted);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    box-shadow 0.25s ease;
+
+  &:hover:not(:disabled, .is-active) {
+    color: var(--um-text);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--um-accent);
+    outline-offset: 1px;
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+
+  &.is-active {
+    background: var(--um-surface);
+    color: var(--um-text);
+    box-shadow: 0 0 0 1px var(--um-line), 0 2px 6px rgb(0 0 0 / 8%);
+  }
+
+  &__count {
+    min-width: 1.4rem;
+    padding: 0 0.4rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--um-text) 8%, transparent);
+    font-size: 0.74rem;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.5;
+    text-align: center;
+    transition: background-color 0.25s ease;
+  }
+
+  &.is-active &__count {
+    background: color-mix(in srgb, var(--um-accent) 16%, transparent);
+  }
+}
+
+.um-anchor {
+  // Scroll target when the page changes, kept just above the list
+  scroll-margin-top: 4.5rem;
+  margin-top: -0.5rem;
+}
+
+.um-result {
+  margin: 0;
+  color: var(--um-muted);
+  font-size: 0.82rem;
+}
+
+// List and rows
+
+.um-list {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--um-line);
+  border-radius: 1.25rem;
+  background: var(--um-surface);
+  list-style: none;
+}
+
+.um-row {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  border-bottom: 1px solid var(--um-line);
+  transition: background-color 0.2s ease;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  &:hover {
+    background: var(--um-hover);
+  }
+
+  &__main {
+    display: grid;
+    flex: 1;
+    grid-template-areas:
+      'avatar id'
+      'avatar chips';
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    column-gap: 0.85rem;
+    row-gap: 0.4rem;
+    min-width: 0;
+    padding: 0.85rem 0.5rem 0.85rem 0.9rem;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid var(--um-accent);
+      outline-offset: -2px;
+    }
+
+    .um-avatar {
+      grid-area: avatar;
+    }
+  }
+
+  &__id {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    grid-area: id;
+    min-width: 0;
+    transition: opacity 0.25s ease;
+  }
+
+  &__name,
+  &__username {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__name {
+    font-size: 0.94rem;
+    font-weight: 650;
+    line-height: 1.4;
+  }
+
+  &__username {
+    color: var(--um-muted);
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+
+  &__chips {
+    display: flex;
+    flex-wrap: wrap;
+    grid-area: chips;
+    gap: 0.35rem;
+    min-width: 0;
+  }
+
+  &__chevron {
+    display: none;
+    grid-area: chevron;
+    color: var(--um-muted);
+    font-size: 0.85rem;
+    opacity: 0;
+    transform: translateX(-0.35rem);
+    transition:
+      opacity 0.2s ease,
+      transform 0.3s var(--um-ease);
+  }
+
+  &__main:hover &__chevron,
+  &__main:focus-visible &__chevron {
+    opacity: 1;
+    transform: none;
+  }
+
+  &__switch {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 0.6rem;
+    padding: 0 1rem 0 0.25rem;
+  }
+
+  &__switch-label {
+    display: none;
+    min-width: 4.5rem;
+    color: var(--um-muted);
+    font-size: 0.8rem;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  &.is-disabled .um-avatar,
+  &.is-disabled &__id {
+    opacity: 0.55;
+  }
+
+  &.is-busy &__switch {
+    opacity: 0.6;
+  }
+
+  &--skeleton {
+    gap: 0.85rem;
+    padding: 0.95rem 1rem;
+  }
+
+  &__skeleton-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+}
+
+.um-avatar {
+  flex-shrink: 0;
+  background: hsl(var(--um-hue, 220) 80% 55% / 0.16);
+  color: hsl(var(--um-hue, 220) 70% 45%);
+  font-weight: 700;
+}
+
+// Empty and error states
+
+.um-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem 1.25rem;
+  border: 1px dashed var(--um-line);
+  border-radius: 1.25rem;
+  text-align: center;
+
+  &__icon {
+    display: grid;
+    place-items: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 50%;
+    background: color-mix(in srgb, var(--um-accent) 14%, transparent);
+    color: var(--um-accent);
+    font-size: 1.15rem;
+
+    &--error {
+      background: color-mix(in srgb, var(--p-red-500, #ef4444) 14%, transparent);
+      color: var(--p-red-500, #ef4444);
+    }
+  }
+
+  &__title {
+    margin: 1rem 0 0;
+    font-size: 1rem;
+    font-weight: 650;
+  }
+
+  &__text {
+    max-width: 22rem;
+    margin: 0.35rem 0 1.1rem;
+    color: var(--um-muted);
+    font-size: 0.86rem;
+    line-height: 1.6;
+  }
+}
+
+// Paginator
+
+.um-paginator {
+  display: block;
+
+  ::ng-deep .p-paginator {
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 0.25rem 0;
+    border: 0;
+    background: transparent;
+  }
+}
+
+// Animations
+
+@keyframes um-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.4rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes um-fade {
+  from {
+    opacity: 0;
+    transform: translateY(0.3rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes um-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.5);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+}
+
+// Classes used by animate.enter in the template. Rows reveal with a short
+// stagger (capped at 8 steps) after the data arrives or the page changes.
+.um-row-enter {
+  animation: um-row-in 0.35s var(--um-ease) both;
+  animation-delay: calc(min(var(--um-i, 0), 8) * 28ms);
+}
+
+.um-fade-in {
+  animation: um-fade 0.4s var(--um-ease) both;
+}
+
+// Container breakpoints (mobile first)
+
+@container um (min-width: 30rem) {
+  .um-row__switch-label {
+    display: block;
+  }
+}
+
+@container um (min-width: 44rem) {
+  .um-head {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+  }
+
+  .um-meter {
+    width: 14rem;
+  }
+
+  .um-toolbar {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .um-search {
+    flex: 1;
+    max-width: 26rem;
+  }
+
+  .um-filters {
+    display: inline-flex;
+  }
+
+  .um-filter {
+    padding-inline: 0.9rem;
+  }
+
+  .um-row__main {
+    grid-template-areas: 'avatar id chips chevron';
+    grid-template-columns: auto minmax(0, 1fr) auto 1rem;
+    column-gap: 1rem;
+    padding: 0.8rem 0.5rem 0.8rem 1.1rem;
+  }
+
+  .um-row__chips {
+    justify-content: flex-end;
+  }
+
+  .um-row__chevron {
+    display: block;
+  }
+
+  .um-row__switch {
+    padding-right: 1.25rem;
+  }
+}
+
+// On narrow containers the page numbers are dropped, arrows and the
+// range text are enough
+@container um (max-width: 36rem) {
+  .um-paginator ::ng-deep .p-paginator-pages {
+    display: none;
+  }
+}
+
+// Reduced motion
+
+@media (prefers-reduced-motion: reduce) {
+  .um,
+  .um *,
+  .um-row-enter,
+  .um-fade-in {
+    animation-delay: 0s !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

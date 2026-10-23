@@ -73,6 +73,15 @@ export class NavigationService {
     return this.router.navigate(['/', ...url.split('/')], extras);
   }
 
+  goToRelationshipDetail(id: string, extras?: NavigationExtras): Promise<boolean> {
+    const url = ROUTE_PATHS.MANAGEMENT.children.RELATIONSHIP_DETAIL.fullPath.replace(':id', id);
+    return this.router.navigate(['/', ...url.split('/')], extras);
+  }
+
+  goToCreateRelationship(extras?: NavigationExtras): Promise<boolean> {
+    return this.navigate(ROUTE_PATHS.MANAGEMENT.children.CREATE_RELATIONSHIP.fullPath, extras);
+  }
+
   /** Navigate to an absolute URL string. */
   navigate(url: string, extras?: NavigationExtras): Promise<boolean> {
     return this.router.navigateByUrl(url, extras);
@@ -80,7 +89,6 @@ export class NavigationService {
 
   /** Navigate using a router command array (for parameterized routes). */
   navigateByCommands(commands: unknown[], extras?: NavigationExtras): Promise<boolean> {
-    console.log('Navigating with commands:', commands.join('/'));
     return this.router.navigate(commands, extras);
   }
 }

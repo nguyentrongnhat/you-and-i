@@ -1,0 +1,240 @@
+// CSS only: no window checks, no viewport JS. Safe for SSR and hydration.
+// The host is the query container, so the layout follows the space the
+// component really has (for example next to a sidebar), not the viewport.
+
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  container: mg / inline-size;
+}
+
+.mg {
+  --mg-line: var(--p-content-border-color, #e4e4e7);
+  --mg-surface: var(--p-content-background, #ffffff);
+  --mg-track: var(--p-content-hover-background, #f4f4f5);
+  --mg-text: var(--p-text-color, #18181b);
+  --mg-muted: var(--p-text-muted-color, #71717a);
+  --mg-ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 75rem;
+  min-width: 0;
+  margin-inline: auto;
+  color: var(--mg-text);
+  animation: mg-enter 0.45s var(--mg-ease) both;
+}
+
+// Heading
+
+.mg-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+
+  &__title {
+    margin: 0;
+    font-size: clamp(1.4rem, 1.05rem + 1.4vw, 2rem);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+  }
+
+  &__text {
+    margin: 0;
+    color: var(--mg-muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+}
+
+// Tabs, restyled as a segmented control with a sliding pill.
+// PrimeNG moves .p-tablist-active-bar under the active tab, we only
+// change how it looks.
+
+.mg-tabs {
+  display: block;
+  min-width: 0;
+
+  ::ng-deep {
+    .p-tablist-content {
+      background: transparent;
+    }
+
+    .p-tablist-tab-list {
+      position: relative;
+      display: flex;
+      width: 100%;
+      gap: 0.25rem;
+      padding: 0.25rem;
+      border: 1px solid var(--mg-line);
+      border-radius: 999px;
+      background: var(--mg-track);
+    }
+
+    .p-tab {
+      position: relative;
+      z-index: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      gap: 0.5rem;
+      padding: 0.6rem 1.1rem;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--mg-muted);
+      font-size: 0.92rem;
+      font-weight: 600;
+      white-space: nowrap;
+      transition: color 0.25s ease;
+
+      i {
+        font-size: 0.9rem;
+        transition: transform 0.35s var(--mg-ease);
+      }
+
+      &:hover {
+        color: var(--mg-text);
+      }
+
+      &:focus-visible {
+        outline: 2px solid var(--p-primary-color, #6366f1);
+        outline-offset: 2px;
+      }
+    }
+
+    .p-tab-active {
+      color: var(--mg-text);
+
+      i {
+        transform: scale(1.15);
+      }
+    }
+
+    .p-tablist-active-bar {
+      top: 0.25rem;
+      bottom: 0.25rem;
+      z-index: 0;
+      height: auto;
+      border-radius: 999px;
+      background: var(--mg-surface);
+      box-shadow:
+        0 0 0 1px var(--mg-line),
+        0 2px 6px rgb(0 0 0 / 8%);
+      transition:
+        left 0.4s var(--mg-ease),
+        width 0.4s var(--mg-ease);
+    }
+
+    .p-tabpanels {
+      padding: 1.25rem 0 0;
+      background: transparent;
+      color: inherit;
+    }
+
+    .p-tabpanel {
+      min-width: 0;
+      animation: mg-panel-in 0.4s var(--mg-ease) both;
+    }
+  }
+}
+
+// Animations
+
+@keyframes mg-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes mg-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.6rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes mg-text-in {
+  from {
+    opacity: 0;
+    transform: translateX(-0.4rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+// Class used by animate.enter in the template
+.mg-text-in {
+  animation: mg-text-in 0.35s var(--mg-ease) both;
+}
+
+// Container breakpoints (mobile first)
+
+@container mg (min-width: 36rem) {
+  .mg {
+    gap: 1.5rem;
+  }
+
+  .mg-tabs ::ng-deep {
+    .p-tablist-tab-list {
+      display: inline-flex;
+      width: fit-content;
+    }
+
+    .p-tab {
+      flex: 0 0 auto;
+      padding-inline: 1.4rem;
+    }
+
+    .p-tabpanels {
+      padding-top: 1.5rem;
+    }
+  }
+}
+
+// Very narrow containers: keep icon and label, tighten the spacing
+@container mg (max-width: 22rem) {
+  .mg-tabs ::ng-deep .p-tab {
+    gap: 0.35rem;
+    padding-inline: 0.6rem;
+    font-size: 0.85rem;
+  }
+}
+
+// Reduced motion
+
+@media (prefers-reduced-motion: reduce) {
+  .mg,
+  .mg *,
+  .mg-text-in {
+    animation-delay: 0s !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .mg-tabs ::ng-deep .p-tabpanel,
+  .mg-tabs ::ng-deep .p-tablist-active-bar {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

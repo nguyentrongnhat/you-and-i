@@ -1,5 +1,5 @@
 import { computed, inject, Injectable, signal } from "@angular/core";
-import { Observable } from "rxjs";
+import { Observable, tap } from "rxjs";
 import { UserDetails } from "../../../core/interfaces/user.dtos";
 import { HttpClientService } from "../../../services/http-client.service";
 import { ROLE } from "../../../core/enums";
@@ -12,6 +12,8 @@ export class UserService {
 
     public currentUser = signal<UserDetails | undefined>(undefined);
 
+    public allUsers = signal<UserDetails[]>([]);
+
     public readonly userRoles = computed<string[]>(() => {
         return this.currentUser()?.roles || [];
     })
@@ -21,7 +23,9 @@ export class UserService {
     }
 
     public getAllUsers(): Observable<UserDetails[]> {
-        return this.httpClientService.get('/user/all');
+        return this.httpClientService.get<UserDetails[]>('/user/all').pipe(
+            tap(users => this.allUsers.set(users))
+        ); 
     }
 
     public updateUserData(userData: any): Observable<UserDetails> {

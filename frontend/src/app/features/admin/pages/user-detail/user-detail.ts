@@ -154,7 +154,7 @@ export class UserDetail implements OnInit {
 		this.getUserDetailsById(this.id());
 		this.roleService.getAllRoles().pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.loaderService.hide())).subscribe({
 			next: (roles) => {
-				console.log('Roles fetched:', roles); // Roles are fetched and cached in the service, no further action needed here
+			// Roles are fetched and cached in the service, no further action needed here
 			}
 		});
 	}
