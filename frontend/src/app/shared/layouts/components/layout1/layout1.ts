@@ -135,7 +135,7 @@ export class Layout1 implements OnInit {
                 requiredRoles: []
             },
             {
-                name: 'Users Management',
+                name: 'Admin',
                 icon: 'pi-th-large',
                 url: this.ROUTE_PATHS.MANAGEMENT.fullPath,
                 active: false,
