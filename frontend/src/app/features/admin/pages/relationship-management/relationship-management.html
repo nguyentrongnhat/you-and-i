@@ -1,110 +1,185 @@
-<div class="flex justify-end mb-4" style="margin-top: 30px; margin-bottom: 70px;">
-  <p-button
-    label="Create"
-    icon="pi pi-plus"
-    (click)="navigateToCreateRelationship()"
-  />
-</div>
+<section class="rm" style="margin-top: 30px; margin-bottom: 200px;">
+  @if (isLoading() || allRelationships().length) {
+    <div class="rm__toolbar">
+      <p-button
+        label="Tạo mối quan hệ"
+        icon="pi pi-plus"
+        [fluid]="true"
+        (onClick)="navigateToCreateRelationship()"
+      />
+    </div>
+  }
 
-<div class="card">
-  <p-dataview [value]="allRelationships()" [rows]="5" [paginator]="true">
-    <ng-template #list let-items>
-      <div class="grid grid-cols-12 gap-4 grid-nogutter">
-        <div *ngFor="let item of items; let first = first" class="col-span-12">
-          <div
-            class="flex flex-col sm:flex-row sm:items-center p-6 gap-4"
-            [ngClass]="{
-              'border-t border-surface-200 dark:border-surface-700': !first,
-            }"
-          >
-            <div class="md:w-40 relative">
-              <img
-                class="block xl:block mx-auto rounded-border w-full"
-                src="https://primefaces.org/cdn/primeng/images/demo/product/bamboo-watch.jpg"
-                [alt]="item.name ?? ''"
-              />
-
-              <p-tag
-                [value]="item.status"
-                severity="contrast"
-                class="absolute"
-                styleClass="dark:!bg-surface-900"
-                [style.left.px]="4"
-                [style.top.px]="4"
-              />
-            </div>
-
-            <div class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-6">
-              <div class="flex flex-row md:flex-col justify-between items-start gap-2">
-                <div>
-                  <span class="font-medium text-secondary text-sm">
-                    {{ item.type }}
-                  </span>
-
-                  <div class="text-lg font-medium text-surface-900 dark:text-surface-0 mt-2">
-                    {{ item?.name ?? '' }}
-                  </div>
-                </div>
-              </div>
-
-              <div class="flex flex-col md:items-end gap-8">
-                <span class="text-xl font-semibold text-surface-900 dark:text-surface-0">
-                  {{ item.members.length }} members
-                </span>
-
-                <div class="flex flex-row-reverse md:flex-row gap-2">
-                  <p-button
-                    icon="pi pi-pencil"
-                    [outlined]="true"
-                    (click)="navigateToRelationshipDetail(item.id)"
-                  />
-
-                  <p-button
-                    icon="pi pi-trash"
-                    severity="danger"
-                    [outlined]="true"
-                    (click)="confirmDeleteRelationship(item.id)"
-                  />
-                </div>
-              </div>
+  @if (isLoading()) {
+    <div
+      class="rm-grid"
+      role="status"
+      aria-busy="true"
+      aria-label="Đang tải danh sách mối quan hệ"
+    >
+      @for (n of [0, 1, 2]; track n) {
+        <div class="rm-card" aria-hidden="true">
+          <div class="rm-card__head">
+            <p-skeleton width="2.75rem" height="2.75rem" borderRadius=".85rem" />
+            <div class="rm-card__text">
+              <p-skeleton width="70%" height="1.1rem" />
+              <p-skeleton width="35%" height=".85rem" />
             </div>
           </div>
+          <div class="rm-card__foot">
+            <p-skeleton width="5.5rem" height="2rem" borderRadius="1rem" />
+          </div>
         </div>
-      </div>
-    </ng-template>
-  </p-dataview>
-</div>
+      }
+    </div>
+  } @else if (allRelationships().length) {
+    <p-dataview
+      [value]="allRelationships()"
+      [rows]="6"
+      [paginator]="true"
+      [alwaysShowPaginator]="false"
+      [pageLinks]="3"
+    >
+      <ng-template #list let-items>
+        <ul class="rm-grid">
+          @for (item of items; track item.id ?? $index; let i = $index) {
+            @let meta = getTypeMeta(item.type);
 
-<!-- Delete dialog -->
+            <li class="rm-item" [style.--i]="i">
+              <article
+                class="rm-card rm-card--interactive"
+                [class.rm-card--inactive]="item.status === Status.INACTIVE"
+                [attr.data-type]="item.type"
+              >
+                <div class="rm-card__head">
+                  <span class="rm-tile" aria-hidden="true">
+                    <i [class]="'pi ' + meta.icon"></i>
+                  </span>
+
+                  <div class="rm-card__text">
+                    <h3 class="rm-card__name">
+                      <button
+                        type="button"
+                        class="rm-card__open"
+                        (click)="navigateToRelationshipDetail(item.id!)"
+                      >
+                        {{ item.name || 'Chưa đặt tên' }}
+                      </button>
+                    </h3>
+
+                    <div class="rm-card__meta">
+                      <span class="rm-card__type">{{ meta.label }}</span>
+                      @if (item.status === Status.INACTIVE) {
+                        <p-tag value="Tạm ngưng" severity="secondary" />
+                      }
+                    </div>
+                  </div>
+
+                  <p-button
+                    class="rm-card__delete"
+                    icon="pi pi-trash"
+                    severity="danger"
+                    [text]="true"
+                    [rounded]="true"
+                    [ariaLabel]="'Xóa ' + (item.name || 'mối quan hệ')"
+                    (onClick)="confirmDeleteRelationship(item.id!)"
+                  />
+                </div>
+
+                <div class="rm-card__foot">
+                  @if (item.members.length) {
+                    <p-avatargroup
+                      class="rm-avatars"
+                      role="group"
+                      [attr.aria-label]="item.members.length + ' thành viên'"
+                    >
+                      @for (member of item.members.slice(0, maxAvatars); track $index) {
+                        <p-avatar
+                          shape="circle"
+                          [label]="memberInitial(member)"
+                          [pTooltip]="memberName(member)"
+                          tooltipPosition="top"
+                        />
+                      }
+                      @if (item.members.length > maxAvatars) {
+                        <p-avatar
+                          shape="circle"
+                          [label]="'+' + (item.members.length - maxAvatars)"
+                        />
+                      }
+                    </p-avatargroup>
+                  } @else {
+                    <span class="rm-card__muted">Chưa có thành viên</span>
+                  }
+
+                  @if (item.startAt) {
+                    <time class="rm-card__muted" [attr.datetime]="item.startAt">
+                      Từ {{ item.startAt | date: 'dd/MM/yyyy' }}
+                    </time>
+                  }
+                </div>
+              </article>
+            </li>
+          }
+        </ul>
+      </ng-template>
+    </p-dataview>
+  } @else {
+    <div class="rm-empty">
+      <div class="rm-empty__tiles" aria-hidden="true">
+        @for (type of typeList; track type; let i = $index) {
+          <span class="rm-tile" [attr.data-type]="type" [style.--i]="i">
+            <i [class]="'pi ' + typeMeta[type].icon"></i>
+          </span>
+        }
+      </div>
+
+      <h2 class="rm-empty__title">Chưa có mối quan hệ nào</h2>
+      <p class="rm-empty__text">Tạo mối quan hệ đầu tiên, sau đó thêm thành viên vào.</p>
+
+      <p-button
+        label="Tạo mối quan hệ"
+        icon="pi pi-plus"
+        (onClick)="navigateToCreateRelationship()"
+      />
+    </div>
+  }
+</section>
+
 <p-dialog
   [(visible)]="displayConfirmDeleteDialog"
-  header="Delete relationship"
+  header="Xóa mối quan hệ"
   [modal]="true"
   [draggable]="false"
   [dismissableMask]="true"
   appendTo="body"
-  [style]="{ width: '26rem', 'max-width': '94vw' }"
+  [style]="{ width: '26rem', maxWidth: 'calc(100vw - 2rem)' }"
 >
-  <p class="rd-dialog__text">
-    <strong>{{ allRelationships().find(r => r.id === relationshipIdToDelete())?.name || 'This relationship' }}</strong>
-    and its member list will be removed. This cannot be undone.
+  <p class="rm-dialog__text">
+    <strong>{{ deleteTargetName() || 'Mối quan hệ này' }}</strong>
+    cùng danh sách thành viên sẽ bị xóa vĩnh viễn. Hành động này không thể hoàn tác.
   </p>
 
-  <div class="rd-dialog__actions">
-    <p-button
-      type="button"
-      label="Cancel"
-      severity="secondary"
-      variant="outlined"
-      (click)="cancelDeleteRelationship()"
-    />
+  <ng-template #footer>
+    <div class="rm-dialog__actions">
+      <p-button
+        type="button"
+        label="Hủy"
+        severity="secondary"
+        variant="text"
+        [fluid]="true"
+        [autofocus]="true"
+        (onClick)="cancelDeleteRelationship()"
+      />
 
-    <p-button
-      type="button"
-      label="Delete"
-      icon="pi pi-trash"
-      severity="danger"
-      (click)="deleteRelationship()"
-    />
-  </div>
+      <p-button
+        type="button"
+        label="Xóa"
+        icon="pi pi-trash"
+        severity="danger"
+        [fluid]="true"
+        (onClick)="deleteRelationship()"
+      />
+    </div>
+  </ng-template>
 </p-dialog>
