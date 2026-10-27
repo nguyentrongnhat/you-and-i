@@ -20,7 +20,12 @@ import com.nguyen_trong_nhat.you_and_i.features.user.repository.UserRepository;
 import com.nguyen_trong_nhat.you_and_i.features.user.service.UserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +34,7 @@ import java.util.*;
 
 @RequiredArgsConstructor
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -38,6 +43,15 @@ public class UserServiceImpl implements UserService {
     private final UserDataMapper userDataMapper;
     private final RelationshipCacheService relationshipCacheService;
     private final FindNumberGameBestRecordCacheService findNumberGameBestRecordCacheService;
+
+    @Override
+    @NullMarked
+    @Cacheable(value = "userDetails", key = "#username")
+    public UserDetails loadUserByUsername(String username) {
+        return userRepository.findByUsername(username)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("User not found"));
+    }
 
     @Override
     @CacheEvict(value = "userDetails", key = "#username.toLowerCase()")
