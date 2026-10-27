@@ -1,45 +1,350 @@
-// Dialogs
+:host {
+  display: block;
+}
 
-.rd-dialog {
+// ---------------------------------------------------------------------------
+// Màu theo loại quan hệ. Mọi thứ khác dùng token của PrimeNG nên theo theme
+// (sáng/tối) tự động.
+// ---------------------------------------------------------------------------
+[data-type='ROMANTIC'] {
+  --rm-accent: #e0457b;
+}
+
+[data-type='FRIENDSHIP'] {
+  --rm-accent: #e08a1e;
+}
+
+[data-type='FAMILY'] {
+  --rm-accent: #16a37f;
+}
+
+[data-type='GROUP'] {
+  --rm-accent: #5b6cf0;
+}
+
+[data-type] {
+  // Màu chữ/icon: pha về màu text để đủ tương phản ở cả sáng và tối
+  --rm-ink: color-mix(in srgb, var(--rm-accent) 62%, var(--p-text-color));
+}
+
+// ---------------------------------------------------------------------------
+// Bố cục
+// ---------------------------------------------------------------------------
+.rm {
   display: flex;
   flex-direction: column;
-  gap: 1.1rem;
+  gap: 1.25rem;
+}
 
-  &__row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
+.rm__toolbar {
+  display: flex;
+  justify-content: flex-end;
+  animation: rm-fade 0.35s ease backwards;
+}
 
-    label {
-      font-size: 0.84rem;
-      font-weight: 600;
-    }
-  }
+.rm-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
+  gap: 1rem;
+  margin: 0 0 0.5rem;
+  padding: 0;
+  list-style: none;
+}
 
-  &__text {
-    margin: 0 0 1.25rem;
-    line-height: 1.6;
-  }
+.rm-item {
+  animation: rm-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: calc(var(--i, 0) * 70ms);
+}
 
-  &__actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.5rem;
-    margin-top: 0.4rem;
+// ---------------------------------------------------------------------------
+// Card
+// ---------------------------------------------------------------------------
+.rm-card {
+  --p-avatar-background: color-mix(in srgb, var(--rm-accent) 16%, var(--p-content-background));
+  --p-avatar-color: var(--rm-ink);
+  --p-avatar-group-border-color: var(--p-content-background);
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  height: 100%;
+  padding: 1.1rem;
+  background: var(--p-content-background);
+  border: 1px solid var(--p-content-border-color);
+  border-radius: var(--p-content-border-radius, 0.75rem);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.3s ease,
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+
+  // Tạm ngưng: bỏ màu loại, về xám trung tính
+  &.rm-card--inactive {
+    --rm-accent: var(--p-surface-500);
   }
 }
 
-.rd-option {
-  display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
+.rm-card--interactive {
+  &:active {
+    transform: scale(0.985);
+  }
+}
 
-  &__name {
-    font-weight: 600;
+@media (hover: hover) {
+  .rm-card--interactive:hover {
+    border-color: color-mix(in srgb, var(--rm-accent) 45%, var(--p-content-border-color));
+    box-shadow: 0 0.9rem 1.6rem -1.1rem color-mix(in srgb, var(--rm-accent) 70%, transparent);
+    transform: translateY(-3px);
+
+    &:active {
+      transform: scale(0.985);
+    }
+
+    .rm-tile {
+      transform: rotate(-7deg) scale(1.08);
+    }
+  }
+}
+
+.rm-card__head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.rm-card__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.rm-card__name {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--p-text-color);
+  overflow-wrap: anywhere;
+}
+
+// Nút tên phủ kín cả card để bấm đâu cũng mở chi tiết
+.rm-card__open {
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: start;
+  background: none;
+  border: 0;
+  cursor: pointer;
+  appearance: none;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--p-content-border-radius, 0.75rem);
   }
 
-  &__sub {
-    color: var(--p-text-muted-color, #71717a);
+  &:focus-visible {
+    outline: none;
+  }
+
+  &:focus-visible::after {
+    outline: 2px solid var(--p-primary-color);
+    outline-offset: 2px;
+  }
+}
+
+.rm-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rm-card__type {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--rm-ink);
+}
+
+.rm-card__delete {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  margin: -0.3rem -0.3rem 0 0;
+}
+
+.rm-card__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 2.75rem;
+  margin-top: auto;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--p-content-border-color);
+}
+
+.rm-card__muted {
+  font-size: 0.82rem;
+  color: var(--p-text-muted-color);
+  white-space: nowrap;
+}
+
+// Chỉ avatar nổi lên trên lớp phủ để tooltip hoạt động
+.rm-avatars {
+  position: relative;
+  z-index: 1;
+}
+
+:host ::ng-deep .rm-avatars .p-avatar + .p-avatar {
+  transition: margin-inline-start 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (hover: hover) {
+  :host ::ng-deep .rm-card--interactive:hover .rm-avatars .p-avatar + .p-avatar {
+    margin-inline-start: -0.35rem;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Ô icon theo loại
+// ---------------------------------------------------------------------------
+.rm-tile {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  font-size: 1.15rem;
+  color: var(--rm-ink);
+  background: color-mix(in srgb, var(--rm-accent) 14%, transparent);
+  border-radius: 0.85rem;
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+// ---------------------------------------------------------------------------
+// Trạng thái trống
+// ---------------------------------------------------------------------------
+.rm-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 3.5rem 1.5rem;
+  text-align: center;
+  border: 1px dashed var(--p-content-border-color);
+  border-radius: var(--p-content-border-radius, 0.75rem);
+  animation: rm-fade 0.4s ease backwards;
+
+  &__tiles {
+    display: flex;
+    gap: 0.6rem;
+    margin-bottom: 0.75rem;
+
+    .rm-tile {
+      width: 3.25rem;
+      height: 3.25rem;
+      font-size: 1.3rem;
+      animation: rm-pop 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+      animation-delay: calc(var(--i, 0) * 90ms + 100ms);
+    }
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--p-text-color);
+  }
+
+  &__text {
+    max-width: 30ch;
+    margin: 0 0 1rem;
+    line-height: 1.5;
+    color: var(--p-text-muted-color);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Dialog xóa
+// ---------------------------------------------------------------------------
+.rm-dialog__text {
+  margin: 0;
+  line-height: 1.6;
+  color: var(--p-text-color);
+  overflow-wrap: anywhere;
+}
+
+.rm-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  width: 100%;
+
+  p-button {
+    flex: 0 0 auto;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Mobile
+// ---------------------------------------------------------------------------
+@media (max-width: 575px) {
+  .rm__toolbar p-button {
+    flex: 1;
+  }
+
+  .rm-card {
+    gap: 0.85rem;
+    padding: 1rem;
+  }
+
+  .rm-empty {
+    padding: 2.5rem 1rem;
+  }
+
+  .rm-dialog__actions p-button {
+    flex: 1 1 0;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Keyframes
+// ---------------------------------------------------------------------------
+@keyframes rm-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+}
+
+@keyframes rm-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes rm-pop {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.55) rotate(-14deg);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Tôn trọng người dùng tắt hiệu ứng chuyển động
+// ---------------------------------------------------------------------------
+@media (prefers-reduced-motion: reduce) {
+  .rm,
+  .rm *,
+  .rm *::before,
+  .rm *::after {
+    animation: none !important;
+    transition: none !important;
   }
 }
