@@ -19,7 +19,7 @@ export class GameTable implements OnInit, AfterViewInit {
 
 	protected screenWidth = signal(0);
 
-	protected columns = computed(() => this.screenWidth() < 768 ? 5 : 10);
+	protected columns = computed(() => this.screenWidth() < 768 ? 5 : 7);
 
 	protected numbers = signal<NumberData[]>(this.generateItems());
 
