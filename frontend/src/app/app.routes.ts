@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './core/auth/auth.guard';
-import { roleGuard } from './core/auth/role.guard';
 import { ROUTE_PATHS } from './core/constants/route-paths';
 import { ALL_ROLES, NON_GUEST_ROLES } from './core/constants/access-control';
 import { LAYOUT } from './core/enums';
+import { authGuard } from './core/routing-interceptors/auth.guard';
+import { roleGuard } from './core/routing-interceptors/role.guard';
 
 export const routes: Routes = [
   {
