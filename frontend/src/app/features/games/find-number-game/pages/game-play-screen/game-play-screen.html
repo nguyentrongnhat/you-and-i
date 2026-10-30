@@ -15,11 +15,11 @@
                   <i class="pi pi-check-circle"></i> Đã tìm
                </span>
                <span class="find-number__cell-value">
-                  {{ currentSelectedNumber() }}<small>/ {{ TOTAL_NUMBERS }}</small>
+                  {{ currentSelectedNumber() }}<small>/ {{ findNumberGameService.TOTAL_NUMBERS }}</small>
                </span>
                <span class="find-number__progress">
                   <span class="find-number__progress-bar"
-                     [style.width.%]="(currentSelectedNumber() / TOTAL_NUMBERS) * 100"></span>
+                     [style.width.%]="(currentSelectedNumber() / findNumberGameService.TOTAL_NUMBERS) * 100"></span>
                </span>
             </div>
             <div class="find-number__cell">

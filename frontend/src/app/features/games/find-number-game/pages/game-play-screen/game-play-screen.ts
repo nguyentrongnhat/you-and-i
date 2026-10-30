@@ -48,7 +48,7 @@ export class GamePlayScreen {
 
    protected currentGameInfo: FindNumberGameDTO | undefined = undefined;
 
-   private findNumberGameService = inject(FindNumberGameService);
+   protected findNumberGameService = inject(FindNumberGameService);
 
    private loaderService = inject(LoaderService);
 

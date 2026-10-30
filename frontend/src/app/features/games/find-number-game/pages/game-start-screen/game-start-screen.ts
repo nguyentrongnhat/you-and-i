@@ -37,7 +37,7 @@ import { UserService } from '../../../../admin/services/user.service';
 })
 export class GameStartScreen {
 
-   private readonly findNumberGameService = inject(FindNumberGameService);
+   protected readonly findNumberGameService = inject(FindNumberGameService);
    
    private readonly loaderService = inject(LoaderService);
    
