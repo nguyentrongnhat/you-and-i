@@ -21,7 +21,7 @@ export const routes: Routes = [
     children: [
       {
         path: ROUTE_PATHS.AUTH.children.LOGIN.path,
-        loadComponent: () => import('./features/auth/login/login').then(c => c.Login),
+        loadComponent: () => import('./features/auth/pages/login/login').then(c => c.Login),
         data: {
           animation: 'LoginPage',
           layout: LAYOUT.EMPTY_LAYOUT
@@ -29,7 +29,7 @@ export const routes: Routes = [
       },
       {
         path: ROUTE_PATHS.AUTH.children.SIGNUP.path,
-        loadComponent: () => import('./features/auth/signup/signup').then(c => c.Signup),
+        loadComponent: () => import('./features/auth/pages/signup/signup').then(c => c.Signup),
         data: {
           animation: 'SignUpPage',
           layout: LAYOUT.EMPTY_LAYOUT
@@ -37,7 +37,7 @@ export const routes: Routes = [
       },
       {
         path: ROUTE_PATHS.AUTH.children.VERIFY_ACCOUNT.path,
-        loadComponent: () => import('./features/auth/verify-account/verify-account').then(c => c.VerifyAccount),
+        loadComponent: () => import('./features/auth/pages/verify-account/verify-account').then(c => c.VerifyAccount),
         data: {
           animation: 'SignUpPage',
           layout: LAYOUT.EMPTY_LAYOUT

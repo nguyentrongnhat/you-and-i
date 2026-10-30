@@ -36,7 +36,6 @@ import { UserService } from '../../../../admin/services/user.service';
    styleUrl: './game-start-screen.scss',
 })
 export class GameStartScreen {
-   protected readonly TOTAL_NUMBERS = 100;
 
    private readonly findNumberGameService = inject(FindNumberGameService);
    
@@ -115,7 +114,7 @@ export class GameStartScreen {
 
    public createNewGame() {
       this.loaderService.show();
-      this.findNumberGameService.createNewGame(this.TOTAL_NUMBERS, GAME_DIFFICULTY_LEVEL.NORMAL)
+      this.findNumberGameService.createNewGame(this.findNumberGameService.TOTAL_NUMBERS, GAME_DIFFICULTY_LEVEL.NORMAL)
       .pipe(
          takeUntilDestroyed(this.destroyRef),
          finalize(() => this.loaderService.hide())

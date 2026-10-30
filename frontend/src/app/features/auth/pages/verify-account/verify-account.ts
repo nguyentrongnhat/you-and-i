@@ -11,16 +11,16 @@ import { InputIconModule } from 'primeng/inputicon';
 import { InputOtp } from 'primeng/inputotp';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
-import { HttpClientService } from '../../../services/http-client.service';
-import { SessionStorageService } from '../../../services/session-storage.service';
-import { ToastService } from '../../../services/toast.service';
-import { VerifyAccountService } from '../services/verify-account.service';
-import { NavigationService } from '../../../services/navigation.service';
-import { MESSAGE_TYPE } from '../../../core/enums';
-import { LoaderService } from '../../../services/loader.service';
+import { HttpClientService } from '../../../../services/http-client.service';
+import { SessionStorageService } from '../../../../services/session-storage.service';
+import { ToastService } from '../../../../services/toast.service';
+import { VerifyAccountService } from '../../services/verify-account.service';
+import { NavigationService } from '../../../../services/navigation.service';
+import { MESSAGE_TYPE } from '../../../../core/enums';
+import { LoaderService } from '../../../../services/loader.service';
 import { finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { PlatformService } from '../../../services/platform.service';
+import { PlatformService } from '../../../../services/platform.service';
 
 export interface EmailVerificationModel {
   email: string,

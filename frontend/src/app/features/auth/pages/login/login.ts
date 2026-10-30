@@ -12,17 +12,18 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
-import { MESSAGE_TYPE, STORAGE_KEY } from '../../../core/enums';
-import { UsernamePasswordLoginResponse } from '../../../core/interfaces/user.dtos';
-import { PlatformService } from '../../../services/platform.service';
-import { SessionStorageService } from '../../../services/session-storage.service';
-import { ToastService } from '../../../services/toast.service';
-import { AuthService } from '../services/auth.service';
-import { NavigationService } from '../../../services/navigation.service';
-import { UserService } from '../../admin/services/user.service';
-import { LoaderService } from '../../../services/loader.service';
+import { MESSAGE_TYPE, STORAGE_KEY } from '../../../../core/enums';
+import { UsernamePasswordLoginResponse } from '../../../../core/interfaces/user.dtos';
+import { PlatformService } from '../../../../services/platform.service';
+import { SessionStorageService } from '../../../../services/session-storage.service';
+import { ToastService } from '../../../../services/toast.service';
+import { AuthService } from '../../services/auth.service';
+import { NavigationService } from '../../../../services/navigation.service';
+import { UserService } from '../../../admin/services/user.service';
+import { LoaderService } from '../../../../services/loader.service';
 import { finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { GoogleLogin } from '../../components/google-login/google-login';
 
 export interface LoginModel {
   username: string,
@@ -67,6 +68,7 @@ export const loginSchema = schema<LoginModel>((root) => {
     PasswordModule,
     DividerModule,
     FormField,
+    GoogleLogin,
   ],
   templateUrl: './login.html',
   styleUrl: './login.scss',

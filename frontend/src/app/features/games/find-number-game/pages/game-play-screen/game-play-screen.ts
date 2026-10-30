@@ -46,8 +46,6 @@ export class GamePlayScreen {
 
    protected GAME_STATUSES = GAME_STATUSES;
 
-   protected TOTAL_NUMBERS = 100;
-
    protected currentGameInfo: FindNumberGameDTO | undefined = undefined;
 
    private findNumberGameService = inject(FindNumberGameService);
@@ -133,7 +131,7 @@ export class GamePlayScreen {
          if (currentSelectedNumber === (this.currentGameInfo?.lastSelectedNumber || 0)) return;
          
          this.updateGameStatusAfterSeclectEachNumber(currentSelectedNumber, this.timer)
-         if (this.findNumberGameService.currentSeclectedNumber() === this.TOTAL_NUMBERS) {
+         if (this.findNumberGameService.currentSeclectedNumber() === this.findNumberGameService.TOTAL_NUMBERS) {
             this.finishGame();
          }
       })
@@ -199,7 +197,7 @@ export class GamePlayScreen {
    private startNewGame() {
       this.currentGameInfo!.gameStatus = GAME_STATUSES.PLAYING
       this.currentGameInfo!.startTime = new Date();
-      this.currentGameInfo!.totalNumbersToFind = this.TOTAL_NUMBERS;
+      this.currentGameInfo!.totalNumbersToFind = this.findNumberGameService.TOTAL_NUMBERS;
       this.currentGameInfo!.lastSelectedNumber = 0;
       this.currentGameInfo!.difficultyLevel = GAME_DIFFICULTY_LEVEL.NORMAL;
 
@@ -210,7 +208,7 @@ export class GamePlayScreen {
 
 
    private loadGameFromLastUpdateInDB() {
-      if (this.currentGameInfo!.lastSelectedNumber === this.TOTAL_NUMBERS) {
+      if (this.currentGameInfo!.lastSelectedNumber === this.findNumberGameService.TOTAL_NUMBERS) {
          // The game is already finished but acesstoken and refresh token are expired, so after login again we can directly finish the game and go to the result screen.
          this.timer = this.currentGameInfo!.elapsedTime || 0;
          this.finishGame();
@@ -270,7 +268,7 @@ export class GamePlayScreen {
       // to finish game api failed due to access token expired or other error
       // , we can still navigate user to result screen and display the correct game status and completion time.
       this.currentGameInfo!.gameStatus = GAME_STATUSES.PLAYING;
-      this.currentGameInfo!.lastSelectedNumber = this.TOTAL_NUMBERS;
+      this.currentGameInfo!.lastSelectedNumber = this.findNumberGameService.TOTAL_NUMBERS;
       this.currentGameInfo!.completionTime = this.timer;
       this.findNumberGameService.currentGameInfo.set(this.currentGameInfo);
       
@@ -320,7 +318,7 @@ export class GamePlayScreen {
       this.currentGameInfo!.elapsedTime = elapsedTime;
       this.timerStartPoint = new Date();
       
-      if(lastSelected > 90) return;
+      if(lastSelected > (this.findNumberGameService.TOTAL_NUMBERS - 10)) return;
       
       this.triggerUpdateGameStatus.next(this.currentGameInfo!);
    }

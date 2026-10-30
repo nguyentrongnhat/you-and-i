@@ -53,6 +53,21 @@
     <div class="divider-with-text">
         <p-divider [style]="'max-width: 450px; width: 100%'" />
     
+        <span style="white-space: nowrap;">Or Sign up with</span>
+    
+        <p-divider [style]="'max-width: 450px; width: 100%'" />
+    </div>
+
+    <div class="signups-option">
+        <p-button icon="pi pi-google" [rounded]="true" [text]="true" [raised]="true" severity="danger" pTooltip="Google Account" tooltipPosition="top" />
+        <p-button icon="pi pi-facebook" [rounded]="true" [text]="true" [raised]="true" severity="info" pTooltip="Facebook Account" tooltipPosition="top" />
+        <p-button icon="pi pi-github" [rounded]="true" [text]="true" [raised]="true" severity="warn" pTooltip="Github Account" tooltipPosition="top" />
+        <app-google-login></app-google-login>
+    </div>
+
+    <div class="divider-with-text">
+        <p-divider [style]="'max-width: 450px; width: 100%'" />
+    
         <span>Or</span>
     
         <p-divider [style]="'max-width: 450px; width: 100%'" />

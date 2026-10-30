@@ -10,6 +10,8 @@ import { UserService } from "../../../admin/services/user.service";
     providedIn: 'root'
 })
 export class FindNumberGameService {
+    public readonly TOTAL_NUMBERS = 100;
+
     private readonly httpClient = inject(HttpClientService);
 
     private readonly userService = inject(UserService);

@@ -38,9 +38,7 @@ export enum FIND_NUMBER_GAME_STATUSES {
    styleUrl: './game-result-screen.scss',
 })
 export class GameResultScreen {
-   protected gameId = input<string | undefined>(undefined);
-
-   protected readonly TOTAL_NUMBERS = 3;
+   protected gameId = input<string | undefined>(undefined);;
 
    /** Decorative confetti pieces for the celebration screen (display only) */
    protected readonly confettiPieces = Array.from({ length: 24 });

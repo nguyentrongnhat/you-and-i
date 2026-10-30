@@ -4,7 +4,7 @@ import { catchError, finalize, map, of, take, tap, throwError } from "rxjs";
 import { API_ENDPOINTS } from "../../../core/constants/api-endpoints";
 import { UsernamePasswordLoginResponse } from "../../../core/interfaces/user.dtos";
 import { HttpClientService } from "../../../services/http-client.service";
-import { SignupModel } from "../signup/signup";
+import { SignupModel } from "../pages/signup/signup";
 import { UserService } from "../../admin/services/user.service";
 import { LoaderService } from "../../../services/loader.service";
 import { PlatformService } from "../../../services/platform.service";
