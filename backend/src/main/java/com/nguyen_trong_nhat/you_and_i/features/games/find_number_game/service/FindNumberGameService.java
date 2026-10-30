@@ -3,6 +3,7 @@ package com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.service;
 import com.nguyen_trong_nhat.you_and_i.common.exception.BadRequestException;
 import com.nguyen_trong_nhat.you_and_i.common.exception.ForbidenException;
 import com.nguyen_trong_nhat.you_and_i.common.config.Constants;
+import com.nguyen_trong_nhat.you_and_i.common.security.util.SecurityUtils;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.dto.*;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGame;
 import com.nguyen_trong_nhat.you_and_i.features.games.find_number_game.entity.FindNumberGameStats;
@@ -61,8 +62,14 @@ public class FindNumberGameService {
             throw new BadRequestException("Invalid game data provided for update.");
         }
         FindNumberGame gameEntity = this.findGameById(gameDTO.getId().toString());
+        if (!gameEntity.getPlayer().getUsername().equals(SecurityUtils.getLoggedInUsername())) {
+            throw new ForbidenException("You are not player, so you can not update the game!");
+        }
         if (gameEntity.getGameStatus().equals(GameStatus.DONE)) {
             throw new BadRequestException("Can not update the game already finished");
+        }
+        if (gameDTO.getElapsedTime() / gameDTO.getLastSelectedNumber() < 3) {
+            throw new BadRequestException("Don't do that!");
         }
         FindNumberGameDataMapper.updateEntity(gameEntity, gameDTO);
         findNumberGameRepository.save(gameEntity);
@@ -74,8 +81,11 @@ public class FindNumberGameService {
     @CachePut(value = Constants.CACHE_FIND_NUMBER_GAME, key = "#result.id.toString()")
     public FindNumberGame finishGame(String userName, FinishFindNumberGameRequest gameInfo) {
         FindNumberGame game = this.findGameById(gameInfo.getGameId().toString());
+        if(game.getTotalNumbersToFind() - game.getLastSelectedNumber() > 20) {
+            throw new BadRequestException("You can not finish the game because you have not found enough numbers");
+        }
         if (!game.getPlayer().getUsername().equals(userName)) {
-            throw new ForbidenException("You are not player, so you can not finish the game!!!");
+            throw new ForbidenException("You are not player, so you can not finish the game!");
         }
         game.setCompletionTime(gameInfo.getCompletionTime());
         game.setElapsedTime(gameInfo.getCompletionTime());
