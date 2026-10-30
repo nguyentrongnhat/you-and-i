@@ -1,1 +1,10 @@
-<div id="google-btn"></div>
+<p-button 
+    icon="pi pi-google" 
+    [rounded]="true" 
+    [text]="true" 
+    [raised]="true" 
+    severity="danger" 
+    pTooltip="Google Account" 
+    tooltipPosition="top"
+    (onClick)="loginWithGoogleCustom()"
+ />

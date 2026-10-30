@@ -1,54 +1,51 @@
 import { HttpClient } from '@angular/common/http';
-import { AfterViewInit, Component, NgZone } from '@angular/core';
+import { Component, inject, NgZone, OnInit } from '@angular/core';
 
-import { environment } from '../../../../../environments/environments';
+import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { ButtonModule } from 'primeng/button';
+import { environment } from '../../../../../environments/environments';
+import { PlatformService } from '../../../../services/platform.service';
 
 declare const google: any;
 
 @Component({
   selector: 'app-google-login',
-  imports: [],
+  imports: [ButtonModule, CommonModule],
   templateUrl: './google-login.html',
   styleUrl: './google-login.scss',
 })
-export class GoogleLogin implements AfterViewInit {
-  constructor(private http: HttpClient, private zone: NgZone, private router: Router) {}
+export class GoogleLogin implements OnInit {
+  private http = inject(HttpClient);
+  private zone = inject(NgZone);
+  private router = inject(Router);
+  private platformService = inject(PlatformService);
 
-  async ngAfterViewInit() {
-    await this.loadGoogleScript();
+  private codeClient: any;
 
-    google.accounts.id.initialize({
+  ngOnInit(): void {
+    this.initGetCode();
+  }
+
+  initGetCode() {
+    if (!this.platformService.isBrowser()) return;
+    this.codeClient = google.accounts.oauth2.initCodeClient({
       client_id: environment.googleClientId,
-      callback: (resp: any) => this.zone.run(() => this.onGoogleLogin(resp.credential)),
-    });
-    google.accounts.id.renderButton(
-      document.getElementById('google-btn'),
-      { theme: 'outline', size: 'large' }
-    );
-  }
-
-  private loadGoogleScript(): Promise<void> {
-    return new Promise((resolve, reject) => {
-      if (typeof google !== 'undefined') {
-        resolve();
-        return;
-      }
-      const script = document.createElement('script');
-      script.src = 'https://accounts.google.com/gsi/client';
-      script.async = true;
-      script.defer = true;
-      script.onload = () => resolve();
-      script.onerror = () => reject(new Error('Cannot load Google script'));
-      document.head.appendChild(script);
+      scope: 'openid email profile',
+      ux_mode: 'popup',
+      select_account: true, // luôn hiện màn chọn tài khoản
+      callback: (res: { code?: string; error?: string }) =>
+        this.zone.run(() => this.onGoogleLogin(res)),
+      error_callback: (err: any) => console.error('Google popup error', err),
     });
   }
 
-  onGoogleLogin(idToken: string) {
-    this.http.post<{ token: string }>('/api/auth/google', { idToken })
-      .subscribe(res => {
-        localStorage.setItem('token', res.token);
-        this.router.navigate(['/']);
-      });
+  onGoogleLogin(res: any) {
+    console.log(res);
+  }
+
+  loginWithGoogleCustom() {
+    console.log('Custom Google login clicked');
+    this.codeClient.requestCode();
   }
 }
