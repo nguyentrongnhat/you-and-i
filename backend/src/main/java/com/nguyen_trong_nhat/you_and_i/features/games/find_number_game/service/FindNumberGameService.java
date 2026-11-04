@@ -13,6 +13,7 @@ import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
 import com.nguyen_trong_nhat.you_and_i.features.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import lombok.Synchronized;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.data.domain.PageRequest;
@@ -57,6 +58,7 @@ public class FindNumberGameService {
     }
 
     @CachePut(value = Constants.CACHE_FIND_NUMBER_GAME, key = "#result.id.toString()")
+    @Synchronized
     public FindNumberGame updateGame(FindNumberGameDTO gameDTO) {
         if (gameDTO == null || gameDTO.getId() == null) {
             throw new BadRequestException("Invalid game data provided for update.");
@@ -68,7 +70,7 @@ public class FindNumberGameService {
         if (gameEntity.getGameStatus().equals(GameStatus.DONE)) {
             throw new BadRequestException("Can not update the game already finished");
         }
-        if (gameDTO.getElapsedTime() / gameDTO.getLastSelectedNumber() < 3) {
+        if (gameDTO.getElapsedTime() != null && gameDTO.getElapsedTime() / gameDTO.getLastSelectedNumber() < 3) {
             throw new BadRequestException("Don't do that!");
         }
         FindNumberGameDataMapper.updateEntity(gameEntity, gameDTO);
