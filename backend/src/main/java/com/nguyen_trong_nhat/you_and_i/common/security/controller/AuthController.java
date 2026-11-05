@@ -4,6 +4,7 @@ import com.nguyen_trong_nhat.you_and_i.common.config.Constants;
 import com.nguyen_trong_nhat.you_and_i.common.dto.*;
 import com.nguyen_trong_nhat.you_and_i.common.security.service.impl.AuthServiceImpl;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -11,9 +12,10 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.time.Duration;
 
-
+@Slf4j
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -134,6 +136,20 @@ public class AuthController {
 
         return ResponseEntity.noContent()
                 .header(HttpHeaders.SET_COOKIE, deleteCookie.toString())
+                .build();
+    }
+
+    @GetMapping("/google/callback")
+    public ResponseEntity<Void> googleCallback(
+            @RequestParam String code,
+            @RequestParam(required = false) String state
+    ) {
+        log.info("Received Google authorization code: {}", code);
+        log.info("Received Google OAuth state: {}", state);
+
+        return ResponseEntity
+                .status(HttpStatus.FOUND)
+                .location(URI.create("http://localhost:4200"))
                 .build();
     }
 }
