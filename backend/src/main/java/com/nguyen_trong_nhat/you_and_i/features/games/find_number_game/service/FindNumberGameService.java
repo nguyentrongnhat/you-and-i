@@ -70,7 +70,7 @@ public class FindNumberGameService {
         if (gameEntity.getGameStatus().equals(GameStatus.DONE)) {
             throw new BadRequestException("Can not update the game already finished");
         }
-        if (gameDTO.getElapsedTime() != null && gameDTO.getElapsedTime() / gameDTO.getLastSelectedNumber() < 3) {
+        if (gameDTO.getElapsedTime() != null && gameDTO.getElapsedTime() - gameEntity.getElapsedTime() < 3) {
             throw new BadRequestException("Don't do that!");
         }
         FindNumberGameDataMapper.updateEntity(gameEntity, gameDTO);
