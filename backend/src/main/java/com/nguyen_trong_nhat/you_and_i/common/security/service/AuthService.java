@@ -13,4 +13,6 @@ public interface AuthService {
     UserDetails authenticate(Authentication authentication);
 
     void signup (UsernamePasswordSignupRequest signupData);
+
+    void testSendVerificationEmail(String email);
 }
