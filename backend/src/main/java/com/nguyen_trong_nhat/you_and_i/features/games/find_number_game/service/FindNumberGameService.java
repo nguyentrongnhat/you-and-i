@@ -73,6 +73,7 @@ public class FindNumberGameService {
         if (gameDTO.getElapsedTime() != null
                 && gameEntity.getElapsedTime() != null
                 && gameDTO.getGameStatus().equals(gameEntity.getGameStatus())
+                && !gameDTO.getLastSelectedNumber().equals(gameEntity.getLastSelectedNumber())
                 && gameDTO.getElapsedTime() - gameEntity.getElapsedTime() < 2) {
             throw new BadRequestException("Don't cheat!");
         }
