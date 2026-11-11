@@ -74,7 +74,7 @@ public class FindNumberGameService {
                 && gameEntity.getElapsedTime() != null
                 && gameDTO.getGameStatus().equals(gameEntity.getGameStatus())
                 && !gameDTO.getLastSelectedNumber().equals(gameEntity.getLastSelectedNumber())
-                && gameDTO.getElapsedTime() - gameEntity.getElapsedTime() < 2) {
+                && gameDTO.getElapsedTime() - gameEntity.getElapsedTime() < 5) {
             throw new BadRequestException("Don't cheat!");
         }
         FindNumberGameDataMapper.updateEntity(gameEntity, gameDTO);
