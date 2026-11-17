@@ -64,3 +64,5 @@ security:
     same-site: None
   jwt:
     secret-key: ${JWT_SECRET_KEY}
+  frontend:
+    url: https://jar-of-messages.azurewebsites.net

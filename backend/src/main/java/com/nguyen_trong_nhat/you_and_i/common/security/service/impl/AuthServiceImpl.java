@@ -5,7 +5,9 @@ import com.nguyen_trong_nhat.you_and_i.common.dto.LoginResponse;
 import com.nguyen_trong_nhat.you_and_i.common.dto.UsernamePasswordSignupRequest;
 import com.nguyen_trong_nhat.you_and_i.common.exception.BadRequestException;
 import com.nguyen_trong_nhat.you_and_i.common.exception.ErrorConstant;
+import com.nguyen_trong_nhat.you_and_i.common.security.authentication.GoogleLoginAuthentication;
 import com.nguyen_trong_nhat.you_and_i.common.security.authentication.JwtRefreshTokenAuthentication;
+import com.nguyen_trong_nhat.you_and_i.common.security.dto.GoogleUserInfo;
 import com.nguyen_trong_nhat.you_and_i.common.security.service.AuthService;
 import com.nguyen_trong_nhat.you_and_i.features.mail.service.MailService;
 import com.nguyen_trong_nhat.you_and_i.features.user.entity.MyUserDetail;
@@ -25,9 +27,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -146,6 +148,21 @@ public class AuthServiceImpl implements AuthService {
     public LoginResponse usernamePasswordAuthenticate(String username, String password) {
         Authentication authentication = new UsernamePasswordAuthenticationToken(username, password);
         UserDetails user = this.authenticate(authentication);
+        String accessToken = jwtService.generateAccessToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user);
+        return new LoginResponse(accessToken, refreshToken, userDataMapper.toUserDetailDTO((MyUserDetail) user));
+    }
+
+    @Transactional
+    public LoginResponse googleAuthenticate(GoogleUserInfo googleUserInfo) {
+        if (googleUserInfo == null || googleUserInfo.getEmail() == null || googleUserInfo.getEmail().isBlank()) {
+            throw new BadRequestException("Google user email is required");
+        }
+
+        String username = googleUserInfo.getEmail().trim().toLowerCase();
+
+        Authentication googleAuthentication = new GoogleLoginAuthentication(username);
+        UserDetails user = this.authenticate(googleAuthentication);
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
         return new LoginResponse(accessToken, refreshToken, userDataMapper.toUserDetailDTO((MyUserDetail) user));

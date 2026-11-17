@@ -26,8 +26,8 @@ spring:
       client:
         registration:
           google:
-            client-id: ${GOOGLE_CLIENT_ID}
-            client-secret: ${GOOGLE_CLIENT_SECRET}
+            client-id: ${GMAIL_CLIENT_ID}
+            client-secret: ${GMAIL_CLIENT_SECRET}
             scope:
               - openid
               - profile
@@ -62,3 +62,6 @@ security:
     same-site: Lax
   jwt:
     secret-key: ${JWT_SECRET_KEY:super-secure-key-super-secure-key}
+  frontend:
+    url: http://localhost:4200
+

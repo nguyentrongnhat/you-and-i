@@ -2,7 +2,10 @@ package com.nguyen_trong_nhat.you_and_i.common.security.controller;
 
 import com.nguyen_trong_nhat.you_and_i.common.config.Constants;
 import com.nguyen_trong_nhat.you_and_i.common.dto.*;
+import com.nguyen_trong_nhat.you_and_i.common.security.dto.GoogleUserInfo;
+import com.nguyen_trong_nhat.you_and_i.common.security.service.GoogleOAuth2Service;
 import com.nguyen_trong_nhat.you_and_i.common.security.service.impl.AuthServiceImpl;
+import com.nguyen_trong_nhat.you_and_i.features.mail.dto.GoogleTokenResponse;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,14 +26,20 @@ public class AuthController {
     private final boolean secureCookie;
     private final String sameSiteCookie;
     private final AuthServiceImpl authService;
+    private final GoogleOAuth2Service googleOAuth2Service;
+    private final String frontendUrl;
 
     public AuthController(
             AuthServiceImpl authService,
+            GoogleOAuth2Service googleOAuth2Service,
             @Value("${security.cookie.secure}") boolean secureCookie,
-            @Value("${security.cookie.same-site}") String sameSiteCookie) {
+            @Value("${security.cookie.same-site}") String sameSiteCookie,
+            @Value("${security.frontend.url}") String frontendUrl) {
         this.authService = authService;
+        this.googleOAuth2Service = googleOAuth2Service;
         this.secureCookie = secureCookie;
         this.sameSiteCookie = sameSiteCookie;
+        this.frontendUrl = frontendUrl;
     }
 
 
@@ -147,10 +156,50 @@ public class AuthController {
         log.info("Received Google authorization code: {}", code);
         log.info("Received Google OAuth state: {}", state);
 
+        GoogleTokenResponse tokenResponse = googleOAuth2Service.exchangeAuthorizationCode(code);
+        GoogleUserInfo userProfile = googleOAuth2Service.getUserInfo(tokenResponse.getAccessToken());
+
+        LoginResponse loginResponse = authService.googleAuthenticate(userProfile);
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", loginResponse.getRefreshToken())
+                .httpOnly(true)
+                .sameSite(sameSiteCookie)
+                .secure(secureCookie)
+                .path("/api/auth/refresh")
+                .maxAge(Duration.ofSeconds(Constants.REFRESH_TOKEN_MAX_AGE))
+                .build();
+
+        log.info("Google user profile: email={}, name={}, sub={}",
+                userProfile.getEmail(), userProfile.getName(), userProfile.getSub());
+
         return ResponseEntity
                 .status(HttpStatus.FOUND)
-                .location(URI.create("http://localhost:4200"))
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                .location(URI.create(frontendUrl))
                 .build();
     }
-}
 
+    @GetMapping("/google/login")
+    public ResponseEntity<LoginResponse> googleLoginFromFrontend(
+            @RequestParam String code
+    ) {
+        log.info("Received Google code from frontend: {}", code);
+
+        GoogleTokenResponse tokenResponse = googleOAuth2Service.exchangeAuthorizationCode(code);
+        GoogleUserInfo userProfile = googleOAuth2Service.getUserInfo(tokenResponse.getAccessToken());
+
+        LoginResponse loginResponse = authService.googleAuthenticate(userProfile);
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", loginResponse.getRefreshToken())
+                .httpOnly(true)
+                .sameSite(sameSiteCookie)
+                .secure(secureCookie)
+                .path("/api/auth/refresh")
+                .maxAge(Duration.ofSeconds(Constants.REFRESH_TOKEN_MAX_AGE))
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                .body(loginResponse);
+    }
+}
