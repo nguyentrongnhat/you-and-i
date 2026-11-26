@@ -27,19 +27,17 @@ public class AuthController {
     private final String sameSiteCookie;
     private final AuthServiceImpl authService;
     private final GoogleOAuth2Service googleOAuth2Service;
-    private final String frontendUrl;
 
     public AuthController(
             AuthServiceImpl authService,
             GoogleOAuth2Service googleOAuth2Service,
             @Value("${security.cookie.secure}") boolean secureCookie,
-            @Value("${security.cookie.same-site}") String sameSiteCookie,
-            @Value("${security.frontend.url}") String frontendUrl) {
+            @Value("${security.cookie.same-site}") String sameSiteCookie
+    ) {
         this.authService = authService;
         this.googleOAuth2Service = googleOAuth2Service;
         this.secureCookie = secureCookie;
         this.sameSiteCookie = sameSiteCookie;
-        this.frontendUrl = frontendUrl;
     }
 
 
