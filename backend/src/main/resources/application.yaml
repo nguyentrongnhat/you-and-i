@@ -39,13 +39,13 @@ app:
   integrations:
     google:
       gmail:
-        refresh-token: ${GMAIL_REFRESH_TOKEN}
+        refresh-token: ${GOOGLE_REFRESH_TOKEN}
         email: ${GMAIL_EMAIL}
 gmail:
   oauth2:
-    client-id: ${GMAIL_CLIENT_ID}
-    client-secret: ${GMAIL_CLIENT_SECRET}
-    refresh-token: ${GMAIL_REFRESH_TOKEN}
+    client-id: ${GOOGLE_CLIENT_ID}
+    client-secret: ${GOOGLE_CLIENT_SECRET}
+    refresh-token: ${GOOGLE_REFRESH_TOKEN}
     email: ${GMAIL_EMAIL}
 
 account:
