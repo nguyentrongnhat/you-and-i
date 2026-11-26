@@ -148,37 +148,6 @@ public class AuthController {
                 .build();
     }
 
-    @GetMapping("/google/callback")
-    public ResponseEntity<Void> googleCallback(
-            @RequestParam String code,
-            @RequestParam(required = false) String state
-    ) {
-        log.info("Received Google authorization code: {}", code);
-        log.info("Received Google OAuth state: {}", state);
-
-        GoogleTokenResponse tokenResponse = googleOAuth2Service.exchangeAuthorizationCode(code);
-        GoogleUserInfo userProfile = googleOAuth2Service.getUserInfo(tokenResponse.getAccessToken());
-
-        LoginResponse loginResponse = authService.googleAuthenticate(userProfile);
-
-        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", loginResponse.getRefreshToken())
-                .httpOnly(true)
-                .sameSite(sameSiteCookie)
-                .secure(secureCookie)
-                .path("/api/auth/refresh")
-                .maxAge(Duration.ofSeconds(Constants.REFRESH_TOKEN_MAX_AGE))
-                .build();
-
-        log.info("Google user profile: email={}, name={}, sub={}",
-                userProfile.getEmail(), userProfile.getName(), userProfile.getSub());
-
-        return ResponseEntity
-                .status(HttpStatus.FOUND)
-                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
-                .location(URI.create(frontendUrl))
-                .build();
-    }
-
     @GetMapping("/google/login")
     public ResponseEntity<LoginResponse> googleLoginFromFrontend(
             @RequestParam String code

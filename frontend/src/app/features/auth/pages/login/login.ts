@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, computed, DestroyRef, inject, signal } from '@angular/core';
+import { AfterViewInit, Component, computed, DestroyRef, effect, inject, input, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { email, form, FormField, required, schema } from '@angular/forms/signals';
 import { AutoFocusModule } from 'primeng/autofocus';
@@ -74,6 +74,8 @@ export const loginSchema = schema<LoginModel>((root) => {
   styleUrl: './login.scss',
 })
 export class Login implements AfterViewInit {
+
+  public code = input<string>('');
   
   protected platformService = inject(PlatformService);
 

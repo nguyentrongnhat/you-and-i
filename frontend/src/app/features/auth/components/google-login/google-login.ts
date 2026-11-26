@@ -1,9 +1,10 @@
-import { Component, inject, NgZone, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, effect, inject, input, NgZone, OnInit } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
+import { distinctUntilChanged, Subject, debounceTime } from 'rxjs';
 import { environment } from '../../../../../environments/environments';
 import { PlatformService } from '../../../../services/platform.service';
-
+import { toObservable } from '@angular/core/rxjs-interop';
 
 declare const google: any;
 
@@ -17,9 +18,18 @@ export class GoogleLogin implements OnInit {
   private zone = inject(NgZone);
   private platformService = inject(PlatformService);
   private codeClient: any;
+  public code = input<string>('');
+
+  private code$ = toObservable(this.code);
 
   ngOnInit(): void {
     this.initGetCode();
+    this.code$.pipe(
+      distinctUntilChanged(), 
+      debounceTime(300)
+    ).subscribe(code => {
+      console.log('Received code in ngOnInit: ', code);
+    });
   }
 
   private initGetCode(): void {
