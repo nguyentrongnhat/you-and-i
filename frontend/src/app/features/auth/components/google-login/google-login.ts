@@ -25,14 +25,12 @@ export class GoogleLogin implements OnInit {
   private code$ = toObservable(this.code);
 
   ngOnInit(): void {
-    console.log('Initializing Google login...');
     this.initGetCode();
     this.code$.pipe(
       distinctUntilChanged(), 
       filter(Boolean),
       debounceTime(300)
     ).subscribe(code => {
-      console.log('Received code in ngOnInit: ', code);
       this.authService.loginWithGoogleAuthorizationCode(code).subscribe();
     });
   }
@@ -48,7 +46,6 @@ export class GoogleLogin implements OnInit {
   }
 
   private getPopupConfig(): any {
-    console.log('Using popup config for Google OAuth');
     return {
       client_id: environment.googleClientId,
       scope: 'openid email profile',
@@ -65,7 +62,6 @@ export class GoogleLogin implements OnInit {
   }
 
   private getRedirectConfig(): any {
-    console.log('Using redirect config for Google OAuth');
     return {
       client_id: environment.googleClientId,
       scope: 'openid email profile',
@@ -83,12 +79,10 @@ export class GoogleLogin implements OnInit {
       console.error('Google authorization failed:', res.error);
       return;
     }
-    console.log('Authorization code:', res.code);
     this.authService.loginWithGoogleAuthorizationCode(res.code).subscribe();
   }
 
   protected triggerLoginWithGoogle() {
-    console.log('Triggering Google login...');
     this.codeClient?.requestCode();
   }
 }

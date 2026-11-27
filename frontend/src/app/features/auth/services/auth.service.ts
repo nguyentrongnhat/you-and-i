@@ -138,7 +138,8 @@ export class AuthService {
                     }
                 }),
                 catchError((err) => {
-                    this.sessionStorageService.setItem(STORAGE_KEY.REDIRECT_URL, this.router.url)
+                    const currentUrl = window.location.pathname + window.location.search + window.location.hash;
+                    this.sessionStorageService.setItem(STORAGE_KEY.REDIRECT_URL, currentUrl);
                     return throwError(() => err);
                 })
             );
