@@ -253,12 +253,7 @@ export class GamePlayScreen {
       this.currentGameInfo!.gameStatus = GAME_STATUSES.PAUSED;
       this.currentGameInfo!.elapsedTime = this.timer;
       this.findNumberGameService.updateGameInfo(this.currentGameInfo!).subscribe({
-         error: err => {
-            const toastSummary = 'An error occurred!!';
-            const toastDetail = err.error.message;
-            this.toastService.showToast(MESSAGE_TYPE.ERROR, toastSummary, toastDetail);
-            this.exitGame();
-         }
+         error: err => this.exitGame()
       });
    }
 

@@ -1,7 +1,7 @@
 import { computed, inject, Injectable, signal } from "@angular/core";
 import { HttpClientService } from "../../../../services/http-client.service";
 import { catchError, Observable, of, Subject, tap, throwError } from "rxjs";
-import { GAME_DIFFICULTY_LEVEL, MESSAGE_TYPE, ROLE } from "../../../../core/enums";
+import { GAME_DIFFICULTY_LEVEL, GAME_STATUSES, MESSAGE_TYPE, ROLE } from "../../../../core/enums";
 import { FindNumberGameBestRecordDTO, FindNumberGameDTO, FindNumberGameHistory } from "../../../../core/interfaces/find-number-game.dto";
 import { ToastService } from "../../../../services/toast.service";
 import { UserService } from "../../../admin/services/user.service";
@@ -55,21 +55,26 @@ export class FindNumberGameService {
                 tap((game: FindNumberGameDTO) => {
                     this.currentGameInfo.set(game);
                 }),
-                catchError((err) => {
-                    if(err.error.status === 404) {
-                        const toastSummary = 'The game is not exist anymore';
-                        const toastDetail = 'The game is not exist anymore. Please start a new game.';
-                        this.toastService.showToast(MESSAGE_TYPE.ERROR, toastSummary, toastDetail);
-                    }
-                    else {
-                        const toastSummary = 'Can not update game';
-                        const toastDetail = err.error.message;
-                        this.toastService.showToast(MESSAGE_TYPE.ERROR, toastSummary, toastDetail);
-                    }
-
-                    return throwError(() => err);
-                })
+                catchError(err => this.handleUpdateGameError(err, 'updateGameInfo'))
             )
+    }
+
+
+    private handleUpdateGameError(err: any, action: string) {
+        console.error(`Error occurred while ${action}:`, err);
+
+        if(err.error.status === 404) {
+            const toastSummary = 'The game is not exist anymore';
+            const toastDetail = 'The game is not exist anymore. Please start a new game.';
+            this.toastService.showToast(MESSAGE_TYPE.ERROR, toastSummary, toastDetail);
+        }
+        else {
+            const toastSummary = 'Can not update game status';
+            const toastDetail = err.error.message;
+            this.toastService.showToast(MESSAGE_TYPE.ERROR, toastSummary, toastDetail);
+        }
+
+        return throwError(() => err);
     }
 
 
