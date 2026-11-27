@@ -13,7 +13,7 @@ import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { MESSAGE_TYPE, STORAGE_KEY } from '../../../../core/enums';
-import { UsernamePasswordLoginResponse } from '../../../../core/interfaces/user.dtos';
+import { LoginResponse } from '../../../../core/interfaces/user.dtos';
 import { PlatformService } from '../../../../services/platform.service';
 import { SessionStorageService } from '../../../../services/session-storage.service';
 import { ToastService } from '../../../../services/toast.service';
@@ -121,22 +121,11 @@ export class Login implements AfterViewInit {
 
   private login(username: string, password: string) {
     this.loaderService.show();
-    this.authService.login(username, password)
+    this.authService.loginWithUsernamePassword(username, password)
     .pipe(
       finalize(() => this.loaderService.hide()),
       takeUntilDestroyed(this.destroyRef)
     ).subscribe({
-      next: (res: UsernamePasswordLoginResponse) => {
-        this.userService.currentUser.set(res.userInfo);
-        const redirectUrl = this.sessionStorageService.getItem(STORAGE_KEY.REDIRECT_URL);
-        if (redirectUrl) {
-          this.sessionStorageService.removeItem(STORAGE_KEY.REDIRECT_URL);
-          this.navigationService.navigate(redirectUrl);
-        } 
-        else {
-          this.navigationService.goToHome();
-        }
-      },
       error: err => {
         const toastSummary = 'Login failed';
         const toastDetail = err.error.message;

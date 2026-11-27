@@ -14,7 +14,6 @@ import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { TooltipModule } from 'primeng/tooltip';
 import { MESSAGE_TYPE } from '../../../../core/enums';
-import { UsernamePasswordLoginResponse } from '../../../../core/interfaces/user.dtos';
 import { PlatformService } from '../../../../services/platform.service';
 import { SessionStorageService } from '../../../../services/session-storage.service';
 import { ToastService } from '../../../../services/toast.service';
@@ -24,6 +23,7 @@ import { VerifyAccountService } from '../../services/verify-account.service';
 import { LoaderService } from '../../../../services/loader.service';
 import { finalize } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { LoginResponse } from '../../../../core/interfaces/user.dtos';
 
 export interface SignupModel {
   username: string,
@@ -151,7 +151,7 @@ export class Signup implements AfterViewInit {
       takeUntilDestroyed(this.destroyRef)
     )
     .subscribe({
-      next: (res: UsernamePasswordLoginResponse) => {
+      next: (res: LoginResponse) => {
         const toastSummary = 'Registration successful!';
         const toastDetail = 'We\'ve sent a verification code to your email. Please enter the code to confirm your email address.';
         this.toastService.showToast(MESSAGE_TYPE.SUCCESS, toastSummary, toastDetail);

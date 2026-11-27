@@ -1,4 +1,4 @@
-export interface UsernamePasswordLoginResponse {
+export interface LoginResponse {
     accessToken: string,
     refreshToken: string,
     userInfo: UserDetails

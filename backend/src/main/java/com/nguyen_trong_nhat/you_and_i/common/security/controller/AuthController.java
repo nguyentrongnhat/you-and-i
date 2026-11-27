@@ -146,9 +146,9 @@ public class AuthController {
                 .build();
     }
 
-    @GetMapping("/google/login")
+    @PostMapping("/google/login")
     public ResponseEntity<LoginResponse> googleLoginFromFrontend(
-            @RequestParam String code
+            @RequestBody String code
     ) {
         log.info("Received Google code from frontend: {}", code);
 

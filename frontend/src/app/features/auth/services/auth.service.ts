@@ -2,7 +2,7 @@ import { computed, inject, Injectable, signal } from "@angular/core";
 import { Router } from "@angular/router";
 import { catchError, finalize, map, of, take, tap, throwError } from "rxjs";
 import { API_ENDPOINTS } from "../../../core/constants/api-endpoints";
-import { UsernamePasswordLoginResponse } from "../../../core/interfaces/user.dtos";
+import { LoginResponse } from "../../../core/interfaces/user.dtos";
 import { HttpClientService } from "../../../services/http-client.service";
 import { SignupModel } from "../pages/signup/signup";
 import { UserService } from "../../admin/services/user.service";
@@ -70,19 +70,44 @@ export class AuthService {
     }
 
 
-    public login(username: string, password: string) {
-        return this.httpService.post<UsernamePasswordLoginResponse>(API_ENDPOINTS.AUTH.LOGIN, { username, password })
+    public loginWithUsernamePassword(username: string, password: string) {
+        return this.httpService.post<LoginResponse>(API_ENDPOINTS.AUTH.LOGIN_WITH_USERNAME_PASSWORD, { username, password })
             .pipe(
-                tap(res => {
-                    this.setAccessToken(res.accessToken);
-                    this.userService.currentUser.set(res.userInfo);
-                    if(this.platformService.isMobile()) {
-                        this.sessionStorageService.setItem(STORAGE_KEY.REFRESH_TOKEN, res.refreshToken);
-                    }
-                })
+                tap(res => this.handelLoginResponse(res))
             );
     }
 
+
+    public loginWithGoogleAuthorizationCode(authorizationCode: string) {
+        console.log('Received authorization code in AuthService: ', !this.platformService.isBrowser() ? 'Not in browser' : 'in browser');
+        return this.httpService.post<LoginResponse>(API_ENDPOINTS.AUTH.LOGIN_WITH_GOOGLE_AUTHORIZATION_CODE, authorizationCode, undefined, false)
+             .pipe(
+                tap(res => this.handelLoginResponse(res))
+            );
+    }
+
+
+    private handelLoginResponse(res: LoginResponse) {
+        this.setAccessToken(res.accessToken);
+
+        if(this.platformService.isMobile()) {
+            this.sessionStorageService.setItem(STORAGE_KEY.REFRESH_TOKEN, res.refreshToken);
+        }
+
+        this.userService.currentUser.set(res.userInfo);
+
+        const redirectUrl = this.sessionStorageService.getItem(STORAGE_KEY.REDIRECT_URL);
+
+        if (redirectUrl) {
+          this.sessionStorageService.removeItem(STORAGE_KEY.REDIRECT_URL);
+          this.navigationService.navigate(redirectUrl);
+        } 
+        else {
+          this.navigationService.goToHome();
+        }
+
+        
+    }
 
     public logout() {
         this.loaderService.show();
@@ -103,7 +128,7 @@ export class AuthService {
     public refreshToken() {
         const refreshToken = this.sessionStorageService.getItem(STORAGE_KEY.REFRESH_TOKEN);
         const REFRESH_TOKEN_ENDPOINT = this.platformService.isMobile() ? API_ENDPOINTS.AUTH.REFRESH_TOKEN_MOBILE : API_ENDPOINTS.AUTH.REFRESH_TOKEN;
-        return this.httpService.post<UsernamePasswordLoginResponse>(REFRESH_TOKEN_ENDPOINT, { refreshToken })
+        return this.httpService.post<LoginResponse>(REFRESH_TOKEN_ENDPOINT, { refreshToken })
             .pipe(
                 tap(res => {
                     this.setAccessToken(res.accessToken);
@@ -121,7 +146,7 @@ export class AuthService {
 
 
     public signup(signupData: SignupModel) {
-        return this.httpService.post<UsernamePasswordLoginResponse>(API_ENDPOINTS.AUTH.SIGNUP, signupData);
+        return this.httpService.post<LoginResponse>(API_ENDPOINTS.AUTH.SIGNUP, signupData);
     }
     
 

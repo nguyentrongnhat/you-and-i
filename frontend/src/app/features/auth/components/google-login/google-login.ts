@@ -5,6 +5,7 @@ import { distinctUntilChanged, Subject, debounceTime, filter } from 'rxjs';
 import { environment } from '../../../../../environments/environments';
 import { PlatformService } from '../../../../services/platform.service';
 import { toObservable } from '@angular/core/rxjs-interop';
+import { AuthService } from '../../services/auth.service';
 
 declare const google: any;
 
@@ -17,6 +18,7 @@ declare const google: any;
 export class GoogleLogin implements OnInit {
   private zone = inject(NgZone);
   private platformService = inject(PlatformService);
+  private authService = inject(AuthService);
   private codeClient: any;
   public code = input<string>('');
 
@@ -31,6 +33,7 @@ export class GoogleLogin implements OnInit {
       debounceTime(300)
     ).subscribe(code => {
       console.log('Received code in ngOnInit: ', code);
+      this.authService.loginWithGoogleAuthorizationCode(code).subscribe();
     });
   }
 
@@ -81,6 +84,7 @@ export class GoogleLogin implements OnInit {
       return;
     }
     console.log('Authorization code:', res.code);
+    this.authService.loginWithGoogleAuthorizationCode(res.code).subscribe();
   }
 
   protected triggerLoginWithGoogle() {

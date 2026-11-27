@@ -19,7 +19,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
     const accessToken = authService.accessToken();
 
-    if (req.url.includes(API_ENDPOINTS.AUTH.LOGIN)) {
+    if (req.url.includes(API_ENDPOINTS.AUTH.LOGIN_WITH_USERNAME_PASSWORD) 
+        || req.url.includes(API_ENDPOINTS.AUTH.LOGIN_WITH_GOOGLE_AUTHORIZATION_CODE) 
+            || req.url.includes(API_ENDPOINTS.AUTH.SIGNUP)) {
         return next(req);
     }
 
